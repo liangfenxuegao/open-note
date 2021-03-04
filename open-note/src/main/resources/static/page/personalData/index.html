@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Jekyll v4.1.1">
+    <title>个人信息</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
+    <link rel="stylesheet" href="../../library/frame/bootstrap-4.4.1-dist/css/bootstrap.min.css">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="personalData.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div id="personalData" class="container">
+        <!--使用CSS的display: none隐藏本按钮。本按钮是用于显示“注册失败提示框”的，不需要显示给用户。-->
+        <button id="activationPromptBox" data-toggle="modal" data-target="#promptBox" style="display: none"></button>
+        <!-- 注册失败提示框 -->
+        <div class="modal fade" id="promptBox" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">提示</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span><!--右上的关闭按钮-->
+                        </button>
+                    </div>
+                    <div class="modal-body"><!--模态框的内容主体-->
+                        {{promptBoxModalBody}}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--TODO 显示个人头像-->
+        <div class="py-5 text-center">
+            <img class="d-block mx-auto mb-4" src="../../source/image/flyBirdLogo-mini.png" alt="头像" width="72" height="72">
+            <h2>个人信息</h2>
+            <p class="lead">
+                查看和管理您的个人信息，及其它设置项。
+            </p>
+        </div>
+
+        <div class="row">
+            <!--资产导航栏-->
+            <div class="col-md-4 order-md-2 mb-4">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">资产</span>
+                    <span class="badge badge-secondary badge-pill">3</span>
+                </h4>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">项目</h6>
+                            <small class="text-muted">由您主管或参与管理的项目</small>
+                        </div>
+                        <span class="text-muted">2个</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0"><a href="../note/index.html">主笔</a></h6>
+                            <small class="text-muted">您主笔撰写的笔记</small>
+                        </div>
+                        <span class="text-muted">56篇</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between bg-light">
+                        <div>
+                            <h6 class="my-0">修改</h6>
+                            <small class="text-muted">您提交过修改的笔记</small>
+                        </div>
+                        <span class="text-muted">573篇</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0"><a href="../member/pricing/index.html">月卡</a></h6>
+                            <small class="text-muted">您的月卡到期日期</small>
+                        </div>
+                        <span class="text-muted">2021.9.23</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>账户余额</span>
+                        <strong>￥20</strong>
+                    </li>
+                </ul>
+                <form class="card p-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="搜索您的项目和笔记">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-secondary">
+                                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+                                    <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-md-8 order-md-1">
+                <h4 class="mb-3">信息</h4>
+                <form class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="firstName">姓</label>
+                            <input type="text" class="form-control" id="firstName" placeholder="" v-model="user.surname">
+                            <div class="invalid-feedback">
+                                格式不正确
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lastName">名</label>
+                            <input type="text" class="form-control" id="lastName" placeholder="" v-model="user.firstName">
+                            <div class="invalid-feedback">
+                                格式不正确
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username">昵称<span id="usernameTips" class="text-danger" style="display: none">(该用户名已被占用)</span></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">@</span>
+                            </div>
+                            <input type="text" class="form-control" id="username" v-model="user.username" required>
+                            <div class="invalid-feedback" style="width: 100%;">
+                                必填
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email">邮箱<span class="text-muted">(暂不支持换绑)</span></label>
+                        <input type="email" class="form-control" id="email" v-model="user.email" required readonly>
+                        <div class="invalid-feedback">
+                            必填
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phoneNumber">手机号</label>
+                        <input type="text" class="form-control" id="phoneNumber" v-model="user.phoneNumber">
+                        <div class="invalid-feedback">
+                            请输入有效的手机号
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address">详细地址</label>
+                        <input type="text" class="form-control" id="address" v-model="user.address">
+                        <div class="invalid-feedback">
+                            请输入有效的地址
+                        </div>
+                    </div>
+
+                    <!--地区-->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="country">国家或地区</label>
+                            <select id="country" class="custom-select d-block w-100" v-model="countryNameByComputed">
+                                <!--
+                                    如果v-model表达式的初始值未能匹配任何选项，select标签将被渲染为“未选中”状态。在iOS中，这会使用户无法选择首个选项。
+                                    因为这样的情况下，iOS不会触发change事件。因此，推荐像下面这样提供一个value=""的disabled选项。
+                                -->
+                                <option disabled value="">请选择...</option>
+                                <!--用v-for动态渲染option，country的值和user.cityDto.countryDto.nameCn是动态绑定的。-->
+                                <option v-for="country in countryList" :value="country">
+                                    {{country}}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">
+                                请选择有效的国家
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="state">省</label>
+                            <select id="state" class="custom-select d-block w-100" v-model="stateNameByComputed">
+                                <option disabled value="">请选择...</option><!--IOS的问题，推荐提供一个value=""的disabled选项。-->
+                                <!--用v-for动态渲染option，state的值和user.cityDto.stateCn是动态绑定的。-->
+                                <option v-for="state in stateList" :value="state">
+                                    {{state}}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">
+                                请选择有效的省
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="city">市</label>
+                            <select id="city" class="custom-select d-block w-100" v-model="cityNameByComputed">
+                                <option disabled value="">请选择...</option><!--IOS的问题，推荐提供一个value=""的disabled选项。-->
+                                <!--用v-for动态渲染option，city的值和user.cityDto.nameCn是动态绑定的。-->
+                                <option v-for="city in cityList" :value="city">
+                                    {{city}}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">
+                                请选择有效的市
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="mb-4">
+
+                    <!--注意单选按钮需要填value属性，否则v-model将不会自动选择按钮，-->
+                    <h4 class="mb-3">性别</h4>
+                    <div class="d-block my-3">
+                        <div class="custom-control custom-radio">
+                            <input id="male" name="male" type="radio" class="custom-control-input" value="男" v-model="user.gender">
+                            <label class="custom-control-label" for="male">男</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input id="female" name="male" type="radio" class="custom-control-input" value="女" v-model="user.gender">
+                            <label class="custom-control-label" for="female">女</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input id="secrecy" name="male" type="radio" class="custom-control-input" value="保密" v-model="user.gender">
+                            <label class="custom-control-label" for="secrecy">保密</label>
+                        </div>
+                    </div>
+
+                    <hr class="mb-4">
+
+                    <h4 class="mb-3">协议</h4>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" checked class="custom-control-input" id="serviceClause">
+                        <label class="custom-control-label" for="serviceClause">
+                            同意开源笔记的服务条款
+                            <span class="text-muted">(必须同意，否则服务将不可用)</span>
+                        </label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" checked class="custom-control-input" id="privacyClause">
+                        <label class="custom-control-label" for="privacyClause">
+                            同意开源笔记的隐私政策
+                            <span class="text-muted">(必须同意，否则服务将不可用)</span>
+                        </label>
+                    </div>
+
+                    <hr class="mb-4">
+
+                    <button class="btn btn-primary btn-lg btn-block" type="button" onclick="vm.updateUser()">提交修改</button>
+                </form>
+            </div>
+        </div>
+
+        <footer class="my-5 pt-5 text-muted text-center text-small">
+            <p class="mb-1">版权所有 &copy; 2020 开源笔记</p>
+            <ul class="list-inline">
+                <li class="list-inline-item"><a href="../clause/openNoteTermsOfService.html">服务条款</a></li>
+                <li class="list-inline-item"><a href="../clause/openNotePolicyPrivacy.html">隐私政策</a></li>
+                <li class="list-inline-item"><a href="#">服务支持</a></li>
+            </ul>
+        </footer>
+    </div>
+
+    <script src="/library/JavaScript/jquery-3.4.0.js"></script>
+    <script src="../../library/frame/bootstrap-4.4.1-dist/js/bootstrap.bundle.js"></script>
+    <script src="/library/JavaScript/vue-2.6.12-development.js"></script>
+    <script src="personalData.js"></script>
+</body>
+</html>

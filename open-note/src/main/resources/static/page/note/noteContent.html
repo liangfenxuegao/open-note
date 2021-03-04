@@ -1,0 +1,51 @@
+<!--本页面要实现查看、编辑、添加笔记的功能-->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>笔记内容</title><!--TODO title应该根据笔记标题变化-->
+
+    <link rel="stylesheet" href="../../library/frame/editorMd/css/editormd.css" />
+    <link rel="stylesheet" href="noteContent.css">
+</head>
+<body>
+    <div id="layout">
+        <header>
+            <h2>使用说明</h2>
+            <ul style="margin: 10px 0 0 18px;">
+                <li>支持解析HTML标签。</li>
+                <li>启用TeX，流程图，序列图，表情符号，FontAwesome，任务列表。</li>
+                <li>启用搜索替换，代码折叠。</li>
+            </ul>
+        </header>
+        <div class="btns">
+            <button id="get-html-btn">得到HTML源文件</button>
+            <button id="watch-btn">预览</button>
+            <button id="unwatch-btn">关闭预览</button>
+            <button id="preview-btn">阅览模式</button>
+            <button id="show-toolbar-btn">显示工具栏</button>
+            <button id="close-toolbar-btn">隐藏工具栏</button>
+        </div>
+
+        <!--标题和描述及上传按钮。默认不显示，noteId为0时才显示。-->
+        <div id="uploadAssembly" class="btns" style="display: none">
+            <h2>上传笔记</h2>
+            <ul style="margin: 10px 0 0 18px;">
+                <li>必须要填写标题后才能上传文章</li>
+            </ul>
+            <form action="" method="POST">
+                <label for="title"></label><input id="title" name="title" type="text" placeholder="标题" required>
+                <label for="describe"></label><input id="describe" name="describe" class="long-text" type="text" placeholder="描述">
+                <button id="upload-note" type="button" onclick="uploadNote()">上传</button>
+            </form>
+        </div>
+
+        <div id="test-editormd"></div>
+    </div>
+
+    <script src="../../library/JavaScript/jquery-3.5.1.min.js"></script>
+    <script src="../../library/frame/editorMd/editormd.min.js"></script>
+    <script src="noteContent.js"></script>
+</body>
+</html>

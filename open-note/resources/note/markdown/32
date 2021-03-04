@@ -1,0 +1,44 @@
+# 规范
+
+## key命名
+
+参考文章：
+
+- https://www.cnblogs.com/joshua317/p/11995197.html
+- https://blog.csdn.net/u013521220/article/details/107640977
+
+### 命名空间
+
+使用冒号分隔即可实现命名空间分组。如果连用两个冒号，相当于之间有个无名的命令空间。
+
+一般情况下，命名空间有四段：
+
+1. 业务模块名。
+2. 业务逻辑含义。
+3. 其它。
+4. value类型。
+
+例如：`openNote:user:id:2`。
+
+## 业务规范
+
+### 强制规范
+
+1. 使用Redis进行缓存时，必须进行申请。申请之前，需要拿出使用的合理方案，然后进行评估，避免随意使用。
+2. Redis应用场景应该是纯缓存服务，功能主要是缓存数据，缓存数据可丢失，除特殊需求外，需提供可行性、可实施的方案。
+3. Redis key一定要设置过期时间。要跟自己的业务场景，需要对key设置合理的过期时间。可以在写入key时，就要追加过期时间；也可以在需要写入另一个key时，删除上一个key。
+4. Redis一定不可使用Keys正则匹配操作。
+5. 不要使用过长的key。
+6. String类型控制在10KB以内，Hash、List、Set、ZSet的元素个数不要超过5000。
+7. 目前Redis支持的数据库结构类型较多：字符串（String），哈希（Hash），列表（List），集合（Set），有序集合（Sorted Set）, Bitmap, HyperLogLog和地理空间索引（geospatial）等,需要根据业务场景选择合适的类型。在不能确定其它复杂数据结构⼀定优于String类型时，避免使用Redis的复杂数据结构。
+
+# 方法
+
+## opsForValue
+
+### set(K key, V value, long timeout, TimeUnit unit)
+
+- key：键。
+- value：值。
+- timeout：超时时间。
+- unit：时间单位，TimeUnit类提供了非常多的时间单位，例如秒、分、时等。

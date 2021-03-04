@@ -1,0 +1,5477 @@
+# 开源笔记-许可
+
+**版本：1.1**
+
+**发布于2020年4月**
+
+**使用、复制和分发的子条款：**
+
+*注释：你可以为作品添加子条款。详见父条款第四条。*
+
+**使用、复制和分发的父条款：**
+
+1. 根据本许可的条款和条件，每位贡献者在此授予您永久、全世界、非排他性、免费、免版税、不可撤销的版权许可，用以复制、衍生、公开展示、公开表演、转授许可证，并以源形式或目标形式分发作品和此类衍生作品。
+2. 使用、复制和分发开源笔记许可发行的作品时，必须携带开源笔记许可。允许为链接方式携带。
+3. 一旦您在商业性质作品中使用了开源笔记许可发行的作品，您必须表示感谢，尤其是对该作品主要贡献者的感谢。当开源笔记许可发行的作品为你产生良好效益时，鼓励您为用到的作品贡献者们、开源笔记组织捐赠，但这绝非强制性的。
+4. 您可以为作品添加子许可条款，且子条款必须写在父条款前。注意您不可修改父条款，否则本许可自动作废，您将不能使用任何由开源笔记许可发行的作品。子条款不可与父条款冲突。
+5. 您可在非约束条文中添加作品贡献者、备注、使用说明书、引用资料等文本，但不可出现以开源笔记许可为名义的约束性条款，它们不属于开源笔记许可，开源笔记许可不对这些内容负责，对于属于开源笔记的约束条款应当写在子条款区。
+6. 当您使用了其它许发行的作品，请确保其对其它许可，尤其是对本许可友好，不与本许可条款冲突。加入的许可不应当是污染性的，例如GPL。不满足上述条件时您不应当加入其它许可，或不对使用到这类许可的作品附上开源笔记许可。
+
+**非约束条文：**
+
+*注释：你可以为作品添加非约束条文。详见父条款第五条。*
+
+1. 本笔记依据尚硅谷的《尚硅谷SpringBoot整合教程(springboot框架实战)》由两份雪糕创建首版，版号1.0.0。该教程在哔哩哔哩的视频连接：https://www.bilibili.com/video/BV1KW411F7oX
+
+2. 建议学习前有SpringBoot基础。
+
+3. 本笔记的开发环境：IntelliJ IDEA工具，Windows10系统。
+
+4. 本文复制了部分使用Apache2.0许可的内容，特将许可列于此：
+
+   ```
+   Copyright 2002-2015 the original author or authors.
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+        https://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+   ```
+   
+5. 部分复制于其它位置的资料若没有在正文给出连接，则是在本文最后的“参考文献”中贴出。
+
+# 一、缓存
+
+## 1.1 JSR107简介
+
+Java Caching定义了五个核心接口，分别是CachingProvider、CacheManager、Cache、Entry、Expiry。
+
+- CachingProvider定义了创建、配置、获取、管理和控制多个CacheManager。应用可在运行期间访问多个CachingProvider。
+- CacheManger定义了创建、配置、获取、管理和控制多个唯一命名的Cache，这些Cache村子啊与CacheManager的上下文中。一个CacheManager仅被一个CachingProvider所拥有。
+- Cache是类似于Map的数据结构并临时储存以Key为索引的值。一个Cache仅被一个CacheManager所拥有。
+- Entry是储存在Cache中的键值对。
+- Expiry每个储存在Cache中的条目都有有效期，超出该时间将为过期状态。过期后条目将不可访问、更新和删除。缓存有效期可通过ExpiryPolicy设置。
+
+图示：
+
+<img src="SpringBootAdvanced.assets\image-20200324215126551.png" alt="image-20200324215126551" style="zoom: 67%;" />
+
+要使用JSP107需要导入javax.cache.cache-api包。
+
+## 1.2 Spring缓存抽象简介
+
+Spring从3.1开始定义了org.springframework.cache.Cache和org.springframework.cache.CacheManager接口来统一不同的缓存技术，并支持使用JCache（JSR-107）注解来简化开发。
+
+- Cache接口为缓存的组件规范定义，包含缓存的各种操作集合。
+- Cache接口下Spring提供了各种xxxCache的实现，如RedisCache、EhCacheCache、ConcurrentMapCache等。
+- 每次调用需要缓存功能的方法时，Spring会检查参数指定的目标方法是否已经被调用过，如果有就直接从缓存中获取方法调用后的结果，如果没有就调用方法并缓存结果后返回给用户，再下次调用又直接从缓存中获取。
+- 使用Spring缓存抽象时我们需要关注以下两点。
+  - 确定方法需要被缓存以及他们的缓存策略。
+  - 从缓存中读取之前缓存存储的数据。
+
+几个重要概念和缓存注解：
+
+| 概念           | 描述                                                         |
+| -------------- | ------------------------------------------------------------ |
+| Cache          | 缓存接口，定义缓存操作。实现有：RedisCache、EhCacheCache、ConcurrentMapCache等。 |
+| CacheManager   | 缓存管理器，管理各种缓存（Cache）组件。                      |
+| @Cacheable     | 主要针对方法配置，能够根据方法的请求参数对其结果进行缓存。   |
+| @CacheEvic     | 清空缓存。                                                   |
+| @CachePut      | 保证方法被调用，又希望结果被缓存。                           |
+| @EnableCaching | 开启基于注解的缓存。                                         |
+| keyGenerator   | 缓存数据时key生成策略                                        |
+| serialize      | 缓存数据时value序列化策略                                    |
+
+图示：
+
+![image-20200326205217800](SpringBootAdvanced.assets\image-20200326205217800.png)
+
+## 1.3 基本环境搭建
+
+**创建个新项目：**
+
+![image-20200326155324087](SpringBootAdvanced.assets\image-20200326155324087.png)
+
+**选择需要的场景：**
+
+<img src="SpringBootAdvanced.assets\image-20200326155834576.png" alt="image-20200326155834576" style="zoom:80%;" />
+
+**生成department和employee两张表：**
+
+运行下面的.sql文件，会在数据库中生成department和employee两张表：
+
+```mysql
+/*
+Target Server Type    : MYSQL
+Target Server Version : 50528
+File Encoding         : 65001
+
+Date: 2018-04-27 14:54:04
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for department
+-- ----------------------------
+DROP TABLE IF EXISTS `department`;
+CREATE TABLE `department` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `departmentName` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for employee
+-- ----------------------------
+DROP TABLE IF EXISTS `employee`;
+CREATE TABLE `employee` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lastName` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `gender` int(2) DEFAULT NULL,
+  `d_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+并向employee表添加数据(d_id暂时不填)：
+
+![image-20200326185708809](SpringBootAdvanced.assets\image-20200326185708809.png)
+
+**创建JavaBean封装数据：**
+
+```java
+package xuegao.learnSpringBoot.cache.bean;
+
+public class Department {
+	
+	private Integer id;
+	private String departmentName;
+	
+	public Department() {
+		super();
+	}
+
+	public Department(Integer id, String departmentName) {
+		super();
+		this.id = id;
+		this.departmentName = departmentName;
+	}
+
+	@Override
+	public String toString() {
+		return "Department [id=" + id + ", departmentName=" + departmentName + "]";
+	}
+
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getDepartmentName() {
+		return departmentName;
+	}
+	public void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
+	}
+}
+```
+
+```java
+package xuegao.learnSpringBoot.cache.bean;
+
+public class Employee {
+   
+   private Integer id;
+   private String lastName;
+   private String email;
+   private Integer gender; //性别 1男  0女
+   private Integer dId;
+
+   public Employee() {
+      super();
+   }
+
+   public Employee(Integer id, String lastName, String email, Integer gender, Integer dId) {
+      super();
+      this.id = id;
+      this.lastName = lastName;
+      this.email = email;
+      this.gender = gender;
+      this.dId = dId;
+   }
+
+   @Override
+   public String toString() {
+      return "Employee [id=" + id + ", lastName=" + lastName + ", email=" + email + ", gender=" + gender + ", dId="
+            + dId + "]";
+   }
+
+   public Integer getId() {
+      return id;
+   }
+   public void setId(Integer id) {
+      this.id = id;
+   }
+   public String getLastName() {
+      return lastName;
+   }
+   public void setLastName(String lastName) {
+      this.lastName = lastName;
+   }
+   public String getEmail() {
+      return email;
+   }
+   public void setEmail(String email) {
+      this.email = email;
+   }
+   public Integer getGender() {
+      return gender;
+   }
+   public void setGender(Integer gender) {
+      this.gender = gender;
+   }
+   public Integer getdId() {
+      return dId;
+   }
+   public void setdId(Integer dId) {
+      this.dId = dId;
+   }
+}
+```
+
+**整合MyBatis来操作数据库：**
+
+配置数据源信息（在SpringBoot Profile中配置）：
+
+```properties
+#配置数据库连接信息
+    spring.datasource.url=jdbc:mysql://localhost:3306/spring_cache?serverTimezone=UTC
+    spring.datasource.username=root
+    spring.datasource.password=523142
+    #driver-class-name可省略不写，会根据url自动判断需要的驱动
+        #spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+```
+
+创建Employee和Department的Mapper接口：
+
+```java
+package xuegao.learnSpringBoot.cache.mapper;
+
+import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
+import xuegao.learnSpringBoot.cache.bean.Employee;
+
+//已在主配置类中用@MapperScan将接口扫描到容器中
+@Repository("employeeMapper")
+public interface EmployeeMapper {
+
+    @Select("SELECT * FROM employee WHERE id=#{id}")
+    public Employee getEmployeeById(Integer id);
+
+    @Update("UPDATE employee SET lastName=#{lastName},email=#{email},gender=#{gender},d_id=#{dId} WHERE id=#{id}")
+    public void updateEmployee(Employee employee);
+
+    @Options(useGeneratedKeys = true,keyProperty = "id")//取出自增主键，并绑定到到employee.id
+    @Insert("INSERT INTO employee(lastName,email,gender,d_id) VALUES (#{lastName},#{email},#{gender},#{dId})")//由于数据库中将employee表中的id设为自增，所以无需提供id值
+    public void insertEmployee(Employee employee);
+
+    @Delete("DELETE FROM employee WHERE id=#{id}")
+    public void deleteEmployeeById(Integer id);
+}
+```
+
+```java
+package xuegao.learnSpringBoot.cache.mapper;
+
+import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
+import xuegao.learnSpringBoot.cache.bean.Department;
+
+@Repository("departmentMapper")
+public interface DepartmentMapper {
+    @Select("select * from department where id=#{id}")
+    public Department getDepartmentById(Integer id);
+
+    @Delete("delete from department where id=#{id}")
+    public void deleteDepartmentById(Integer id);
+
+    @Options(useGeneratedKeys = true,keyProperty = "id")//取出自增主键，并绑定到到Department.id
+    @Insert("insert into department(departmentName) values(#{departmentName})")//由于数据库中将department表中的id设为自增，所以只需提供部门名
+    public void insertDepartment(Department department);
+
+    @Update("update department set departmentName=#{departmentName} where id=#{id}")
+    public void updateDepartment(Department department);
+}
+```
+
+使用@MapperScan指定需要扫描的Mapper接口所在的包（标注于主配置类）：
+
+```java
+@MapperScan(value = {"xuegao.learnSpringBoot.cache.mapper"})
+@SpringBootApplication
+public class CacheApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(CacheApplication.class, args);
+    }
+}
+```
+
+测试下EmployeeMapper接口的getEmployeeById方法(在单元测试中)：
+
+```java
+package xuegao.learnSpringBoot.cache;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import xuegao.learnSpringBoot.cache.bean.Employee;
+import xuegao.learnSpringBoot.cache.mapper.EmployeeMapper;
+
+import javax.annotation.Resource;
+
+@SpringBootTest
+class CacheApplicationTests {
+    @Resource(name = "employeeMapper")
+    EmployeeMapper employeeMapper;
+
+    @Test
+    void contextLoads() {
+        Employee employee = employeeMapper.getEmployeeById(1);
+        System.out.println(employee);
+    }
+
+}
+```
+
+控制台输出：
+
+![image-20200326195913176](SpringBootAdvanced.assets\image-20200326195913176.png)
+
+创建EmployeeService：
+
+```java
+package xuegao.learnSpringBoot.cache.service;
+
+import org.springframework.stereotype.Service;
+import xuegao.learnSpringBoot.cache.bean.Employee;
+import xuegao.learnSpringBoot.cache.mapper.EmployeeMapper;
+
+import javax.annotation.Resource;
+
+@Service("employeeService")
+public class EmployeeService {
+    @Resource(name = "employeeMapper")
+    EmployeeMapper employeeMapper;
+
+    public Employee getEmployee(Integer id){
+        Employee employee = employeeMapper.getEmployeeById(id);
+        System.out.println("编号为"+id+"的员工信息为："+employee);
+        return employee;
+    }
+
+}
+```
+
+创建EmployeeController：
+
+```java
+package xuegao.learnSpringBoot.cache.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+import xuegao.learnSpringBoot.cache.bean.Employee;
+import xuegao.learnSpringBoot.cache.service.EmployeeService;
+
+import javax.annotation.Resource;
+
+@RestController
+public class EmployeeController {
+    @Resource(name = "employeeService")
+    EmployeeService employeeService;
+
+    @GetMapping("employee/{id}")
+    public Employee getEmployee(@PathVariable("id") Integer id){
+        return employeeService.getEmployee(id);
+    }
+}
+```
+
+向employee表添加2号员工，注意添加了d_id的值：
+
+![image-20200326200437857](SpringBootAdvanced.assets\image-20200326200437857.png)
+
+启动项目，查询2号员工：
+
+![image-20200326200745536](SpringBootAdvanced.assets\image-20200326200745536.png)
+
+会发现dId的值为null，怎么回事呢？观察数据库中employee时可以发现,该表没有dId，而是d_id，所以映射不到Employee模型中。所以去SpringBoot全局配置文件中开启MyBatis的全局驼峰命名映射：
+
+```properties
+#开启MyBatis的全局驼峰命名映射
+mybatis.configuration.map-underscore-to-camel-case=true
+```
+
+重新编译项目，刷新页面dId就有值啦：
+
+![image-20200326201909532](SpringBootAdvanced.assets\image-20200326201909532.png)
+
+## 1.4 @Cacheable初体验
+
+未使用缓存时每次发起查询都要再次发送SQL命令，可以开启日志查看一下（在application.properties中）：
+
+```properties
+#开启xuegao.learnSpringBoot.cache.mapper下的日志
+logging.level.xuegao.learnSpringBoot.cache.mapper=debug
+```
+
+重新编译项目，然后多刷新几次浏览器页面（相当于多次发送查询请求），查看控制台信息，可以看到确实多次发送了SQL语句：
+
+![image-20200326233023447](SpringBootAdvanced.assets\image-20200326233023447.png)
+
+在主配置类上标注@EnableCaching能开启基于注解的缓存机制：
+
+```java
+@EnableCaching//开启基于注解的缓存机制
+@MapperScan(value = {"xuegao.learnSpringBoot.cache.mapper"})
+@SpringBootApplication
+public class CacheApplication {
+```
+
+使用@Cacheable注解的方法，其运行结果将被缓存：
+
+```java
+@Service("employeeService")
+public class EmployeeService {
+
+    @Resource(name = "employeeMapper")
+    EmployeeMapper employeeMapper;
+
+    /*
+    @Cacheable用于将方法的运行结果缓存之。
+    CacheManager管理多个Cache组件，对缓存真正的增删改查操作在Cache中，每个缓存组件都有自己唯一的名字。
+    @Cacheable下的属性：
+        cacheNames或value：指定缓存组件的名称，可以指定多个。
+        key：
+            缓存数据会对应生成key，默认为方法所有参数值进行组合，
+            例如下面方法中传入id=1的话，key就为1。key支持SpEL表达式编写。
+            另外#id、#a0、#p0、#root.args[0]都会取到同个值。
+        keyGenerator：key生成器，可以自行指定key生成器的组件id。和key是二选一的关系。
+        cacheManager：指定缓存管理器。
+        cacheResolver：指定获取解析器。和cacheManager是二选一的关系。
+        condition：满足条件时会缓存。
+        unless：满足条件时不缓存。SpEL式"result == null"表示方法执行后的返回值为空时不缓存结果。
+        sync：是否使用异步模式。要注意的是启用异步模式后将不支持unless属性。
+    */
+    //@Cacheable(cacheNames = {"employee","temp"},key = "#id",condition = "#id>0",unless = "#result == null")
+    @Cacheable(cacheNames = {"employee"},keyGenerator = "myKeyGenerator")
+    public Employee getEmployee(Integer id){
+        Employee employee = employeeMapper.getEmployeeById(id);
+        System.out.println("编号为"+id+"的员工信息为："+employee);
+        return employee;
+    }
+}
+```
+
+重新启动项目，发送查询员工信息请求，多刷新几次：
+
+![image-20200327193047737](SpringBootAdvanced.assets\image-20200327193047737.png)
+
+会发现控制台只打印了一次SQL查询语句，说明缓存成功：
+
+![image-20200327193217247](SpringBootAdvanced.assets\image-20200327193217247.png)
+
+@Cacheable、@CachePut、@CacheEvict 的主要参数：
+
+| 参数                              | 描述                                                         | 示例                                                         |
+| --------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| value                             | 缓存的名称，在 spring  配置文件中定义，至少指定一个          | 例如：     @Cacheable(value=”mycache”) 或者      @Cacheable(value={”cache1”,”cache2”} |
+| key                               | 缓存的  key，可以为空，如果指定要按照  SpEL 表达式编写，如果不指定，则默认按照方法的所有参数进行组合 | 例如： @Cacheable(value=”testcache”,key=”#userName”)         |
+| condition                         | 缓存的条件，可以为空，使用  SpEL 编写，返回  true 或者 false，只有为  true 才进行缓存/清除缓存，在调用方法之前之后都能判断 | 例如：     @Cacheable(value=”testcache”, condition=”#userName.length()>2”) |
+| allEntries  (@CacheEvict  )       | 是否清空所有缓存内容，缺省为  false，如果指定为 true，则方法调用后将立即清空所有缓存 | 例如： @CachEvict(value=”testcache”,allEntries=true)         |
+| beforeInvocation  (@CacheEvict)   | 是否在方法执行前就清空，缺省为  false，如果指定为 true，则在方法还没有执行的时候就清空缓存，缺省情况下，如果方法执行抛出异常，则不会清空缓存 | 例如：@CachEvict(value=”testcache”，beforeInvocation=true)   |
+| unless  (@CachePut)  (@Cacheable) | 用于否决缓存的，不像condition，该表达式只在方法执行之后判断，此时可以拿到返回值result进行判断。条件为true不会缓存，fasle才缓存 | 例如： @Cacheable(value=”testcache”,unless=”#result  == null”) |
+
+Cache SpEL available metadata（缓存SpEL可用元数据）：
+
+| **名字**      | **位置**           | **描述**                                                     | **示例**             |
+| ------------- | ------------------ | :----------------------------------------------------------- | -------------------- |
+| methodName    | root object        | 当前被调用的方法名                                           | #root.methodName     |
+| method        | root object        | 当前被调用的方法                                             | #root.method.name    |
+| target        | root object        | 当前被调用的目标对象                                         | #root.target         |
+| targetClass   | root object        | 当前被调用的目标对象类                                       | #root.targetClass    |
+| args          | root object        | 当前被调用的方法的参数列表                                   | #root.args[0]        |
+| caches        | root object        | 当前方法调用使用的缓存列表（如@Cacheable(value={"cache1",  "cache2"})），则有两个cache | #root.caches[0].name |
+| argument name | evaluation context | 方法参数的名字. 可以直接 #参数名 ，也可以使用 #p0或#a0 的形式，0代表参数的索引； | #iban 、 #a0 、 #p0  |
+| result        | evaluation context | 方法执行后的返回值（仅当方法执行之后的判断有效，如‘unless’，’cache put’的表达式 ’cache evict’的表达式beforeInvocation=false） | #result              |
+
+## 1.5 缓存工作原理和@Cacheable运行流程
+
+**缓存工作原理：**
+
+1. 自动配置类：org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration。
+
+2. 缓存的配置类：
+
+   ```
+   org.springframework.boot.autoconfigure.cache.GenericCacheConfiguration
+   org.springframework.boot.autoconfigure.cache.JCacheCacheConfiguration
+   org.springframework.boot.autoconfigure.cache.EhCacheCacheConfiguration
+   org.springframework.boot.autoconfigure.cache.HazelcastCacheConfiguration
+   org.springframework.boot.autoconfigure.cache.InfinispanCacheConfiguration
+   org.springframework.boot.autoconfigure.cache.CouchbaseCacheConfiguration
+   org.springframework.boot.autoconfigure.cache.RedisCacheConfiguration
+   org.springframework.boot.autoconfigure.cache.CaffeineCacheConfiguration
+   org.springframework.boot.autoconfigure.cache.SimpleCacheConfiguration
+   org.springframework.boot.autoconfigure.cache.NoOpCacheConfiguration
+   ```
+
+3. 默认生效的配置类：
+
+   在application.properties中添加该配置：
+
+   ```properties
+   #开启全局debug级日志
+   debug=true
+   ```
+
+   在Console中能找到只有SimpleCacheConfiguration生效。查看该类构成：
+
+   ```java
+   /**
+    * Simplest cache configuration, usually used as a fallback.
+    *
+    * @author Stephane Nicoll
+    */
+   @Configuration(proxyBeanMethods = false)
+   @ConditionalOnMissingBean(CacheManager.class)
+   @Conditional(CacheCondition.class)
+   class SimpleCacheConfiguration {
+   
+       //向容器注册了个ConcurrentMapCacheManager类的CacheManager
+   	@Bean
+   	ConcurrentMapCacheManager cacheManager(CacheProperties cacheProperties,
+   			CacheManagerCustomizers cacheManagerCustomizers) {
+   		ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager();
+   		List<String> cacheNames = cacheProperties.getCacheNames();
+   		if (!cacheNames.isEmpty()) {
+   			cacheManager.setCacheNames(cacheNames);
+   		}
+   		return cacheManagerCustomizers.customize(cacheManager);
+   	}
+   
+   }
+   ```
+
+4. 向向容器注册了个ConcurrentMapCacheManager类的CacheManager。
+
+5. 可以获取和创建ConcurrentMapCache类的缓存组件 。它的作用是将数据保存在ConcurrentMap中。
+
+**运行流程：**
+
+1. 方法运行之前先去查询Cache（缓存组件），按照cahceNames指定的名称获取（CacheManager先获取相应的缓存）。首次获取缓存若没有Cache组件则会自动创建Cache。
+
+2. 使用key去Cache查找对应的缓存内容，默认为方法的参数值。key有生成策略，默认使用keyGenerator生成（默认由SimpleKeyGenerator类实现）。
+
+   ![image-20200327221537765](SpringBootAdvanced.assets\image-20200327221537765.png)
+
+   SimpleKeyGenerator默认的key生成策略：
+
+   - 无参数时key = new SimpleKey()
+   - 单参数时key = 参数值
+   - 多参数时key = new SimpleKey(params)
+
+3. 没有查到相应缓存数据时将调用目标方法，也就是发出SQL查询命令。
+
+4. 将查询到的结果放进缓存里。下图是org.springframework.cache.concurrent.ConcurrentMapCache类里的方法：
+
+   ![image-20200327222454873](SpringBootAdvanced.assets\image-20200327222454873.png)
+
+5. 总结一下就是被@Cacheable标注的方法，在执行之前会先检查缓存中有没有对应的数据，默认将方法的参数值做为key去查询，若无数据就将运行查询方法并将结果放入缓存，以后再次查询该key就直接使用缓存中对应的数据。
+
+## 1.6 @Cacheable其它属性
+
+keyGenerator：key生成器，可以自行指定key生成器的组件id。和key是二选一的关系。
+
+下面创建Cache配置类来手写key生成器：
+
+```java
+package xuegao.learnSpringBoot.cache.config;
+
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
+@Configuration
+public class MyCacheConfig {
+
+    @Bean("myKeyGenerator")//添加到IOC容器并命名为myKeyGenerator，不写时默认为方法名
+    public KeyGenerator keyGenerator(){
+        return new KeyGenerator(){
+            @Override
+            public Object generate(Object target, Method method, Object... params) {
+                //自定义拼串规则
+                return method.getName()+Arrays.asList(params).toString();
+            }
+        };
+    }
+}
+```
+
+在需要缓存的方法上使用@Cacheable的keyGenerator属性指定使用myKeyGenerator：
+
+```java
+@Cacheable(cacheNames = {"employee"},keyGenerator = "myKeyGenerator")
+public Employee getEmployee(Integer id){
+    Employee employee = employeeMapper.getEmployeeById(id);
+    System.out.println("编号为"+id+"的员工信息为："+employee);
+    return employee;
+}
+```
+
+通过Debug可以发现拼串成功：
+
+![image-20200328212410747](SpringBootAdvanced.assets\image-20200328212410747.png)
+
+## 1.7 @CachePut
+
+在EmployeeService类下创建updateEmployee方法：
+
+```java
+/*
+@CachePut：保证方法被调用，又希望结果被缓存。
+@CachePut运行机制：先调用目标方法，再将目标方法的结果缓存。
+@CachePut下的属性：
+    cacheNames或value：这里设为employee，即和前面的getEmployee方法共享缓存。
+*/
+@CachePut(cacheNames = {"employee"})
+public Employee updateEmployee(Employee employee){
+    employeeMapper.updateEmployee(employee);
+    System.out.println("更新的员工信息为："+employee);
+    return employee;
+}
+```
+
+在EmployeeController类下创建updateEmployee方法：
+
+```java
+@PostMapping("employeeUpdate")
+public Employee updateEmployee(Employee employee){
+    return employeeService.updateEmployee(employee);
+}
+```
+
+在src/main/resources/static目录下创建index.html：
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+<body>
+    <form method="post" action="/employeeUpdate">
+        编号：<input name="id" type="number"><br>
+        姓氏：<input name="lastName" type="text"><br>
+        邮箱：<input name="email" type="email"><br>
+        性别：<input name="gender" type="number"><br>
+        部门：<input name="dId" type="number"><br>
+        <input type="submit" value="提交">
+    </form>
+</body>
+</html>
+```
+
+这时候可以测试一下，先查询employee id = 3的情况，显然此时id = 3的对应数据就缓存了，多刷新几次也不会再次发送SQL查询语句：
+
+![image-20200329001628985](SpringBootAdvanced.assets\image-20200329001628985.png)
+
+那么此时更新三号员工：
+
+![image-20200329001955208](SpringBootAdvanced.assets\image-20200329001955208.png)
+
+再查询employee id = 3的情况时，发现情况不对了，怎么还是之前缓存的数据？
+
+==原因在于key，数据是通过键值对的方式存入缓存的，而目前getEmployee和updateEmployee使用的key是不一样的，当然互相不受影响。==目前updateEmployee方法缓存的key为employee对象，值也是employee对象。而getEmployee方法上节设为了keyGenerator = "myKeyGenerator"，也就是由myKeyGenerator来生成key。
+
+所以要使两者的key相等：
+
+```java
+@Cacheable(cacheNames = {"employee"},key = "#id")
+public Employee getEmployee(Integer id){
+    Employee employee = employeeMapper.getEmployeeById(id);
+    System.out.println("编号为"+id+"的员工信息为："+employee);
+    return employee;
+}
+
+/*
+key：
+	为了和getEmployee使用同个key，可用#employee.id（从入参中取值）、
+    #result.id（从返回值中取，@Cacheable注解不适用，因为其在方法调用之前就要用key在缓存中查数据）
+*/
+@CachePut(cacheNames = {"employee"},key = "#employee.id")
+public Employee updateEmployee(Employee employee){
+    employeeMapper.updateEmployee(employee);
+    System.out.println("更新的员工信息为："+employee);
+    return employee;
+}
+```
+
+然后重启项目，查询三号员工，更新三号员工，再查询三号员工，应当会使用更新后的缓存，并且再查询时无需发送SQL语句，而是直接从缓存取值。
+
+## 1.8 @CacheEvict
+
+在EmployeeService类中添加deleteEmployee方法，这里只测试其清除缓存的能力，所以并不实际删除数据库里的相应数据：
+
+```java
+/*
+@CacheEvict：清除缓存
+*/
+@CacheEvict(cacheNames = {"employee"},key = "#id")
+public void deleteEmployee(Integer id){
+    System.out.println("清除了"+id+"号员工的缓存");
+    //employeeMapper.deleteEmployeeById(id);
+}
+```
+
+在EmployeeController类中调用该方法：
+
+```java
+@PostMapping("deleteEmployee")
+public String deleteEmployee(@RequestParam("id") Integer id){
+    employeeService.deleteEmployee(id);
+    return "删除成功";
+}
+```
+
+为index.html添加该表单：
+
+```html
+<h2>删除指定员工：</h2>
+<form method="post" action="/deleteEmployee">
+    编号：<input name="id" type="number">
+    <input type="submit" value="删除">
+</form>
+```
+
+重启项目，先查询三号员工的数据：
+
+![image-20200329202847375](SpringBootAdvanced.assets\image-20200329202847375.png)
+
+查看控制台，能看到发出了SQL语句：
+
+![image-20200329202933105](SpringBootAdvanced.assets\image-20200329202933105.png)
+
+再次查询时应当不会再次发出SQL语句，那么来到首页清除三号的员工的缓存：
+
+![image-20200329203048834](SpringBootAdvanced.assets\image-20200329203048834.png)
+
+然后再查询三号员工信息，看控制台输出，显然再次发送了查询语句，所以缓存清除成功：
+
+![image-20200329203154682](SpringBootAdvanced.assets\image-20200329203154682.png)
+
+上面是清除指定key的缓存，而@CacheEvict有个名为allEntries的属性，其默认为false，为true时清除cacheNames属性指定的缓存组件的所有条目。那么在EmployeeService类的deleteEmployee方法上，将@CacheEvict的allEntries属性设为true：
+
+```java
+@CacheEvict(cacheNames = {"employee"},allEntries = true)
+public void deleteEmployee(Integer id){
+    System.out.println("清除了"+id+"号员工的缓存");
+    //employeeMapper.deleteEmployeeById(id);
+}
+```
+
+理论上这样会清除employee缓存组件的所有数据，所以下面先查3、4号员工：
+
+![image-20200329220029366](SpringBootAdvanced.assets\image-20200329220029366.png)
+
+然后再删除三号员工（实际上清除了所有员工缓存）：
+
+![image-20200329220057939](SpringBootAdvanced.assets\image-20200329220057939.png)
+
+再查询四号员工，发现SQL语句再次发送，allEntries测试成功：
+
+![image-20200329220224789](SpringBootAdvanced.assets\image-20200329220224789.png)
+
+最后来讲下@CacheEvict的beforeInvocation属性，为true时在方法执行前清除缓存，默认为false，即方法执行之后清除缓存。设为true的好处是当方法体出错时，依然能完成清除缓存的任务。
+
+```java
+@CacheEvict(cacheNames = {"employee"},key = "#id",beforeInvocation = true)
+```
+
+## 1.9 @Caching和@CacheConfig
+
+先去xuegao.learnSpringBoot.cache.mapper.EmployeeMapper定义getEmployeeByLastName方法：
+
+```java
+@Select("SELECT * FROM employee WHERE lastName = #{lastName}")
+Employee getEmployeeByLastName(String lastName);
+```
+
+在xuegao.learnSpringBoot.cache.service.EmployeeService中添加getEmployeeByLastName方法：
+
+```java
+/*@Caching可以同时使用多类注解，包括@Cacheable、@CachePut、@CacheEvict*/
+@Caching(
+        cacheable = {
+                @Cacheable(cacheNames = {"employee"},key = "#lastName")
+        },
+        put = {
+                @CachePut(cacheNames = {"employee"},key = "#result.id"),
+                @CachePut(cacheNames = {"employee"},key = "#result.email")
+        }
+)
+public Employee getEmployeeByLastName(String lastName){
+    return employeeMapper.getEmployeeByLastName(lastName);
+}
+```
+
+从org.springframework.cache.annotation.Caching源码可以看出这是个组合注解：
+
+```java
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+public @interface Caching {
+   Cacheable[] cacheable() default {};
+   CachePut[] put() default {};
+   CacheEvict[] evict() default {};
+}
+```
+
+在xuegao.learnSpringBoot.cache.controller.EmployeeController中创建getEmployeeByLastName方法：
+
+```java
+@GetMapping("getEmployeeByLastName")
+public Employee getEmployeeByLastName(@RequestParam("lastName") String lastName){
+    return employeeService.getEmployeeByLastName(lastName);
+}
+```
+
+启动项目，使用姓氏查询对应员工信息：
+
+![image-20200331211007392](SpringBootAdvanced.assets\image-20200331211007392.png)
+
+此时可以测试用id查询员工信息，看看对应员工的数据是否被缓存：
+
+```
+http://localhost:8080/employee/4
+```
+
+结果应该是会被缓存，不再发送SQL语句。但使用getEmployeeByLastName去查的话依然要发送SQL语句，因为其使用了@CachePut注解。
+
+本节及前面几节中大量使用了cacheNames = {"employee"}属性，其实不必为每个标签添加该注解，使用@CacheConfig可以解决该问题，该注解有如下属性：
+
+```java
+package org.springframework.cache.annotation;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface CacheConfig {
+   String[] cacheNames() default {};
+   String keyGenerator() default "";
+   String cacheManager() default "";
+   String cacheResolver() default "";
+}
+```
+
+为EmployeeService打上注解，配置@CacheConfig的cacheNames属性后，方法上的注解就不用逐一配置cacheNames属性了：
+
+```java
+/*
+* @CacheConfig：
+*   @CacheConfig会抽取缓存的公共配置，所以可以通过它对整个类下的Cache类注解进行属性配置。
+*   例如这里使用cacheNames就能对@Cacheable、@CachePut、@CacheEvict里的cacheNames进行统一配置。
+* */
+@CacheConfig(cacheNames = "employee")
+@Service("employeeService")
+public class EmployeeService {
+```
+
+然后重新测试各个方法，看看缓存工作是否正常即可。
+
+## 1.10 搭建Redis环境及测试
+
+SpringBoot默认使用的是ConcurrentMapCacheManager创建ConcurrentMapCache，而ConcurrentMapCache将数据保存在ConcurrentMap<Object, Object>类型的空间中。
+
+实际开发中往往使用缓存中间件，例如redis、memcached、ehcache。
+
+**Redis简介：**
+
+REmote DIctionary Server(Redis) 是一个由Salvatore Sanfilippo写的key-value存储系统。
+
+Redis是一个开源的使用ANSI C语言编写、遵守BSD协议、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。
+
+它通常被称为数据结构服务器，因为值（value）可以是 字符串(String), 哈希(Hash), 列表(list), 集合(sets) 和 有序集合(sorted sets)等类型。
+
+**搭建步骤：**
+
+1. 连接上Linux，确保以安装Docker，使用docker pull redis命令拉去Redis的镜像：
+
+   ```sh
+   docker pull redis
+   ```
+
+2. 使用docker run命令启动Redis：
+
+   ```shell
+   #-d表示后台运行，-p用于将主机端口映射到容器内部的端口，-name用于为该容器取名
+   docker run -d -p 6379:6379 --name myRedis redis
+   ```
+
+3. 连接Redis：
+
+   教程里使用的是Redis Desktop Manager但我使用的是AnotherRedisDesktopManager。两者在GitHub上都有，其中Redis Desktop Manager只提供源码，而官网则只提供订阅版。除非你想自己编译或付费订阅，否则建议你找一下网上现成编译好的安装包，GitHub上也有，这里贴个适用于Windows的https://github.com/lework/RedisDesktopManager-Windows
+
+   我呢是选择了AnotherRedisDesktopManager（我后面用着出现了问题，它不支持JDK序列化出来的key，所以还是建议下载Redis Desktop Manager，😔明明界面美观挺喜欢的），你想用这个的话直接在GitHub搜就行，有现成的安装包。无脑安装好后打开软件，点击新建连接即可 ，Host是填IP的，若你安装在本地就用localhost，用虚拟机、云主机之类的就填对应的IP，还没有设密码，所以不用填Auth：
+
+   ![image-20200401204901701](SpringBootAdvanced.assets\image-20200401204901701.png)
+
+   怎么设置密码呢？连接上Redis服务后，你可以在本软件中打开Redis控制台，按钮如下：
+
+   ![image-20200401210441319](SpringBootAdvanced.assets\image-20200401210441319.png)
+
+   打开效果如下：
+
+   ![image-20200401210546048](SpringBootAdvanced.assets\image-20200401210546048.png)
+
+   设置密码的方法：
+
+   ```shell
+   #使用该命令设置密码，注意使用CONFIG set requirepass "password"后需要重新登录该redis。
+   CONFIG set requirepass "password"
+   
+   #使用该命令查看已设置的密码
+   CONFIG get requirepass
+   ```
+
+4. 测试一些基本的Redis命令：
+
+   如果你英文好可以直接去看官网文档，这里贴出中文复刻版的网址www.redis.cn（我感觉网速比官网快，所以英文好也推荐使用这个😂），点击命令：
+
+   ![image-20200401212206625](SpringBootAdvanced.assets\image-20200401212206625.png)
+
+   进入命令后选择Strings，测试下这里的命令：![image-20200401212355303](SpringBootAdvanced.assets\image-20200401212355303.png)
+
+   为key追加个值：
+
+   ```shell
+   APPEND key HelloRedis
+   ```
+
+   刷新一下，就能看到key和其对应的值了（默认保存在DB0）：
+
+   ![image-20200401215628844](SpringBootAdvanced.assets\image-20200401215628844.png)
+
+   使用上面的命令可以一直追加值，例如再来个APPEND key 你好Redis：
+
+   ![image-20200401220015993](SpringBootAdvanced.assets\image-20200401220015993.png)
+
+   使用GET key命令取出key，其控制台输出：
+
+   ![image-20200401220300992](SpringBootAdvanced.assets\image-20200401220300992.png)
+
+   再来测试下Lists相关命令。
+
+   测试LPUSH命令：
+
+   ```shell
+   #LPUSH key value ... 命令用于将所有指定的值存入key列表的头部，像栈一样
+   LPUSH mylist 1 2 3 4 5
+   ```
+
+   查看键mylist：
+
+   ![image-20200401221626676](SpringBootAdvanced.assets\image-20200401221626676.png)
+
+   测试LPOP命令：
+
+   ```shell
+   #移除并且返回key对应的list的首个元素。
+   LPOP mylist
+   ```
+
+   控制台输出：
+
+   ```shell
+   > LPOP mylist
+   5
+   ```
+
+   测试RPOP命令：
+
+   ```shell
+   #移除并返回存于key的list的最后一个元素
+   RPOP mylist
+   ```
+
+   控制台输出：
+
+   ```shell
+   > rpop mylist
+   1
+   ```
+
+   测试SADD命令：
+
+   ```shell
+   #将元素添加到集合中，就是数学意义上的集合：无序、值不重复。
+   SADD myset 张三 李四
+   ```
+
+   再次向myset添加“张三”时，发现返回0，这是因为集合中已有该值
+
+   ```shell
+   > SADD myset 张三
+   0
+   ```
+
+   可用SMEMBERS命令返回集合中所有的元素：
+
+   ```shell
+   > SMEMBERS myset
+   张三
+   李四
+   ```
+
+   可用SISMEMBER判断给定值是否为该集合的成员，0为false，1为true：
+
+   ```shell
+   > SISMEMBER myset 雪糕
+   0
+   > SISMEMBER myset 张三
+   1
+   ```
+
+## 1.11 RedisTemplate及序列化机制
+
+**安装Redis的启动器：**
+
+1. 为项目引入redis启动器：
+
+   ```xml
+   <dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-data-redis</artifactId>
+   </dependency>
+   ```
+
+2. 在SpringBoot Profile中配置Redis：
+
+   ```properties
+   #配置Redis
+       spring.redis.host=Redis服务器所在的IP地址
+       spring.redis.password=你配置的密码
+   ```
+
+3. 查看org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration：
+
+   ```java
+   @Configuration(proxyBeanMethods = false)
+   @ConditionalOnClass(RedisOperations.class)
+   @EnableConfigurationProperties(RedisProperties.class)
+   @Import({ LettuceConnectionConfiguration.class, JedisConnectionConfiguration.class })
+   public class RedisAutoConfiguration {
+   
+      @Bean
+      @ConditionalOnMissingBean(name = "redisTemplate")
+      public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory)
+            throws UnknownHostException {
+         RedisTemplate<Object, Object> template = new RedisTemplate<>();
+         template.setConnectionFactory(redisConnectionFactory);
+         return template;
+      }
+   
+      @Bean
+      @ConditionalOnMissingBean
+      public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory)
+            throws UnknownHostException {
+         StringRedisTemplate template = new StringRedisTemplate();
+         template.setConnectionFactory(redisConnectionFactory);
+         return template;
+      }
+   
+   }
+   ```
+
+**测试Redis基本操作：**
+
+Redis常见的数据类型：String、List、Set、Hash、ZSet（有序集合）。
+
+这些类型对应的操作方法（stringRedisTemplate可以改为redisTemplate，只不过分别是操作字符串和对象的）：
+    stringRedisTemplate.opsForValue();
+    stringRedisTemplate.opsForList();
+    stringRedisTemplate.opsForSet();
+    stringRedisTemplate.opsForHash();
+    stringRedisTemplate.opsForZSet();
+
+在xuegao.learnSpringBoot.cache.CacheApplicationTests中测试stringRedisTemplate.opsForValue()：
+
+```java
+@SpringBootTest
+class CacheApplicationTests {
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;//操作“键值”都是字符串的
+    @Autowired
+    RedisTemplate redisTemplate;//操作“键值”都是对象的
+    
+    @Test
+    void testRedisBasicOperation(){
+        stringRedisTemplate.opsForValue().append("message","hello");//向Redis添加数据
+    }
+}
+```
+
+运行testRedisBasicOperation，查看效果：
+
+![image-20200402161036436](SpringBootAdvanced.assets\image-20200402161036436.png)
+
+使用stringRedisTemplate.opsForValue().get()获取数据，应当能在Console看到message的值：
+
+```java
+@Test
+void testRedisBasicOperation(){
+    //stringRedisTemplate.opsForValue().append("message","hello");//向Redis追加数据
+    //读取message的数据，显示到控制台
+    String message = stringRedisTemplate.opsForValue().get("message");
+    System.out.println(message);
+}
+```
+
+
+
+测试leftPush：
+
+```java
+@Test
+void testRedisBasicOperation(){
+    //测试leftPush
+    stringRedisTemplate.opsForList().leftPush("myList","1");
+    stringRedisTemplate.opsForList().leftPush("myList","2");
+}
+```
+
+效果：
+
+![image-20200402162036659](SpringBootAdvanced.assets\image-20200402162036659.png)
+
+使用employeeMapper查询三号员工，用redisTemplate.opsForValue().set("employee_4",employee)将对象添加到employee_4中：
+
+```java
+@SpringBootTest
+class CacheApplicationTests {
+    @Resource(name = "employeeMapper")
+    EmployeeMapper employeeMapper;
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;//操作“键值”都是字符串的
+    @Autowired
+    RedisTemplate redisTemplate;//操作“键值”都是对象的
+
+    /*测试保存对象*/
+    @Test
+    void testSaveObject(){
+        Employee employee = employeeMapper.getEmployeeById(4);
+        //保存对象时默认使用JDK序列化机制，序列化后的数据保存到Redis中
+        redisTemplate.opsForValue().set("employee_4",employee);
+    }
+}
+```
+
+此时运行该测试会报错，因为还没有序列化Employee类：
+
+![image-20200402165747582](SpringBootAdvanced.assets\image-20200402165747582.png)
+
+实现序列化：
+
+```java
+package xuegao.learnSpringBoot.cache.bean;
+
+import java.io.Serializable;
+
+public class Employee implements Serializable {
+```
+
+重新运行测试，查看employee_4：
+
+- 我用的Another Redis DeskTop Manager这里出现了问题，因为它不支持JDK序列化的key：
+
+![image-20200402172405441](SpringBootAdvanced.assets\image-20200402172405441.png)
+
+- 用Redis DeskTop Manager，并没有问题：
+
+  ![image-20200402172636152](SpringBootAdvanced.assets\image-20200402172636152.png)
+
+可以看到这样的数据很难看，不直观。这是因为保存对象时默认使用JDK序列化机制。如果想用JSON格式保存数据怎么办？有两种方法，一是自行将对象转为JSON格式，二是用RedisTemplate提供的序列化器。==注意，使用JSON格式会损失效率，但能节约存储空间且令数据直观，即时间换空间。==
+
+org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration中有向IOC容器添加redisTemplate对象的方法，将其复制过来，放到xuegao.learnSpringBoot.cache.config.MyRedisConfig中，稍作修改：
+
+```java
+@Configuration
+public class MyRedisConfig {
+    //自行向IOC容器添加名为redisTemplateEmployee的Bean
+    @Bean
+    public RedisTemplate<Object, Employee> redisTemplateEmployee(RedisConnectionFactory redisConnectionFactory)
+            throws UnknownHostException {
+        RedisTemplate<Object, Employee> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory);
+        //使用Jackson2JsonRedisSerializer作为序列化器，这里将Employee类的序列化设为JSON格式
+        Jackson2JsonRedisSerializer<Employee> serializer = new Jackson2JsonRedisSerializer<Employee>(Employee.class);
+        template.setDefaultSerializer(serializer);
+        
+        return template;
+    }
+
+}
+```
+
+在xuegao.learnSpringBoot.cache.CacheApplicationTests中测试：
+
+```java
+@Autowired
+RedisTemplate<Object, Employee> redisTemplateEmployee;
+
+/*测试保存对象*/
+@Test
+void testSaveObject(){
+    /*
+    以JSON格式的保存数据：
+        方法一、自行将对象转为JSON格式
+        方法二、RedisTemplate提供了序列化器
+    */
+    //使用Jackson2JsonRedisSerializer<Employee>序列化employee对象，若有需要可改为改成Object，从而对所有类型生效
+    Employee employee = employeeMapper.getEmployeeById(5);
+    redisTemplateEmployee.opsForValue().set("employee_5",employee);
+}
+```
+
+效果：
+
+![image-20200402183206929](SpringBootAdvanced.assets\image-20200402183206929.png)
+
+前面的只能对Employee类型的对象做序列化和反序列化，若要对所有类型做这种操作，可以将泛型该为Object，例如在MyRedisConfig中添加该方法：
+
+```java
+//自行向IOC容器添加名为redisTemplateObject的Bean
+@Bean
+public RedisTemplate<Object, Object> redisTemplateObject(RedisConnectionFactory redisConnectionFactory)
+        throws UnknownHostException {
+    RedisTemplate<Object, Object> template = new RedisTemplate<>();
+    template.setConnectionFactory(redisConnectionFactory);
+    //使用Jackson2JsonRedisSerializer作为序列化器，这里将所有类的序列化设为JSON格式
+    Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<Object>(Object.class);
+    template.setDefaultSerializer(serializer);
+
+    return template;
+}
+```
+
+单元测试：
+
+```java
+/*测试操作任意对象*/
+@Test
+void testOperationObject(){
+    Department department = departmentMapper.getDepartmentById(2);
+    redisTemplateObject.opsForValue().set("department_2",department);//序列化存入缓存
+    Object department_2 = redisTemplateObject.opsForValue().get("department_2");//从缓存中反序列化读取
+    System.out.println("department_2：" + department_2);
+}
+```
+
+## 1.12自定义CacheManager
+
+**前言：**
+
+由CacheManager管理Cache组件，再由Cache组件来实际给缓存中存取数据。导入Redis的starter后，将使用RedisCacheManager来创建RedisCache，由RedisCache通过Redis软件来缓存数据。
+
+**测试：**
+
+前面的几节中，向项目导入了Redis启动器，那么SimpleCacheConfiguration还是生效的吗？首先去SpringBoot Profile中开启全局debug级日志：
+
+```properties
+#开启全局debug级日志
+debug=true
+```
+
+启动项目，使用Find功能查找（快捷键Ctrl+F，没用的话去设置里配置Keymap），看起来是未匹配的：
+
+![image-20200403193224998](SpringBootAdvanced.assets\image-20200403193224998.png)
+
+事实上导入Redis启动器后用的是RedisCacheConfiguration，它是匹配的：
+
+![image-20200403193506743](SpringBootAdvanced.assets\image-20200403193506743.png)
+
+查看org.springframework.boot.autoconfigure.cache.RedisCacheConfiguration的源码，可以得出引入Redis启动器后，容器保存的是RedisCacheManager：
+
+```java
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnClass(RedisConnectionFactory.class)
+@AutoConfigureAfter(RedisAutoConfiguration.class)
+@ConditionalOnBean(RedisConnectionFactory.class)
+@ConditionalOnMissingBean(CacheManager.class)
+@Conditional(CacheCondition.class)
+class RedisCacheConfiguration {
+
+   @Bean
+   RedisCacheManager cacheManager(CacheProperties cacheProperties, CacheManagerCustomizers cacheManagerCustomizers,
+         ObjectProvider<org.springframework.data.redis.cache.RedisCacheConfiguration> redisCacheConfiguration,
+         ObjectProvider<RedisCacheManagerBuilderCustomizer> redisCacheManagerBuilderCustomizers,
+         RedisConnectionFactory redisConnectionFactory, ResourceLoader resourceLoader) {
+```
+
+org.springframework.data.redis.cache.RedisCacheManager会创建RedisCache来作为缓存组件，RedisCache通过操作Redis缓存数据。
+
+```java
+/**
+ * Configuration hook for creating {@link RedisCache} with given name and {@code cacheConfig}.
+ *
+ * @param name must not be {@literal null}.
+ * @param cacheConfig can be {@literal null}.
+ * @return never {@literal null}.
+ */
+protected RedisCache createRedisCache(String name, @Nullable RedisCacheConfiguration cacheConfig) {
+   return new RedisCache(name, cacheWriter, cacheConfig != null ? cacheConfig : defaultCacheConfig);
+}
+```
+
+这意味着项目已启用Redis，相关配置都配置好了，数据会缓存到Redis中，那么查询个员工试试：
+
+![image-20200403201723122](SpringBootAdvanced.assets\image-20200403201723122.png)
+
+查看Redis中是否有对应键值，可以注意到这又不是JSON格式了：
+
+![image-20200403202043429](SpringBootAdvanced.assets\image-20200403202043429.png)
+
+这是因为RedisCacheManager默认保存的键值对都是Object类型，并使用序列化保存。
+
+**保存为JSON格式：**
+
+如何保存为JSON格式？需要自定义CacheManager。SpringBoot 2和1版本发生较大变化，这里贴个新版本的解决方法https://blog.csdn.net/qinying233/article/details/104689709。还有官方文档对此也有说明https://docs.spring.io/spring-data/redis/docs/2.2.5.RELEASE/reference/html/#redis:support:cache-abstraction。
+
+核心就是传入RedisConnectionFactory，返回RedisCacheManager。下面是两个可用的代码，放入到配置类中就好，我放在了MyRedisConfig中：
+
+```java
+/*自定义CacheManager*/
+@Bean
+public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+    RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(15))// 设置缓存过期时间
+            .disableCachingNullValues()// 禁用缓存空值，不缓存null校验
+            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new
+                    GenericJackson2JsonRedisSerializer()));// 设置CacheManager的值序列化方式为JSON序列化，可加入@Class属性
+    // 使用RedisCacheConfiguration创建RedisCacheManager
+    RedisCacheManager redisCacheManager = RedisCacheManager.builder(connectionFactory).cacheDefaults(cacheConfiguration ).build();
+    return redisCacheManager;
+}
+```
+
+```java
+@Bean
+public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+	//初始化RedisCacheWriter，RedisCacheWriter提供了对Redis的set、setnx、get等命令的访问权限，可以由多个缓存实现共享，并负责写/读来自Redis的二进制数据。
+	RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory);
+	//设置CacheManager的值序列化方式为json序列化
+	RedisSerializer<Object> jsonSerializer = new GenericJackson2JsonRedisSerializer();
+	RedisSerializationContext.SerializationPair<Object> pair = RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer);
+	RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(pair);
+
+	defaultCacheConfig.entryTtl(Duration.ofSeconds(30));//设置默认超过期时间是30秒
+	return new RedisCacheManager(redisCacheWriter, defaultCacheConfig);//初始化RedisCacheManager
+}
+```
+
+值得注意的是如果若定义了两个以上的CacheManager的时候Spring Boot启动时会报错，因为Spring无法得知它在默认的时候要使用哪个CacheManager。这时候我们需要创建个基本的CacheManager或者用@Primary注解指定要使用的CacheManager。
+
+重启项目，查询员工信息（注意清除Redis原有的缓存，否则会直接读取原先十六进制值的缓存，会报错说无法转为JSON格式），查看键值：
+
+![image-20200404000909101](SpringBootAdvanced.assets\image-20200404000909101.png)
+
+没得问题，成功变为JSON格式。虽然这么费劲的吧数据定义为JSON格式，但是序列化格式保存后处理速度更快，所以一般无需这么折腾。但话又说回来，对于Redis来说，无论是JSON序列化还是JDK序列化，Redis接受的都是字符串文本，而JDK的序列化方式字符串会比JSON序列化文本大5倍。综上这是个时空取舍问题，根据场景需求，仁者见仁，智者见智。
+
+org.springframework.boot.autoconfigure.cache.CacheManagerCustomizers可以用来定制部分缓存规则。
+
+在存入Redis时，不难发现这是由cacheNames::key组合而成，具体可以看之前创建的EmployeeService类里的方法：
+
+```java
+@Cacheable(cacheNames = {"employee"},key = "#id")
+public Employee getEmployee(Integer id){
+    Employee employee = employeeMapper.getEmployeeById(id);
+    System.out.println("编号为"+id+"的员工信息为："+employee);
+    return employee;
+}
+```
+
+这是为了防止key之间重复，如果只用key的话重名的概率显然很大。
+
+ **测试部门：**
+
+先去数据库中的部门表添加信息：
+
+![image-20200404115702817](SpringBootAdvanced.assets\image-20200404115702817.png)
+
+创建xuegao.learnSpringBoot.cache.service.DepartmentService，提供依ID查询部门信息的方法：
+
+```java
+@CacheConfig(cacheNames = "department")
+@Service("departmentService")
+public class DepartmentService {
+    
+    @Resource(name = "departmentMapper")
+    DepartmentMapper departmentMapper;
+
+    @Cacheable(key = "#id")
+    public Department getDepartmentById(Integer id){
+        return departmentMapper.getDepartmentById(id);
+    }
+}
+```
+
+创建DepartmentController：
+
+```java
+@RestController
+public class DepartmentController {
+
+    @Resource(name = "departmentService")
+    DepartmentService departmentService;
+
+    @GetMapping("getDepartmentById")
+    public Department getDepartmentById(@RequestParam("id") Integer id){
+        return departmentService.getDepartmentById(id);
+    }
+}
+```
+
+http://localhost:8080/getDepartmentById?id=1发出查询，看看Redis里有没有缓存：
+
+![image-20200404135907789](SpringBootAdvanced.assets\image-20200404135907789.png)
+
+多刷新几次也没有问题，教程中由于使用的是SpringBoot 1系版本，所以会反序列化失败，但2系版本可以直接使用RedisConnectionFactory统一转化，所以不用担心不同类型的反序列化问题了。
+
+**通过CacheManager得到缓存，然后进行API调用：**
+
+不同于教程，我是在单元测试xuegao.learnSpringBoot.cache.CacheApplicationTests中做的，实际上可以放在任何地方：
+
+```java
+@Resource(name = "departmentMapper")
+DepartmentMapper departmentMapper;
+@Autowired//因为只有一个RedisCacheManager类型的Bean，所以可以用自动注入
+RedisCacheManager cacheManager;
+
+/*测试通过CacheManager得到缓存，然后进行API调用*/
+@Test
+void testCacheManager(){
+    //通过CacheManager得到缓存
+    Cache departmentCache = cacheManager.getCache("department");
+    //调用API写入数据
+    departmentCache.put("department_4",departmentMapper.getDepartmentById(4));
+    //读取department_4并将信息映射到Department模型
+    Department department = departmentCache.get("department_4", Department::new);
+    //打印信息到控制台
+    System.out.println(department);
+}
+```
+
+运行该测试，查看Redis缓存：
+
+![image-20200404155353770](SpringBootAdvanced.assets\image-20200404155353770.png)
+
+控制台输出：
+
+![image-20200404155317417](SpringBootAdvanced.assets\image-20200404155317417.png)
+
+这样就测试通过了。
+
+# 二、消息
+
+## 2.1 JMS和AMQP简介
+
+**概述：**
+
+1.大多应用中，可通过消息服务中间件来提升系统异步通信、扩展解耦能力。
+
+2.消息服务中两个重要概念：
+
+- 消息代理（message broker）和目的地（destination）。
+- 当消息发送者发送消息以后，将由消息代理接管，消息代理保证消息传递到指定目的地。
+
+3.消息队列主要有两种形式的目的地：
+
+- 队列（queue）：点对点消息通信（point-to-point）。
+- 主题（topic）：发布（publish）/订阅（subscribe）消息通信。
+
+4.点对点式：
+
+- 消息发送者发送消息，消息代理将其放入队列中，消息接收者从队列中获取消息内容，消息读取后被移出队列。
+- 消息只有唯一的发送者和接受者，但并不是说只能有一个接收者。（注意接受和接收的区别）
+
+5.发布订阅式：
+
+- 发送者（发布者）发送消息到主题，多个接收者（订阅者）监听（订阅）这个主题，那么就会在消息到达时同时收到消息。
+
+6.JMS（Java Message Service）JAVA消息服务：
+
+- 基于JVM消息代理的规范。ActiveMQ、HornetMQ是JMS实现。
+
+7.AMQP（Advanced Message Queuing Protocol）：
+
+- 高级消息队列协议，也是一个消息代理的规范，兼容JMS。
+- RabbitMQ是AMQP的实现。
+
+8.Spring支持：
+
+- spring-jms提供了对JMS的支持。
+- spring-rabbit提供了对AMQP的支持。
+- 需要ConnectionFactory的实现来连接消息代理。
+- 提供JmsTemplate、RabbitTemplate来发送消息。
+- @JmsListener（JMS）、@RabbitListener（AMQP）注解在方法上监听消息代理发布的消息。
+- @EnableJms、@EnableRabbit开启支持。
+
+9.Spring Boot自动配置：
+
+- JmsAutoConfiguration。
+- RabbitAutoConfiguration。
+
+**JMS对比AMQP：**
+
+|              | JMS                                                          | AMQP                                                         |
+| ------------ | :----------------------------------------------------------- | ------------------------------------------------------------ |
+| 定义         | Java  API                                                    | 网络线级协议                                                 |
+| 跨语言       | 否                                                           | 是                                                           |
+| 跨平台       | 否                                                           | 是                                                           |
+| Model        | 提供两种消息模型：点对点、发布/订阅。                        | 提供了五种消息模型：direct  exchange（点对点）、fanout、exchange、topic  change、headers  exchange、system  exchange 。本质来讲，后四种和JMS的“发布/订阅”模型没有太大差别，仅是在路由机制上做了更详细的划分。 |
+| 支持消息类型 | 多种消息类型：  TextMessage、 MapMessage、BytesMessage、 StreamMessage、ObjectMessage、Message（只有消息头和属性）。 | 只有byte[]。当实际应用，有复杂的消息时，可以将消息序列化后发送。 |
+| 综合评价     | JMS  定义了JAVA  API层面的标准；在java体系中，多个client均可以通过JMS进行交互，不需要应用修改代码，但是其对跨平台的支持较差。 | AMQP定义了wire-level层的协议标准；天然具有跨平台、跨语言特性。 |
+
+**场景：**
+
+异步处理：
+
+![image-20200404173307226](SpringBootAdvanced.assets\image-20200404173307226.png)
+
+应用解耦：
+
+![image-20200404173341368](SpringBootAdvanced.assets\image-20200404173341368.png)
+
+![image-20200404173346212](SpringBootAdvanced.assets\image-20200404173346212.png)
+
+流量削峰：
+
+![image-20200404173427358](SpringBootAdvanced.assets\image-20200404173427358.png)
+
+## 2.2 RabbitMQ基本概念
+
+**RabbitMQ简介：**
+
+RabbitMQ是由erlang开发的AMQP(Advanved Message Queue Protocol)的开源实现。
+
+**核心概念：**
+
+1. Meaage
+
+   消息，消息是不具名的，它由消息头和消息体组成。消息体是不透明的，而消息头则由一系列的可选属性组成，这些属性包括routing-key（路由键）、priority（相对于其他消息的优先权）、delivery-mode（指出该消息可能需要持久性存储）等。
+
+2. Publisher
+
+   消息的生产者，也是向交换器发布消息的客户端应用程序。
+
+3. Exchange
+
+   交换器，用来接收生产者发送的消息并将这些消息路由给服务器中的队列。
+
+   Exchange有4种类型：direct(默认)、fanout、topic、和headers，不同类型的Exchange转发消息的策略有所区别。
+
+4. Queue
+
+   消息队列，用来保存消息直到发送给消费者。它是消息的容器，也是消息的终点。一个消息可投入一个或多个队列。消息一直在队列里面，等待消费者连接到这个队列将其取走。
+
+5. Binding
+
+   绑定，用于消息队列和交换器之间的关联。绑定就是基于路由键将交换器和消息队列连接起来的路由规则，所以可以将交换器理解成由绑定构成的路由表。
+
+   Exchange 和Queue的绑定可以是多对多的关系。
+
+6. Connection
+
+   网络连接，比如TCP连接。
+
+7. Channel
+
+   信道，多路复用连接中的一条独立的双向数据流通道。信道是建立在真实的TCP连接内的虚拟连接，AMQP 命令都是通过信道发出去的，不管是发布消息、订阅队列还是接收消息，这些动作都是通过信道完成。因为对于操作系统来说建立和销毁 TCP 都是非常昂贵的开销，所以引入了信道的概念，用以复用同一条 TCP 连接。
+
+8. Consumer
+
+   消息的消费者，表示从消息队列中取得消息的客户端应用程序。
+
+9. Virtual Host
+
+   虚拟主机，表示一批交换器、消息队列和相关对象。虚拟主机是共享相同的身份认证和加密环境的独立服务器域。每个 vhost 本质上就是一个mini 版的 RabbitMQ 服务器，拥有自己的队列、交换器、绑定和权限机制。vhost 是 AMQP 概念的基础，必须在连接时指定，RabbitMQ 默认的 vhost 是 / 。
+
+10. Broker
+
+    表示消息队列服务器实体。
+
+**RabbitMQ概念图示：**
+
+<img src="SpringBootAdvanced.assets\image-20200404195536669.png" alt="image-20200404195536669" style="zoom:80%;" />
+
+## 2.3 RabbitMQ运行机制
+
+**AMQP 中的消息路由：**
+
+AMQP 中消息的路由过程和 Java 开发者熟悉的 JMS 存在一些差别，AMQP 中增加了 **Exchange** 和 **Binding** 的角色。生产者把消息发布到 Exchange 上，消息最终到达队列并被消费者接收，而 Binding 决定交换器的消息应该发送到那个队列。
+
+图示：
+
+![image-20200404202921450](SpringBootAdvanced.assets\image-20200404202921450.png)
+
+**Exchange 类型：**
+
+Exchange分发消息时根据类型的不同分发策略有区别，目前共四种类型：direct（直连）、fanout（广播）、topic（模糊）、headers 。headers 匹配 AMQP 消息的 header 而不是路由键， headers 交换器和 direct 交换器完全一致，但性能差很多，目前几乎用不到了，所以直接看另外三种类型。
+
+1. Direct Exchange：
+
+   消息中的路由键（routing key）如果和 Binding 中的 binding key一致， 交换器就将消息发到对应的队列中。路由键与队列名完全匹配，如果一个队列绑定到交换机要求路由键为“dog”，则只转发 routing key 标记为“dog”的消息，不会转发“dog.puppy”，也不会转发“dog.guard”等等。它是完全匹配、单播的模式。
+
+   ![image-20200404204603661](SpringBootAdvanced.assets\image-20200404204603661.png)
+
+2. Fanout Exchange：
+
+   每个发到 fanout 类型交换器的消息都会分到所有绑定的队列上去。fanout 交换器不处理路由键，只是简单的将队列绑定到交换器上，每个发送到交换器的消息都会被转发到与该交换器绑定的所有队列上。很像子网广播，每台子网内的主机都获得了一份复制的消息。fanout 类型转发消息是最快的。
+
+   ![image-20200404204729515](SpringBootAdvanced.assets\image-20200404204729515.png)
+
+3. Topic Exchange：
+
+   topic 交换器通过模式匹配分配消息的路由键属性，将路由键和某个模式进行匹配，此时队列需要绑定到一个模式上。它将路由键和绑定键的字符串切分成单词，这些单词之间用点隔开。它同样也会识别两个通配符：符号“#”和符号“\*”。#匹配0个或多个单词，\*匹配一个单词。
+
+   ![image-20200404204825240](SpringBootAdvanced.assets\image-20200404204825240.png)
+
+## 2.4 RabbitMQ安装测试
+
+**安装：**
+
+去Docker Hub搜索rabbitmq，在Tags中找到标签带management的镜像，带management的提供Web操作界面：
+
+![image-20200405171703287](SpringBootAdvanced.assets\image-20200405171703287.png)
+
+复制命令：docker pull rabbitmq:management。在Linux中使用该命令。
+
+拉取完完镜像后使用docker run -d -p 5672:5672 -p 15672:15672 --name myRabbitMQ 38e57f281891运行之，其中5672是客户端与主机的通讯端口，而15672是Web管理界面的访问端口：
+
+![image-20200405174201152](SpringBootAdvanced.assets\image-20200405174201152.png)
+
+运行起来后访问15672端口，账号密码均为guest：
+
+![image-20200405175050416](SpringBootAdvanced.assets\image-20200405175050416.png)
+
+登录后的界面：
+
+![image-20200405175201914](SpringBootAdvanced.assets\image-20200405175201914.png)
+
+点开Admin→Users→guest：
+
+![image-20200405180623157](SpringBootAdvanced.assets\image-20200405180623157.png)
+
+找到Update this user，就能更新其密码了：
+
+![image-20200405180705070](SpringBootAdvanced.assets\image-20200405180705070.png)
+
+**测试：**
+
+下面将基于该图进行测试：
+
+![image-20200405222215776](SpringBootAdvanced.assets\image-20200405222215776.png)
+
+先添加Exchanges，点击导航栏的Exchanges：
+
+![image-20200405202625244](SpringBootAdvanced.assets\image-20200405202625244.png)
+
+在下方找到Add a new exchange，Type选direct，其中Durability属性用于选择是否持久化，Durable为持久，Transient为暂时，选为持久时重启RabbitMQ不会清除本exchange，否则会清除：
+
+![image-20200405203149403](SpringBootAdvanced.assets\image-20200405203149403.png)
+
+Add exchange后其会出现在All exchanges中：
+
+![image-20200405203339876](SpringBootAdvanced.assets\image-20200405203339876.png)
+
+再添加个exchange.fanou，Type选fanout：
+
+![image-20200405204107195](SpringBootAdvanced.assets\image-20200405204107195.png)
+
+以及exchange.topic：
+
+![image-20200405210932456](SpringBootAdvanced.assets\image-20200405210932456.png)
+
+进入Queues，添加Queue：
+
+![image-20200405212305074](SpringBootAdvanced.assets\image-20200405212305074.png)
+
+值得注意的是queue多了Type属性，可选Classic和Quorum，Quorum是什么呢？我也很疑惑，百度翻译告诉我这是名词，意为：(会议的)法定人数。再查了解到：Quorom 机制，是一种分布式系统中常用的，用来保证数据冗余和最终一致性的投票算法，其主要数学思想来源于鸽巢原理。具体可看这两篇博文：https://blog.csdn.net/zixiao217/article/details/81633839、https://blog.csdn.net/sunykk/article/details/88087213。
+
+RabbitMQ从3.8.0版本开始支持Quorum Queue，具体看该文章：https://www.oschina.net/news/110317/rabbitmq-3-8-0-released。官方对此的介绍：http://next.rabbitmq.com/quorum-queues.html。
+
+由于看了这一波还是云里雾里的，所以先用默认的classic吧，将四个队列添加进去：
+
+![image-20200405220309370](SpringBootAdvanced.assets\image-20200405220309370.png)
+
+回到Exchanges，进入exchange.direct，绑定xuegao队列：
+
+![image-20200405215855352](SpringBootAdvanced.assets\image-20200405215855352.png)
+
+将四个队列都绑定到exchange.direct中，注意队列和Routing key是不同的东西，只不过这里与队列同名了：
+
+![image-20200405221533752](SpringBootAdvanced.assets\image-20200405221533752.png)
+
+以同样操作将四个队列绑定到exchange.fanout中。
+
+exchange.topic有所不同，路由键可用通配符，#匹配0个或多个单词，\*匹配一个单词：
+
+![image-20200405224217936](SpringBootAdvanced.assets\image-20200405224217936.png)
+
+回到exchange.direct，使用路由键xuegao发送Payload里的消息：
+
+![image-20200405234708039](SpringBootAdvanced.assets\image-20200405234708039.png)
+
+由于exchange.direct是完全匹配的Direct模式，所以只会有xuegao队列能收到该消息，可以进入Queues页面查看xuegao队列的信息：
+
+![image-20200405235338923](SpringBootAdvanced.assets\image-20200405235338923.png)
+
+exchange.fanout是广播模式，所以所有队列都应当会搜到该消息：
+
+![image-20200405235847416](SpringBootAdvanced.assets\image-20200405235847416.png)
+
+进入Queues页面查看All queues就能看到所有队列消息Total+1了：
+
+<img src="SpringBootAdvanced.assets\image-20200406000143981.png" alt="image-20200406000143981" style="zoom:80%;" />
+
+可以点开某个队列Get Message查看一下：
+
+![image-20200406000302633](SpringBootAdvanced.assets\image-20200406000302633.png)
+
+再来测试exchange.topic：
+
+![image-20200406000630767](SpringBootAdvanced.assets\image-20200406000630767.png)
+
+查看其匹配规则可以发现xuegao.news四个队列都能匹配：
+
+![image-20200405224217936](SpringBootAdvanced.assets\image-20200405224217936.png)
+
+查看Queues页面可以验证这点：
+
+<img src="SpringBootAdvanced.assets\image-20200406000938172.png" alt="image-20200406000938172" style="zoom:80%;" />
+
+再来发布个CCTV.news为路由键的消息：
+
+![image-20200406001418941](SpringBootAdvanced.assets\image-20200406001418941.png)
+
+根据匹配规则，应该只有kaiyuanbiji.news、xuegao.news两者会被匹配，查看两者的Total，确实+1了：
+
+![image-20200406001750396](SpringBootAdvanced.assets\image-20200406001750396.png)
+
+进入查看Message内容，会发现点击Get Message会得到重复的内容，这是因为Ack Mode（应答模式）被设为了Nack message requeue true，需要设为Ack message requeue false才能使消息被删除掉：
+
+![image-20200406002415350](SpringBootAdvanced.assets\image-20200406002415350.png)
+
+## 2.5 RabbitTemplate发送接收消息和序列化机制
+
+新建项目：
+
+![image-20200407220627749](SpringBootAdvanced.assets\image-20200407220627749.png)
+
+导入需要的依赖：
+
+![image-20200407220847132](SpringBootAdvanced.assets\image-20200407220847132.png)
+
+进入项目的POM文件可以看到导入了这两个依赖：
+
+```xml
+<!--导入RabbitMQ场景所需要的依赖-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>
+<!--导入RabbitMQ测试-->
+<dependency>
+    <groupId>org.springframework.amqp</groupId>
+    <artifactId>spring-rabbit-test</artifactId>
+    <scope>test</scope>
+</dependency>
+```
+
+org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration是RabbitMQ的自动配置类。其配置了rabbitConnectionFactory，RabbitProperties封装了RabbitMQ的配置，RabbitTemplate用于给RabbitMQ发送和接收消息，AmqpAdmin是RabbitMQ系统管理功能组件。
+
+有RabbitProperties，所以可以在SpringBoot配置文件中配置RabbitMQ，这里只配置了三个属性，其实还有像prok、virtualHost等非常多属性，但绝大多数都保持默认即可，甚至这里的username也可以不配，因为默认就是guest：
+
+```properties
+#配置RabbitMQ
+spring.rabbitmq.host=192.168.0.3
+spring.rabbitmq.username=guest
+spring.rabbitmq.password=123456
+```
+
+来到SpringBoot测试类，使用RabbitTemplate做测试：
+
+```java
+@SpringBootTest
+class RabbitmqApplicationTests {
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+    
+    @Test
+    void contextLoads() {
+        //message需要自行构造，自定义消息体内容和消息头
+        //rabbitTemplate.send(exchange,routeKey,message);
+
+        //object默认作为消息体，传入要发送的对象后会自动序列化发送给RabbitMQ
+        //rabbitTemplate.convertAndSend(exchange,routeKey,object)
+
+        //做个map对象，放些数据进去
+        Map<String,Object> map = new HashMap<>();
+        map.put("message","清明时节雨纷纷，路上行人欲断魂。");
+        map.put("data", Arrays.asList("你好RabbitMQ",666,true));
+        //选择单播模式（exchange.direct）,路由键为xuegao.news，将map对象序列化后发送出去
+        rabbitTemplate.convertAndSend("exchange.direct","xuegao.news",map);
+    }
+}
+```
+
+进入RabbitMQ的管理界面，查看xuegao.news队列的Message，这是被默认的JDK序列化机制操作后的数据：
+
+![image-20200409113701848](SpringBootAdvanced.assets\image-20200409113701848.png)
+
+尝试取出数据：
+
+```java
+/**接收指定队列的消息*/
+@Test
+void receive(){
+    Object object = rabbitTemplate.receiveAndConvert("xuegao.news");
+    System.out.println(object.getClass());
+    System.out.println(object);
+}
+```
+
+控制台输出：
+
+![image-20200409122825914](SpringBootAdvanced.assets\image-20200409122825914.png)
+
+此时xuegao.news队列不再拥有该消息，因为也没有其它消息，所以为空了：
+
+![image-20200409123450223](SpringBootAdvanced.assets\image-20200409123450223.png)
+
+如果想序列化为JSON格式，需要用到org.springframework.amqp.support.converter.MessageConverter接口，下面自己写配置类来自定义实现方法：
+
+```java
+package xuegao.learnSpringBoot.rabbitmq.config;
+
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class MyAmqpConfig {
+
+    @Bean
+    public MessageConverter messageConverter(){
+        return new Jackson2JsonMessageConverter();
+    }
+}
+```
+
+Jackson2JsonMessageConverter与MessageConverter的层级关系：
+
+![image-20200409131127469](SpringBootAdvanced.assets\image-20200409131127469.png)
+
+再次运行RabbitmqApplicationTests类下的contextLoads方法，发送消息。然后查看xuegao.news队列的Message：
+
+![image-20200409131943642](SpringBootAdvanced.assets\image-20200409131943642.png)
+
+显然成功序列化为JSON格式，并且多了一些信息，包括headers里的内容、编码。那么再运行receive方法，查看控制台输出，发现也是能正常查询，和之前的输出并无差别。
+
+接下来测试自己的对象能不能序列化成功，创建xuegao.learnSpringBoot.rabbitmq.bean.Book模型（JackJSON不需要Bean实现serializable）：
+
+```java
+package xuegao.learnSpringBoot.rabbitmq.bean;
+
+public class Book {
+    private String bookName;
+    private String author;
+
+    public Book() {
+    }
+
+    public Book(String bookName, String author) {
+        this.bookName = bookName;
+        this.author = author;
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "bookName='" + bookName + '\'' +
+                ", author='" + author + '\'' +
+                '}';
+    }
+
+    public String getBookName() {
+        return bookName;
+    }
+
+    public void setBookName(String bookName) {
+        this.bookName = bookName;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+}
+```
+
+测试序列化book对象：
+
+```java
+@Test
+void testBook(){
+    Book book = new Book("重构之王", "两份雪糕");
+    rabbitTemplate.convertAndSend("exchange.direct","xuegao.news",book);
+}
+```
+
+运行方法，在xuegao.news队列查看消息：
+
+![image-20200409135920191](SpringBootAdvanced.assets\image-20200409135920191.png)
+
+运行RabbitmqApplicationTests的receive方法，查看控制台输出，是正常的，说明可以直接使用Object接收任意对象：
+
+![image-20200409140257296](SpringBootAdvanced.assets\image-20200409140257296.png)
+
+接下来测试广播模式：
+
+```java
+/*测试广播模式*/
+@Test
+void testFanout(){
+    Book book = new Book("《一觉睡醒后成了世界最萌》", "守株待妹");
+    rabbitTemplate.convertAndSend("exchange.fanout","",book);
+}
+```
+
+运行后能看到所有的队列都收到了该消息：
+
+<img src="SpringBootAdvanced.assets\image-20200409141938179.png" alt="image-20200409141938179" style="zoom:80%;" />
+
+随便点开一个能看具体消息：
+
+![image-20200409142012702](SpringBootAdvanced.assets\image-20200409142012702.png)
+
+## 2.6 @RabbitListener和@EnableRabbit
+
+创建BookService：
+
+```java
+package xuegao.learnSpringBoot.rabbitmq.service;
+
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Service;
+import xuegao.learnSpringBoot.rabbitmq.bean.Book;
+
+@Service
+public class BookService {
+    /*监听xuegao.news队列，只要其有消息进来就能监听到*/
+    @RabbitListener(queues = "xuegao")
+    public void receive(Book book){
+        System.out.println("队列xuegao有新消息了，此时book状态为："+book);
+    }
+}
+```
+
+在主配置类上使用@EnableRabbit注解：
+
+```java
+@EnableRabbit//启用RabbitMQ的注解功能
+@SpringBootApplication
+public class RabbitmqApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(RabbitmqApplication.class, args);
+    }
+}
+```
+
+启动项目，运行RabbitmqApplicationTests类的testFanout方法，查看RabbitmqApplication的控制台输出，能看到BookService下的receive成功监听到了xuegao队列里的消息：
+
+![image-20200409172943476](SpringBootAdvanced.assets\image-20200409172943476.png)
+
+回到BookService类里，创建receiveXuegaoEmployees方法：
+
+```java
+@RabbitListener(queues = "xuegao.employees")
+public void receiveXuegaoEmployees(Message message){
+    System.out.println(message.getMessageProperties());//获得消息头信息
+    System.out.println(message.getBody());//获得消息体
+}
+```
+
+重启项目，运行RabbitmqApplicationTests类的testFanout方法，查看RabbitmqApplication的控制台输出：
+
+![image-20200409174544862](SpringBootAdvanced.assets\image-20200409174544862.png)
+
+## 2.7 AmqpAdmin管理组件的使用
+
+前面是使用Web界面管理RabbitMQ，而在代码中的AmqpAdmin也可以做到这点。AmqpAdmin是RabbitMQ系统的管理功能组件，它能创建和删除Queue、Exchange、Binding。
+
+在RabbitmqApplicationTests中尝试用AmqpAdmin创建exchange：
+
+```java
+@Autowired
+AmqpAdmin amqpAdmin;//RabbitMQ系统的管理功能组件
+
+/*创建交换机，DirectExchange为Exchange接口下的实现类之一*/
+@Test
+void creatExchange(){
+    amqpAdmin.declareExchange(new DirectExchange("amqpAdmin.exchange"));//取名为amqpAdmin.exchange
+    System.out.println("amqpAdmin.exchange创建完成");
+}
+```
+
+运行测试，查看Exchanges列表，可以看到成功创建了amqpAdmin.exchange：
+
+![image-20200409185504670](SpringBootAdvanced.assets\image-20200409185504670.png)
+
+Exchange接口下的层次关系：
+
+![image-20200409185620778](SpringBootAdvanced.assets\image-20200409185620778.png)
+
+还是在RabbitmqApplicationTests，尝试创建queue：
+
+```java
+/*创建队列*/
+@Test
+void creatQueue(){
+    //取名为amqpAdmin.queue，并将持久化设为true
+    amqpAdmin.declareQueue(new Queue("amqpAdmin.queue",true));
+    System.out.println("amqpAdmin.queue创建完成");
+}
+```
+
+查看queues：
+
+![image-20200409191113580](SpringBootAdvanced.assets\image-20200409191113580.png)
+
+接下来测试Binding，先看看org.springframework.amqp.core.Binding中的带参构造：
+
+```java
+public Binding(String destination, DestinationType destinationType, String exchange, String routingKey,@Nullable Map<String, Object> arguments) {
+
+   super(arguments);
+   this.destination = destination;
+   this.destinationType = destinationType;
+   this.exchange = exchange;
+   this.routingKey = routingKey;
+}
+```
+
+在RabbitmqApplicationTests中，测试Binding：
+
+```java
+/*测试Binding，将exchange和queue绑定起来*/
+@Test
+void creatBinding(){
+    //依次填写目的地、目的地类型、交换机名、路由键名、参数（消息头）
+    amqpAdmin.declareBinding(new Binding("amqpAdmin.queue",Binding.DestinationType.QUEUE,
+			"amqpAdmin.exchange","amqp.hello",null));
+}
+```
+
+查看amqpAdmin.exchange的Bindings：
+
+![image-20200409193231754](SpringBootAdvanced.assets\image-20200409193231754.png)
+
+AmqpAdmin还有很多方法，可以自行逐一测试：
+
+![image-20200409193351323](SpringBootAdvanced.assets\image-20200409193351323.png)
+
+# 三、检索
+
+## 3.1 Elasticsearch简介和安装
+
+**简介：**
+
+应用经常需要添加检索功能，开源的 [ElasticSearch](https://www.elastic.co/) 是目前全文搜索引擎的首选。它可以快速的存储、搜索和分析海量数据。Spring Boot通过整合Spring Data ElasticSearch提供了非常便捷的检索功能支持。
+
+Elasticsearch是个分布式搜索服务，使用Java编写，提供Restful API，底层基于Lucene，采用多shard（分片）的方式保证数据安全，并且提供自动resharding的功能，github等大型的站点也是采用了ElasticSearch作为其搜索服务。
+
+**搭建：**
+
+使用Docker拉取elasticsrarch的镜像（默认的latest标签版本有些老，最新版本可以自己去Docker Hub查）：
+
+```shell
+docker pull elasticsearch:7.6.2
+```
+
+接下来要run个它的容器出来，但是要注意的是ElasticSearch一旦运行就会占用2GB内存用于堆，所以若你的系统内存不是很够的话在运行时应当做出限制。因为Elasticsearch使用Java编写的，所以可以用Java的命令做出限制：
+
+```shell
+#-Xms256m表示初始堆内存大小为256MB，-Xmx512m表示最大堆内存为512MB，-d后台运行，-p暴露端口
+#其默认用9200作为Web通信端口。在分步式的情况下，各结点的通信默认用9300端口
+#开发模式下还需要加上-e "discovery.type=single-node"
+docker run -e ES_JAVA_OPTS="-Xms256m -Xmx512m" -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" --name HiElasticSearch elasticsearch:7.6.2
+```
+
+访问目标主机的9200端口（这时候我才发现版本有些老……不知道为什么latest标签是这么久以前的版本，然后我重新搞了个新的😂）：
+
+![image-20200409223243881](SpringBootAdvanced.assets\image-20200409223243881.png)
+
+这是新的：
+
+![image-20200409225714111](SpringBootAdvanced.assets\image-20200409225714111.png)
+
+## 3.2 Elasticsearch快速入门
+
+Elasticsearch是有[官方中文文档](https://www.elastic.co/guide/cn/elasticsearch/guide/current/index.html)的：
+
+![image-20200410202440786](SpringBootAdvanced.assets\image-20200410202440786.png)
+
+打开“面向文档”：
+
+![image-20200410202721587](SpringBootAdvanced.assets\image-20200410202721587.png)
+
+开头是这样说的：
+
+- 在应用程序中对象很少只是一个简单的键和值的列表。通常，它们拥有更复杂的数据结构，可能包括日期、地理信息、其他对象或者数组等。
+- 也许有一天你想把这些对象存储在数据库中。使用关系型数据库的行和列存储，这相当于是把一个表现力丰富的对象塞到一个非常大的电子表格中：为了适应表结构，你必须设法将这个对象扁平化—通常一个字段对应一列—而且每次查询时又需要将其重新构造为对象。
+
+- Elasticsearch 是 *面向文档* 的，意味着它存储整个对象或 *文档*。Elasticsearch 不仅存储文档，而且 *索引* 每个文档的内容，使之可以被检索。在 Elasticsearch 中，我们对文档进行索引、检索、排序和过滤—而不是对行列数据。这是一种完全不同的思考数据的方式，也是 Elasticsearch 能支持复杂全文检索的原因。
+
+接着说明Elasticsearch使用JSON作为文档的序列化格式：
+
+- Elasticsearch 使用 JavaScript Object Notation（或者 [*JSON*](http://en.wikipedia.org/wiki/Json)）作为文档的序列化格式。JSON 序列化为大多数编程语言所支持，并且已经成为 NoSQL 领域的标准格式。 它简单、简洁、易于阅读。
+
+- 下面这个 JSON 文档代表了一个 user 对象：
+
+  ```json
+  {
+      "email":      "john@smith.com",
+      "first_name": "John",
+      "last_name":  "Smith",
+      "info": {
+          "bio":         "Eco-warrior and defender of the weak",
+          "age":         25,
+          "interests": [ "dolphins", "whales" ]
+      },
+      "join_date": "2014/05/01"
+  }
+  ```
+
+- 虽然原始的user对象很复杂，但这个对象的结构和含义在 JSON 版本中都得到了体现和保留。在 Elasticsearch 中将对象转化为 JSON 后构建索引要比在一个扁平的表结构中要简单的多。
+
+**适应新环境：**
+
+适应新环境：
+
+- 为了让大家对 Elasticsearch 能实现什么及其上手难易程度有一个基本印象，让我们从一个简单的教程开始并介绍索引、搜索及聚合等基础概念。
+- 我们将一并介绍一些新的技术术语，即使无法立即全部理解它们也无妨，因为在本书后续内容中，我们将继续深入介绍这里提到的所有概念。
+- 接下来尽情享受 Elasticsearch 探索之旅。
+
+创建雇员目录：
+
+- 我们受雇于  *Megacorp* 公司，作为 HR 部门新的 *“热爱无人机”* （*"We love our drones!"*）激励项目的一部分，我们的任务是为此创建一个员工目录。该目录应当能培养员工认同感及支持实时、高效、动态协作，因此有一些业务需求：
+  1. 支持包含多值标签、数值、以及全文本的数据
+  2. 检索任一员工的完整信息
+  3. 允许结构化搜索，比如查询 30 岁以上的员工
+  4. 允许简单的全文搜索以及较复杂的短语搜索
+  5. 支持在匹配文档内容中高亮显示搜索片段
+  6. 支持基于数据创建和管理分析仪表盘
+
+**索引员工文档：**
+
+- 第一个业务需求是存储员工数据。 这将会以*员工文档* 的形式存储：一个文档代表一个员工。存储数据到 Elasticsearch 的行为叫做 *索引* ，但在索引一个文档之前，需要确定将文档存储在哪里。
+- 一个 Elasticsearch 集群可以包含多个*索引* ，相应的每个索引可以包含多个*类型*，但是==建议一个索引只对应一个类型== 。 这些不同的类型存储着多个*文档* ，每个文档又有多个*属性* 。
+
+图示：
+
+![image-20200410210427463](SpringBootAdvanced.assets\image-20200410210427463.png)
+
+对于员工目录，我们将做如下操作：
+
+- 每个员工索引一个文档，文档包含该员工的所有信息。
+- 每个文档都将是 employee *类型* 。
+- 该类型位于*索引* megacorp 内。
+- 该索引保存在我们的Elasticsearch 集群中。
+
+实践中这非常简单（尽管看起来有很多步骤），我们可以通过一条命令完成所有这些动作：
+
+```json
+PUT /megacorp/employee/1
+{
+    "first_name" : "John",
+    "last_name" :  "Smith",
+    "age" :        25,
+    "about" :      "I love to go rock climbing",
+    "interests": [ "sports", "music" ]
+}
+```
+
+注意，路径 `/megacorp/employee/1` 包含了三部分的信息：
+
+- `megacorp`	索引名称
+- `employee`    类型名称
+- `1`                特定雇员的ID
+
+**使用Postman测试：**
+
+选择PUT类型的请求，9200为交互端口，所以IP后接9200，然后填写路径。再选择Body，点击raw（原始），选择JSON，将上面的JSON数据粘贴上去即可：
+
+![image-20200410212541685](SpringBootAdvanced.assets\image-20200410212541685.png)
+
+收到的响应：
+
+```json
+{
+    "_index": "megacorp",
+    "_type": "employee",
+    "_id": "1",
+    "_version": 1,
+    "result": "created",
+    "_shards": {
+        "total": 2,
+        "successful": 1,
+        "failed": 0
+    },
+    "_seq_no": 0,
+    "_primary_term": 1
+}
+```
+
+如法炮制，添加2、3号员工：
+
+```json
+PUT /megacorp/employee/2
+{
+    "first_name" :  "Jane",
+    "last_name" :   "Smith",
+    "age" :         32,
+    "about" :       "I like to collect rock albums",
+    "interests":  [ "music" ]
+}
+
+PUT /megacorp/employee/3
+{
+    "first_name" :  "Douglas",
+    "last_name" :   "Fir",
+    "age" :         35,
+    "about":        "I like to build cabinets",
+    "interests":  [ "forestry" ]
+}
+```
+
+**检索文档：**
+
+目前我们已经在 Elasticsearch 中存储了一些数据， 接下来就能专注于实现应用的业务需求了。第一个需求是：可以检索到单个雇员的数据。
+
+这在 Elasticsearch 中很简单，执行HTTP `GET` 请求并指定文档的地址——索引库、类型和ID，使用这三个信息可以返回原始的 JSON 文档：
+
+请求：
+
+```
+192.168.0.3:9200/megacorp/employee/1
+```
+
+响应：
+
+```json
+{
+    "_index": "megacorp",
+    "_type": "employee",
+    "_id": "1",
+    "_version": 1,
+    "_seq_no": 0,
+    "_primary_term": 1,
+    "found": true,
+    "_source": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "age": 25,
+        "about": "I love to go rock climbing",
+        "interests": [
+            "sports",
+            "music"
+        ]
+    }
+}
+```
+
+提示：
+
+将 HTTP 命令由 `PUT` 改为 `GET` 可以用来检索文档，同样的，可以使用 `DELETE` 命令来删除文档，以及使用 `HEAD` 指令来检查文档是否存在。如果想更新已存在的文档，只需再次 `PUT` 。
+
+更新员工信息得到的响应示例，能注意到_version发生变化，并且result为updated：
+
+```json
+{
+    "_index": "megacorp",
+    "_type": "employee",
+    "_id": "3",
+    "_version": 2,
+    "result": "updated",
+    "_shards": {
+        "total": 2,
+        "successful": 1,
+        "failed": 0
+    },
+    "_seq_no": 5,
+    "_primary_term": 1
+}
+```
+
+**轻量搜索：**
+
+使用该请求来搜索所有雇员，这几乎是最简单的搜索了：
+
+```
+192.168.0.3:9200/megacorp/employee/_search
+```
+
+可以看到，我们仍然使用索引库 `megacorp` 以及类型 `employee`，但与指定一个文档 ID 不同，这次使用 `_search` 。返回结果包括了所有三个文档，放在数组 `hits` 中。一个搜索默认返回十条结果。响应内容如下：
+
+```json
+{
+    "took": 182,
+    "timed_out": false,
+    "_shards": {
+        "total": 1,
+        "successful": 1,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 3,
+            "relation": "eq"
+        },
+        "max_score": 1.0,
+        "hits": [
+            {
+                "_index": "megacorp",
+                "_type": "employee",
+                "_id": "1",
+                "_score": 1.0,
+                "_source": {
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "age": 25,
+                    "about": "I love to go rock climbing",
+                    "interests": [
+                        "sports",
+                        "music"
+                    ]
+                }
+            },
+            {
+                "_index": "megacorp",
+                "_type": "employee",
+                "_id": "3",
+                "_score": 1.0,
+                "_source": {
+                    "first_name": "两份",
+                    "last_name": "雪糕",
+                    "age": 35,
+                    "about": "I like to build cabinets",
+                    "interests": [
+                        "forestry"
+                    ]
+                }
+            },
+            {
+                "_index": "megacorp",
+                "_type": "employee",
+                "_id": "2",
+                "_score": 1.0,
+                "_source": {
+                    "first_name": "Jane",
+                    "last_name": "Smith",
+                    "age": 32,
+                    "about": "I like to collect rock albums",
+                    "interests": [
+                        "music"
+                    ]
+                }
+            }
+        ]
+    }
+}
+```
+
+注意：返回结果不仅告知匹配了哪些文档，还包含了整个文档本身：显示搜索结果给最终用户所需的全部信息。
+
+接下来，尝试下搜索姓氏为``Smith`` 的雇员。为此，我们将使用*高亮* 搜索。这个方法一般涉及到*查询字符串* （*query-string*）搜索，也就是用q来指定，因为我们通过URL参数来传递查询信息给搜索接口：
+
+```
+192.168.0.3:9200/megacorp/employee/_search?q=last_name:Smith
+```
+
+我们仍然在请求路径中使用 `_search` 端点，并将查询本身赋值给参数 `q=` 。返回结果给出了所有last_name属性为Smith的员工信息：
+
+```json
+{
+    "took": 64,
+    "timed_out": false,
+    "_shards": {
+        "total": 1,
+        "successful": 1,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 2,
+            "relation": "eq"
+        },
+        "max_score": 0.52354836,
+        "hits": [
+            {
+                "_index": "megacorp",
+                "_type": "employee",
+                "_id": "1",
+                "_score": 0.52354836,
+                "_source": {
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "age": 25,
+                    "about": "I love to go rock climbing",
+                    "interests": [
+                        "sports",
+                        "music"
+                    ]
+                }
+            },
+            {
+                "_index": "megacorp",
+                "_type": "employee",
+                "_id": "2",
+                "_score": 0.52354836,
+                "_source": {
+                    "first_name": "Jane",
+                    "last_name": "Smith",
+                    "age": 32,
+                    "about": "I like to collect rock albums",
+                    "interests": [
+                        "music"
+                    ]
+                }
+            }
+        ]
+    }
+}
+```
+
+**使用查询表达式搜索：**
+
+Query-string 搜索通过命令非常方便地进行临时性的即席搜索  ，但它有自身的局限性（参见 [*轻量* 搜索](https://www.elastic.co/guide/cn/elasticsearch/guide/current/search-lite.html) ）。Elasticsearch 提供了丰富灵活的查询语言，叫做 *查询表达式* ， 它支持构建更加复杂和健壮的查询。
+
+*领域特定语言* （DSL）， 下面使用 JSON 构造了请求。可以像这样重写之前的查询所有名为 Smith 的搜索 ：
+
+请求：
+
+```
+192.168.0.3:9200/megacorp/employee/_search
+```
+
+Body：
+
+```json
+{
+    "query" : {
+        "match" : {
+            "last_name" : "Smith"
+        }
+    }
+}
+```
+
+返回结果与之前的查询一样，但还是可以看到有一些变化。其中之一是，不再使用 *query-string* 参数，而是由请求体替代。这个请求使用 JSON 构造，并使用了`match` 查询（属于查询类型之一，后面将继续介绍）。
+
+**更复杂的的搜索：**
+
+现在尝试下更复杂的搜索。 同样搜索姓氏为 Smith 的员工，但这次我们只需要年龄大于 30 的。查询需要稍作调整，使用过滤器 *filter* ，它支持高效地执行结构化查询。
+
+还是GET请求：
+
+```
+192.168.0.3:9200/megacorp/employee/_search
+```
+
+Body：
+
+- filter里是`range` *过滤器* ， 它能找到年龄大于 30 的文档，其中 `gt` 表示_大于_(*great than*)。
+
+```json
+{
+    "query" : {
+        "bool": {
+            "must": {
+                "match" : {
+                    "last_name" : "smith" 
+                }
+            },
+            "filter": {
+                "range" : {
+                    "age" : { "gt" : 30 } 
+                }
+            }
+        }
+    }
+}
+```
+
+响应：
+
+```json
+{
+    "took": 28,
+    "timed_out": false,
+    "_shards": {
+        "total": 1,
+        "successful": 1,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 1,
+            "relation": "eq"
+        },
+        "max_score": 0.52354836,
+        "hits": [
+            {
+                "_index": "megacorp",
+                "_type": "employee",
+                "_id": "2",
+                "_score": 0.52354836,
+                "_source": {
+                    "first_name": "Jane",
+                    "last_name": "Smith",
+                    "age": 32,
+                    "about": "I like to collect rock albums",
+                    "interests": [
+                        "music"
+                    ]
+                }
+            }
+        ]
+    }
+}
+```
+
+**全文搜索：**
+
+截止目前的搜索相对都很简单：单个姓名，通过年龄过滤。现在尝试下稍微高级点儿的全文搜索，传统数据库很难搞定的任务。
+
+搜索下所有喜欢攀岩（rock climbing）的员工：
+
+- 请求：
+
+  ```
+  192.168.0.3:9200/megacorp/employee/_search
+  ```
+
+- Body：
+
+  ```json
+  {
+      "query" : {
+          "match" : {
+              "about" : "rock climbing"
+          }
+      }
+  }
+  ```
+
+- 响应：
+
+  ```json
+  {
+      "took": 53,
+      "timed_out": false,
+      "_shards": {
+          "total": 1,
+          "successful": 1,
+          "skipped": 0,
+          "failed": 0
+      },
+      "hits": {
+          "total": {
+              "value": 2,
+              "relation": "eq"
+          },
+          "max_score": 1.4167401,
+          "hits": [
+              {
+                  "_index": "megacorp",
+                  "_type": "employee",
+                  "_id": "1",
+                  "_score": 1.4167401,
+                  "_source": {
+                      "first_name": "John",
+                      "last_name": "Smith",
+                      "age": 25,
+                      "about": "I love to go rock climbing",
+                      "interests": [
+                          "sports",
+                          "music"
+                      ]
+                  }
+              },
+              {
+                  "_index": "megacorp",
+                  "_type": "employee",
+                  "_id": "2",
+                  "_score": 0.4589591,
+                  "_source": {
+                      "first_name": "Jane",
+                      "last_name": "Smith",
+                      "age": 32,
+                      "about": "I like to collect rock albums",
+                      "interests": [
+                          "music"
+                      ]
+                  }
+              }
+          ]
+      }
+  }
+  ```
+
+可以注意下查询到的结果中的_score属性。
+
+相关性得分：
+
+- Elasticsearch  默认按照相关性得分排序，即每个文档跟查询的匹配程度。第一个最高得分的结果很明显：John Smith 的 `about` 属性清楚地写着 “rock climbing” 。
+- 但为什么 Jane Smith 也作为结果返回了呢？原因是它的`about` 属性里提到了 “rock” 。因为只有 “rock” 而没有 “climbing” ，所以她的相关性得分低于 John 的。
+- 这是个很好的案例，阐明了Elasticsearch如何 *在* 全文属性上搜索并返回相关性最强的结果。Elasticsearch中的 *相关性*  概念非常重要，也是完全区别于传统关系型数据库的一个概念，传统数据库中的记录要么匹配要么不匹配。
+
+**短语搜索：**
+
+找出属性中的独立单词是没有问题的，但有时候想要精确匹配一系列单词或者_短语_ 。 比如， 我们想执行这样的查询：仅匹配同时包含 “rock” *和* “climbing” ，*并且*  二者以短语 “rock climbing” 的形式紧挨着的雇员记录。
+
+为此对 `match` 查询稍作调整，使用 `match_phrase` 查询：
+
+- 请求：
+
+  ```
+  192.168.0.3:9200/megacorp/employee/_search
+  ```
+
+- Body：
+
+  ```json
+  {
+      "query" : {
+          "match_phrase" : {
+              "about" : "rock climbing"
+          }
+      }
+  }
+  ```
+
+- 响应：
+
+  ```json
+  {
+      "took": 19,
+      "timed_out": false,
+      "_shards": {
+          "total": 1,
+          "successful": 1,
+          "skipped": 0,
+          "failed": 0
+      },
+      "hits": {
+          "total": {
+              "value": 1,
+              "relation": "eq"
+          },
+          "max_score": 1.4167401,
+          "hits": [
+              {
+                  "_index": "megacorp",
+                  "_type": "employee",
+                  "_id": "1",
+                  "_score": 1.4167401,
+                  "_source": {
+                      "first_name": "John",
+                      "last_name": "Smith",
+                      "age": 25,
+                      "about": "I love to go rock climbing",
+                      "interests": [
+                          "sports",
+                          "music"
+                      ]
+                  }
+              }
+          ]
+      }
+  }
+  ```
+
+不出所料，返回结果仅有 John Smith 的文档。
+
+**高亮搜索：**
+
+许多应用都倾向于在每个搜索结果中 *高亮*  部分文本片段，以便让用户知道为何该文档符合查询条件。在 Elasticsearch 中检索出高亮片段也很容易。
+
+再次执行前面的查询，并使用 `highlight` 参数：
+
+- 请求：
+
+  ```
+  192.168.0.3:9200/megacorp/employee/_search
+  ```
+
+- Body：
+
+  ```json
+  {
+      "query" : {
+          "match_phrase" : {
+              "about" : "rock climbing"
+          }
+      },
+      "highlight": {
+          "fields" : {
+              "about" : {}
+          }
+      }
+  }
+  ```
+
+- 响应：
+
+  ```json
+  {
+      "took": 105,
+      "timed_out": false,
+      "_shards": {
+          "total": 1,
+          "successful": 1,
+          "skipped": 0,
+          "failed": 0
+      },
+      "hits": {
+          "total": {
+              "value": 1,
+              "relation": "eq"
+          },
+          "max_score": 1.4167401,
+          "hits": [
+              {
+                  "_index": "megacorp",
+                  "_type": "employee",
+                  "_id": "1",
+                  "_score": 1.4167401,
+                  "_source": {
+                      "first_name": "John",
+                      "last_name": "Smith",
+                      "age": 25,
+                      "about": "I love to go rock climbing",
+                      "interests": [
+                          "sports",
+                          "music"
+                      ]
+                  },
+                  "highlight": {
+                      "about": [
+                          "I love to go <em>rock</em> <em>climbing</em>"
+                      ]
+                  }
+              }
+          ]
+      }
+  }
+  ```
+
+当执行该查询时，返回结果较之前多了 `highlight` 部分。该部分包含了 `about` 属性匹配的文本片段，并以 HTML 标签 <em></em> 封装。
+
+## 3.3 SpringBoot整合Jest来操作Elasticsearch
+
+创建新项目：
+
+![image-20200411154003943](SpringBootAdvanced.assets\image-20200411154003943.png)
+
+添加Web和Elasticsearch场景：
+
+![image-20200411155347975](SpringBootAdvanced.assets\image-20200411155347975.png)
+
+创建好项目后，再POM文件中可以看到这样一段配置，它用于引入Elasticsearch场景：
+
+```xml
+<!--引入Elasticsearch场景，SpringBoot默认使用SpringData ElasticSearch模块进行操作-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+</dependency>
+```
+
+注意下这两个包内的类：
+
+- org.springframework.boot.autoconfigure.data.elasticsearch
+
+- org.springframework.boot.autoconfigure.elasticsearch.jest
+
+- 在项目结构的External Libraries中可以找到
+
+  ![image-20200411171359762](SpringBootAdvanced.assets\image-20200411171359762.png)
+
+  ![image-20200411171137951](SpringBootAdvanced.assets\image-20200411171137951.png)
+
+  ![image-20200411171152564](SpringBootAdvanced.assets\image-20200411171152564.png)
+
+SpringBoot默认支持两种技术来和Elasticsearch交互：
+
+- Jest（以过时）：
+  - 默认不生效，需要导入Jest的工具包。
+  - Jest以过时，所以从2.2.0开始支持其它自动配置的Elasticsearch客户端。
+
+- SpringData ElasticSearch：
+
+  - ElasticsearchAutoConfiguration是Elasticsearch的自动配置类，全部源码可以自己去翻：
+
+    - ```java
+      @Bean
+      @ConditionalOnMissingBean
+      public TransportClient elasticsearchClient() throws Exception {
+         TransportClientFactoryBean factory = new TransportClientFactoryBean();
+         factory.setClusterNodes(this.properties.getClusterNodes());
+         factory.setProperties(createProperties());
+         factory.afterPropertiesSet();
+         return factory.getObject();
+      }
+      
+      private Properties createProperties() {
+         Properties properties = new Properties();
+         properties.put("cluster.name", this.properties.getClusterName());
+         properties.putAll(this.properties.getProperties());
+         return properties;
+      }
+      ```
+
+    - 它配置了Client的节点信息，包括ClusterNodes、ClusterName等。
+
+  - 使用org.springframework.data.elasticsearch.core.ElasticsearchTemplate来操作Elasticsearch。
+
+  - 编写org.springframework.data.elasticsearch.repository.ElasticsearchRepository的子接口来操作Elasticsearch。
+
+  - Elasticsearch Clients：
+
+    - Transport Client：
+      - 从Elasticsearch 7开始不推荐使用众所周知的TransportClient，并将在Elasticsearch 8中将其删除。（请参阅Elasticsearch文档）。
+      - 强烈建议使用High Level REST Client而不是TransportClient。
+    - High Level REST Client：
+      - 从2.2.0开始支持High Level REST Client，并且是默认客户端。
+    - ReactiveElasticsearchClient：
+      - ReactiveElasticsearchClient是基于WebClient的非官方驱动程序。它使用Elasticsearch核心项目提供的请求/响应对象。
+    - 官方文档：https://docs.spring.io/spring-data/elasticsearch/docs/3.2.6.RELEASE/reference/html/#elasticsearch.clients
+
+**使用Jest操作Elasticsearch：**
+
+引入Jest（最好要和Elasticsearch对应版本）：
+
+```xml
+<!-- https://mvnrepository.com/artifact/io.searchbox/jest -->
+<dependency>
+    <groupId>io.searchbox</groupId>
+    <artifactId>jest</artifactId>
+    <version>6.3.1</version>
+</dependency>
+```
+
+可配置项于org.springframework.boot.autoconfigure.elasticsearch.jest.JestProperties查看。
+
+去SpringBoot配置文件中配置uris参数，连接你的服务器，该参数是数组，可用逗号分隔多个参数，默认IP是localhost：
+
+```properties
+spring.elasticsearch.jest.uris=http://192.168.64.128:9200/
+```
+
+启动项目，控制台输出是这样的，没有报错即可：
+
+```
+2020-04-12 21:17:28.380  INFO 13676 --- [           main] io.searchbox.client.AbstractJestClient   : Setting server pool to a list of 1 servers: [http://192.168.0.3:9200/]
+```
+
+创建xuegao.learnSpringBoot.elasticsearch.bean.Article模型，并为所有属性添加GetSet方法：
+
+```java
+package xuegao.learnSpringBoot.elasticsearch.bean;
+
+import io.searchbox.annotations.JestId;
+
+public class Article {
+    @JestId
+    private Integer id;//使用@JestId告诉Jest这是主键
+    private String author;
+    private String title;
+    private String content;
+
+	/*省略GetSet方法的代码……*/
+}
+```
+
+接下来在单元测试中，尝试索引文档：
+
+```java
+package xuegao.learnSpringBoot.elasticsearch;
+
+import io.searchbox.client.JestClient;
+import io.searchbox.core.Index;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import xuegao.learnSpringBoot.elasticsearch.bean.Article;
+
+import java.io.IOException;
+
+@SpringBootTest
+class ElasticsearchApplicationTests {
+    @Autowired
+    JestClient jestClient;
+
+    @Test
+    void contextLoads() {
+        Article article = new Article();
+        article.setId(1);
+        article.setTitle("闪耀暖暖");
+        article.setAuthor("叠纸");
+        article.setContent("桃之夭夭，灼灼其华。");
+
+        //在Elasticsearch中索引（保存）文档，这样保存的索引路径为/xuegao/article
+        Index index = new Index.Builder(article).index("xuegao").type("article").build();
+        try {
+            jestClient.execute(index);//执行index，可能会抛出IO异常
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+```
+
+访问文档：
+
+![image-20200413214601070](SpringBootAdvanced.assets\image-20200413214601070.png)
+
+测试搜索：
+
+```java
+//测试搜索
+@Test
+void search() throws IOException {
+    //查询表达式，查询content属性中带“夭夭”的文档
+    String json = "{\n" +
+            "    \"query\" : {\n" +
+            "        \"match\" : {\n" +
+            "            \"content\" : \"夭夭\"\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
+    //使用上面的查询表达式，构建搜索功能，查询指定索引→类型下的文档
+    Search search = new Search.Builder(json).addIndex("xuegao").addType("article").build();
+    //执行search，可能会抛出IO异常。执行后有返回值，可以得到很多信息，这里只打印JSON格式的响应信息。
+    SearchResult result = jestClient.execute(search);
+    System.out.println(result.getJsonString());
+}
+```
+
+控制台，这行JSON很长，就不贴了，反正数据和前面浏览器查到的是一样的：
+
+![image-20200413221629894](SpringBootAdvanced.assets\image-20200413221629894.png)
+
+关于Jest的更多操作可以看GitHub里Jest的文档：https://github.com/searchbox-io/Jest。
+
+## 3.4 整合SpringDataElasticsearch
+
+在项目的POM文件中启用Spring Data ElasticSearch模块，原先的Jest依赖可以不删除：
+
+```xml
+<!--
+引入Elasticsearch场景，SpringBoot默认使用Spring Data ElasticSearch模块进行操作。
+Spring Data ElasticSearch模块和Jest客户端可以共存。
+-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+</dependency>
+```
+
+原教程中使用的是现在已经不被推荐使用的配置项，IDEA提示The transport client support is deprecated（传输客户端支持已弃用），但这里还是测试下，于SpringBoot配置文件配置：
+
+```properties
+spring.data.elasticsearch.cluster-name=docker-cluster
+spring.data.elasticsearch.cluster-nodes=192.168.0.3:9300
+```
+
+cluster-name可通过访问9200端口响应的数据获取：
+
+```json
+{
+  "name" : "d024e351d8d1",
+  "cluster_name" : "docker-cluster",
+  "cluster_uuid" : "RYD7g5S6TVObhMOO5DL9QQ",
+  "version" : {
+    "number" : "7.6.2",
+    "build_flavor" : "default",
+    "build_type" : "docker",
+    "build_hash" : "ef48eb35cf30adf4db14086e8aabd07ef6fb113f",
+    "build_date" : "2020-03-26T06:34:37.794943Z",
+    "build_snapshot" : false,
+    "lucene_version" : "8.4.0",
+    "minimum_wire_compatibility_version" : "6.8.0",
+    "minimum_index_compatibility_version" : "6.0.0-beta1"
+  },
+  "tagline" : "You Know, for Search"
+}
+```
+
+cluster-nodes为主机地址加上9300端口（各结点的通信默认用9300端口）。
+
+配置好后直接启动项目，原教程中出现超时错误，我并没有出现，但还是记录一下问题解决方法。老师在视频中说Elasticsearch版本可能会出现不合适的情况，我查看了下SpringBoot2.2.6的Elasticsearch是6.8.7版本的：
+
+![image-20200414234139386](SpringBootAdvanced.assets\image-20200414234139386.png)
+
+我装在服务器的Elasticsearch版本为7.6.2。该网址展示了Spring Data Elasticsearch与Elasticsearch的版本对应关系https://docs.spring.io/spring-data/elasticsearch/docs/3.2.0.RC3/reference/html/#preface.versions，这里将版本表格摘录出来（你也可以自行去官网spring data elasticsearch相关的文档查说明）：
+
+| Spring Data Elasticsearch | Elasticsearch |
+| :-----------------------: | :-----------: |
+|           3.2.x           |     6.8.1     |
+|           3.1.x           |     6.2.2     |
+|           3.0.x           |     5.5.0     |
+|           2.1.x           |     2.4.0     |
+|           2.0.x           |     2.2.0     |
+|           1.3.x           |     1.5.2     |
+
+打开项目POM，查看依赖关系图，找到spring-data-elasticsearch，能看到其版本号为3.2.6：
+
+![image-20200417221115753](SpringBootAdvanced.assets\image-20200417221115753.png)
+
+如果出现了版本不适配的问题有两种解决方法：
+
+1. 升级SpringBoot的版本。
+2. 安装对应版本的Elasticsearch，即更换服务器上的Elasticsearch版本。
+
+重启项目应当不会报错。
+
+创建Book模型为后面的操作做准备：
+
+```java
+package xuegao.learnSpringBoot.elasticsearch.bean;
+
+import org.springframework.data.elasticsearch.annotations.Document;
+
+//@Document用于声明该文档位于Elasticsearch仓库的liangfenxuegao索引→book类型下
+@Document(indexName = "liangfenxuegao",type = "book")
+public class Book {
+    private Integer id;
+    private String bookName;
+    private String author;
+ 
+    /*省略GetSet、toString方法……*/
+}
+```
+
+这里说下我踩坑了，@Document的indexName属性我先用的xuegao，但是后面测试添加文档时项目启动失败：
+
+```
+Failed to load ApplicationContext
+```
+
+关键错误在于：
+
+```
+nested exception is java.lang.IllegalArgumentException: Rejecting mapping update to [xuegao] as the final mapping would have more than 1 type: [article, book]
+```
+
+意思是拒绝对[xuegao]的映射更新，因为最终映射将具有超过1个类型：[article，book]。这其实和3.2节中的：“建议一个索引只对应一个类型”对上了，也就是xuegao索引下已经有article，不能再放book类型了。所以我将@Document的indexName属性改为liangfenxuegao。
+
+**Spring Data Elasticsearch之Transport Client的几种用法：**
+
+- 编写org.springframework.data.repository.CrudRepository的子接口来操作Elasticsearch。
+
+  - 创建BookCrudRepository：
+
+    ```java
+    package xuegao.learnSpringBoot.elasticsearch.repository;
+    
+    import org.springframework.data.repository.CrudRepository;
+    import xuegao.learnSpringBoot.elasticsearch.bean.Book;
+    import java.util.List;
+    
+    //CrudRepository<Book, Integer>表示要操作的类型为Book，其主键类型为Integer。
+    public interface BookCrudRepository extends CrudRepository<Book, Integer> {
+        /*
+         * 除了继承父接口的方法，还可以自定义方法，关于怎么定义方法，使其为你想要的查询方式工作，需要查看SpringBoot官方文档。
+         * 具体位于官方文档的Spring Data Elasticsearch的Elasticsearch Repositories下。
+         * https://docs.spring.io/spring-data/elasticsearch/docs/3.2.6.RELEASE/reference/html/#elasticsearch.repositories。
+       * */
+        List<Book> findByBookName(String bookName);
+    }
+    ```
+  
+  - 在单元测试中尝试保存文档：
+  
+    ```java
+    @Autowired
+    BookCrudRepository bookCrudRepository;
+    
+    //添加索引，内容为book文档，Book类上需要用@Document注解
+    @Test
+    void bookCrudRepositoryIndex(){
+        Book book = new Book();
+        book.setId(1);
+        book.setBookName("乌云之上");
+        book.setAuthor("两份雪糕");
+     	bookCrudRepository.save(book);
+    
+      	System.out.println("通过ID查找："+bookCrudRepository.findById(1));
+        System.out.println("通过书名查找："+bookCrudRepository.findByBookName("乌云"));
+    }
+    ```
+  
+  - 控制台输出：
+  
+    ```
+    通过ID查找：Optional[Book{id=1, bookName='乌云之上', author='两份雪糕'}]
+    通过书名查找：[Book{id=1, bookName='乌云之上', author='两份雪糕'}]
+    ```
+  
+- 通过org.springframework.data.elasticsearch.repository.ElasticsearchRepository的子接口来操作Elasticsearch。
+
+  - 创建BookElasticsearchRepository：
+
+    ```java
+    package xuegao.learnSpringBoot.elasticsearch.repository;
+    
+    import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+    import xuegao.learnSpringBoot.elasticsearch.bean.Book;
+    import java.util.List;
+    
+    public interface BookElasticsearchRepository extends ElasticsearchRepository<Book,Integer> {
+        List<Book> findByAuthorLike(String author);
+    }
+    ```
+
+  - 在单元测试中尝试保存文档：
+
+    ```java
+    //编写ElasticsearchRepository的子接口来操作Elasticsearch
+    @Autowired
+    BookElasticsearchRepository bookElasticsearchRepository;
+    
+    //添加索引，内容为book文档，Book类上需要用@Document注解
+    @Test
+    void bookElasticsearchRepository(){
+        Book book = new Book();
+        book.setId(2);
+        book.setBookName("飞云之下");
+        book.setAuthor("梦屿千寻");
+        bookElasticsearchRepository.index(book);
+    
+        System.out.println(bookElasticsearchRepository.findById(2));
+        System.out.println(bookElasticsearchRepository.findByAuthorLike("千寻"));
+    }
+    ```
+
+  - 运行后的控制台输出：
+
+    ```
+    Optional[Book{id=2, bookName='飞云之下', author='梦屿千寻'}]
+    [Book{id=2, bookName='飞云之下', author='梦屿千寻'}]
+    ```
+
+- 使用org.springframework.data.elasticsearch.core.ElasticsearchTemplate来操作Elasticsearch。
+
+  - 直接测试：
+
+    ```java
+    //使用Transport Client的ElasticsearchTemplate
+    @Autowired
+    ElasticsearchTemplate elasticsearchTemplate;
+    
+    //单字符串模糊查询，默认排序，将从所有字段中查找包含传来的word分词后字符串的数据集。
+    @Test
+    void testElasticsearchTemplate(){
+        String author = "雪糕";//使用queryStringQuery完成单字符串查询
+        SearchQuery searchQuery = new NativeSearchQueryBuilder().withQuery(QueryBuilders.queryStringQuery(author)).build();
+        List<Book> books = elasticsearchTemplate.queryForList(searchQuery, Book.class);
+        System.out.println(books);
+    }
+    ```
+
+  - 控制台输出：
+
+    ```
+    [Book{id=1, bookName='乌云之上', author='两份雪糕'}]
+    ```
+
+**Spring Data Elasticsearch之使用RestClient：**
+
+https://github.com/spring-projects/spring-data-elasticsearch中提到了不再推荐使用Transport Client，而是使用RestClient，那么接下来就使用RestClient连接Elasticsearch：
+
+```properties
+spring.elasticsearch.rest.uris=http://106.13.166.140:9200
+```
+
+测试：
+
+```java
+//使用RestHighLevelClient
+@Autowired
+RestHighLevelClient restHighLevelClient;
+
+@Test
+void testRestHighLevelClient() throws IOException {
+    //实例化book
+    Book book = new Book();
+    book.setId(11);
+    book.setBookName("天才剑仙的徒弟为何是我这个废材");
+    book.setAuthor("佐仓生生子");
+    //使用Jackson的ObjectMapper类将book序列化为JSON格式
+    ObjectMapper objectMapper = new ObjectMapper();
+    String source = objectMapper.writeValueAsString(book);
+
+    /*
+    IndexRequest()里第二个参数使用_doc的原因是我之前用book，控制台里提示：Specifying types in document index requests is deprecated, use the typeless endpoints instead (/{index}/_doc/{id}, /{index}/_doc, or /{index}/_create/{id})
+    */
+    IndexRequest indexRequest = new IndexRequest("liangfenxuegao", "_doc","11");
+    indexRequest.source(source, XContentType.JSON);
+    restHighLevelClient.index(indexRequest);
+}
+```
+
+访问http://192.168.0.3:9200/liangfenxuegao/_doc/11后得到的响应：
+
+```json
+{
+  "_index": "liangfenxuegao",
+  "_type": "_doc",
+  "_id": "11",
+  "_version": 1,
+  "_seq_no": 1,
+  "_primary_term": 1,
+  "found": true,
+  "_source": {
+    "id": 11,
+    "bookName": "天才剑仙的徒弟为何是我这个废材",
+    "author": "佐仓生生子"
+  }
+}
+```
+
+其实还有 Reactive Client等客户端，以及非Java语言的客户端，这里就不再展开说了。
+
+## 3.5 新版本RestClient
+
+我在使用RestClient的过程中发现有大量被弃用的方法，不得不吐槽一下版本更新的变化太大了。
+
+建议使用RestClient前先去查看对应版本的文档：https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high.html 。
+
+# 四、任务
+
+## 4.1 异步任务
+
+在Java应用中，绝大多数情况下都是通过同步的方式来实现交互处理的，但是在处理与第三方系统交互的时候，容易造成响应迟缓的情况。之前大部分都是使用多线程来完成此类任务，其实，在Spring 3.x之后，就已经内置了@Async来完美解决这个问题。
+
+创建新项目：
+
+![image-20200422190042038](SpringBootAdvanced.assets\image-20200422190042038.png)
+
+添加Spring Web场景：
+
+![image-20200422203737806](SpringBootAdvanced.assets\image-20200422203737806.png)
+
+创建AsyncService类，用Thread.sleep(300)令线程睡眠三秒：
+
+```java
+package xuegao.learnSpringBoot.task.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class AsyncService {
+
+    public void helloAsync(){
+        try {
+            Thread.sleep(3000);//令线程睡眠三秒
+            System.out.println("异步你好");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+创建AsyncController类，调用AsyncService类里的方法：
+
+```java
+package xuegao.learnSpringBoot.task.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import xuegao.learnSpringBoot.task.service.AsyncService;
+import javax.annotation.Resource;
+
+@RestController
+public class AsyncController {
+    @Resource(name = "asyncService")
+    AsyncService asyncService;
+
+    @GetMapping("hi")
+    String hi(){
+        asyncService.helloAsync();//以同步方式工作时，会先等待该方法执行完成再运行下面的代码
+        return "Hi！";
+    }
+}
+```
+
+在浏览器发hi请求，你会发现延迟三秒以上才得到响应：
+
+![image-20200422212500271](SpringBootAdvanced.assets\image-20200422212500271.png)
+
+控制台也会得到响应：
+
+![image-20200422215623269](SpringBootAdvanced.assets\image-20200422215623269.png)
+
+这是因为目前以同步方式工作，可以通过@Async告诉SpringBoot这是异步方法：
+
+```java
+@Service
+public class AsyncService {
+    @Async//告诉SpringBoot这是异步方法
+    public void helloAsync(){
+    	/*省略……*/   
+    }
+}
+```
+
+还需要在主配置类用@EnableAsync来启用Async注解功能：
+
+```java
+@EnableAsync//启用Async注解，才能使用@Async
+@SpringBootApplication
+public class TaskApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(TaskApplication.class, args);
+    }
+}
+```
+
+重启项目，你会发现发hi请求后，页面马上会得到响应，而控制台的“异步你好”仍有三秒延迟。说明AsyncService类的helloAsync方法确实以异步方式工作了。
+
+注意：
+
+- 在使用@Async的时候切记不要在一个类里面调用@Async声明的方法，会产生代理绕过问题。
+
+## 4.2 定时任务
+
+项目开发中经常需要执行一些定时任务，比如需要在每天凌晨时候，分析一次前一天的日志信息。Spring为我们提供了异步执行任务调度的方式，提供TaskExecutor 、TaskScheduler 接口。
+
+创建ScheduledService类来测试@Scheduled注解：
+
+```java
+package xuegao.learnSpringBoot.task.service;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ScheduledService {
+    /**
+     * @Scheduled
+     *  cron的用法:
+     *      共六位，依次为秒、分、时、天、月、周。
+     *      可以通过特殊字符来代表特殊含义。
+     *      例如"0 * * * * MON-FRI"表示周一到周五，每分钟里，秒数为0时都执行该方法。
+     * */
+    @Scheduled(cron = "0 * * * * MON-FRI")
+    public void hi(){
+        System.out.println("Hi！");
+    }
+}
+```
+
+这样还不够，还需要在主配置类种启用@Scheduled注解：
+
+```java
+@EnableScheduling//启用Scheduling注解，才能使用@Scheduled
+@SpringBootApplication
+public class TaskApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(TaskApplication.class, args);
+    }
+}
+```
+
+这样启动项目后，在周一至周五，每分钟里秒数为0时都会在Console打印”Hi!“：
+
+```
+Hi！
+Hi！
+```
+
+cron表达式：
+
+| **字段** | **允许值**                          | **允许的特殊字符** |
+| -------- | ----------------------------------- | ------------------ |
+| 秒       | 0-59                                | , -  * /           |
+| 分       | 0-59                                | , -  * /           |
+| 小时     | 0-23                                | , -  * /           |
+| 日期     | 1-31                                | , -  * ? / L W C   |
+| 月份     | 1-12                                | , -  * /           |
+| 星期     | 0-7或SUN-SAT（0和7都是周日的意思 ） | , -  * ? / L C #   |
+
+特殊字符的含义：
+
+| **特殊字符** | **代表含义**               |
+| ------------ | -------------------------- |
+| ,            | 枚举                       |
+| -            | 区间                       |
+| *            | 任意                       |
+| /            | 步长                       |
+| ?            | 日/星期冲突匹配            |
+| L            | 最后                       |
+| W            | 工作日                     |
+| C            | 和calendar联系后计算过的值 |
+| #            | 星期，4#2，第2个星期四     |
+
+通过逗号来枚举多个：
+
+```java
+//表示周一到周五，每分钟里，秒数为0,1,2,3,4时都执行该方法。
+@Scheduled(cron = "0,1,2,3,4 * * * * MON-FRI")
+```
+
+通过短横杠表示区间：
+
+```java
+//表示周一到周五，每分钟里，秒数为0,1,2,3,4时都执行该方法。
+@Scheduled(cron = "0-4 * * * * MON-FRI")
+```
+
+通过斜杠表示步长：
+
+```java
+//表示周一到周五，每过四秒都执行该方法。
+@Scheduled(cron = "0/4 * * * * MON-FRI")
+```
+
+更高级的组合用法：
+
+```java
+//每逢当月最后一个工作日凌晨2点，执行该方法
+@Scheduled(cron = "0 0 2 LW * ?")
+```
+
+其实表达式搞起来也挺烦人的，所以我个人推荐使用cron表达式生成器来完成工作，贴个cron在线生成器http://www.qqe2.com/dev/cron。
+
+另外说一下特殊字符，问号，的作用。例如你指定每周都要运行，但又指定了每月的第1天不运行，那显然有冲突，是会出错的，那么就可以用问号来使周不生效：
+
+```
+* * * 1 * ? 
+```
+
+## 4.3 邮件任务
+
+在项目的POM文件中引入spring-boot-starter-mail：
+
+```xml
+<!--使用邮件发送任务需要引入spring-boot-starter-mail启动器-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+```
+
+在org.springframework.boot.autoconfigure.mail下有这几个类，用于自动配置等功能，MailProperties中有许多属性可配置：
+
+![image-20200423233648256](SpringBootAdvanced.assets\image-20200423233648256.png)
+
+收发邮件的过程示例：
+
+<img src="SpringBootAdvanced.assets\image-20200423233900538.png" alt="image-20200423233900538" style="zoom:80%;" />
+
+进行项目的mail任务配置前，需要先有支持POP3/SMTP等服务的邮箱账号，以QQ邮箱为例，进入设置→账户：
+
+![image-20200423235042051](SpringBootAdvanced.assets\image-20200423235042051.png)
+
+在下方有开启服务的内容：
+
+![image-20200423235132878](SpringBootAdvanced.assets\image-20200423235132878.png)
+
+例如开启IMAP/SMTP服务，会弹出对话框，具体怎么操作就不说了：
+
+![image-20200423235312763](SpringBootAdvanced.assets\image-20200423235312763.png)
+
+有了授权码后，去SpringBoot Profile配置相关属性。QQ邮箱的SMTP域名为smtp.qq.com。163邮箱的为smtp.163.com，其实这些信息都可以自己去找。
+
+```properties
+#配置邮箱的账号密码
+    spring.mail.username=liangfenxuegao@163.com
+    spring.mail.password=我是授权码
+#配置SMTP服务器的服务器主机位置
+    spring.mail.host=smtp.163.com
+```
+
+来测试一下（注意message.setFrom要和上面SpringBoot Profile中配置的账号一致，否则会报错）：
+
+```java
+package xuegao.learnSpringBoot.task;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+
+@SpringBootTest
+class TaskApplicationTests {
+    @Autowired
+    JavaMailSenderImpl mailSender;//引入JavaMailSender实现
+
+    @Test
+    void contextLoads() {
+        //实例化简单邮件消息，该类提供了一些简单的方法
+        SimpleMailMessage message = new SimpleMailMessage();
+        //设置消息
+        message.setSubject("我是主题");
+        message.setText("我是内容");
+        message.setFrom("liangfenxuegao@163.com");//谁发的
+        message.setTo("liangfenxuegao@foxmail.com");//发给谁
+
+        mailSender.send(message);//使用mailSender发送消息
+    }
+}
+```
+
+登录liangfenxuegao@foxmail.com，确实收到来自liangfenxuegao@163.com的邮件了：
+
+![image-20200424003415020](SpringBootAdvanced.assets\image-20200424003415020.png)
+
+并且我登录163邮箱也能在“以发送”中看到这条邮件：
+
+![image-20200424003534826](SpringBootAdvanced.assets\image-20200424003534826.png)
+
+在spring.mail.properties可以配置额外的属性，原教程中老师出现了530错误。具体为：A secure connection is requiered(such as ssl)。意思是需要安全连接（例如SSL）。这应该是旧版本的SpringBoot未默认启用SSL的原因，解决办法是再SpringBoot配置文件中启用SSL连接，新版本中不再需要再设置此配置项（我是2.2.6）：
+
+```properties
+spring.mail.properties.mail.smtp.ssl.enable=true
+```
+
+**测试复杂邮件收发：**
+
+```java
+//测试复杂邮件收发
+@Test
+void complexMail() throws MessagingException {
+    //创建复杂消息邮件，可以发送附件、HTML页面等
+    MimeMessage mimeMessage = mailSender.createMimeMessage();
+    //使用MimeMessage助手，它有很多方法可供使用
+    MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+    //使用mimeMessageHelper设置消息
+    mimeMessageHelper.setSubject("我是主题");
+    mimeMessageHelper.setText("<b style='color:red'>使用了HTML标签的内容</b>",true);//可使用HTML标签，需要将二参设为true才能生效
+    mimeMessageHelper.setFrom("liangfenxuegao@163.com");//谁发的
+    mimeMessageHelper.setTo("liangfenxuegao@foxmail.com");//发给谁
+    //添加附件，可以用java.io.File或org.springframework.core.io.InputStreamSource来指定文件
+    mimeMessageHelper.addAttachment("附件1.jpg",new File("src/main/resources/static/images/女孩-吃东西.jpg"));
+    mimeMessageHelper.addAttachment("附件2.jpg",new File("src/main/resources/static/images/美女-水母-唯美.jpg"));
+    mailSender.send(mimeMessage);//使用mailSender发送消息
+}
+```
+
+注意我添加的两个附件，是两张图片，放在了项目内的这个位置：
+
+![image-20200424011624730](SpringBootAdvanced.assets\image-20200424011624730.png)
+
+然后运行测试即可收到邮件：
+
+![image-20200424011657427](SpringBootAdvanced.assets\image-20200424011657427.png)
+
+# 五、安全
+
+## 5.1 测试环境搭建
+
+目前有两个比较流行的框架，分别为Apache Shiro和Spring Security。
+
+Spring Security是针对Spring项目的安全框架，也是Spring Boot底层安全模块默认的技术选型。他可以实现强大的web安全控制。对于安全控制，我们仅需引入spring-boot-starter-security模块，进行少量的配置，即可实现强大的安全管理。
+
+使用Spring Security模块时会用到这几个类：
+
+- WebSecurityConfigurerAdapter：自定义Security策略
+- AuthenticationManagerBuilder：自定义认证策略
+- @EnableWebSecurity：开启WebSecurity模式
+
+创建项目：
+
+![image-20200424213642054](SpringBootAdvanced.assets\image-20200424213642054.png)
+
+添加依赖场景，暂时不添加Spring Security（不是不可以添加）：
+
+![image-20200424213940526](SpringBootAdvanced.assets\image-20200424213940526.png)
+
+在尚硅谷的资料中有用于SpringSecurity实验的文档，接下来要使用它：
+
+![image-20200424214901380](SpringBootAdvanced.assets\image-20200424214901380.png)
+
+将该文档下templates中的内容粘贴到项目的src\main\resources下：
+
+![image-20200424215334143](SpringBootAdvanced.assets\image-20200424215334143.png)
+
+将该文档下java中的文件粘贴到src\main\java\xuegao\learnSpringBoot\security\controller下：
+
+![image-20200424215719868](SpringBootAdvanced.assets\image-20200424215719868.png)
+
+启动项目，访问之，目前任何访客都可以查看该系统的所有秘籍：
+
+![image-20200424222057472](SpringBootAdvanced.assets\image-20200424222057472.png)
+
+原教程中出现了Thymeleaf版本过低的问题，导致无法访问该页面，如果需要指定版本，可以在项目POM文件的properties标签中指定需要的版本。
+
+通过这两个步骤进入spring-boot-dependencies：
+
+![image-20200424223028206](SpringBootAdvanced.assets\image-20200424223028206.png)
+
+![image-20200424223037199](SpringBootAdvanced.assets\image-20200424223037199.png)
+
+该文件中设置了所有依赖的版本，找到thymeleaf版本管理，复制需要管理的项到项目POM文件的properties标签中，指定为自己需要的版本即可：
+
+![image-20200424223319895](SpringBootAdvanced.assets\image-20200424223319895.png)
+
+```xml
+<properties>
+    <java.version>11</java.version>
+    <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
+    <thymeleaf-layout-dialect.version>2.4.1</thymeleaf-layout-dialect.version>
+    <thymeleaf-extras-springsecurity4.version>3.0.4.RELEASE</thymeleaf-extras-springsecurity4.version>
+</properties>
+```
+
+## 5.2 登录、认证和授权
+
+**关于访问控制的通用概念（不限于Spring Security）：**
+
+- 应用程序的两个主要区域是“认证”和“授权”（或者访问控制）。这两个主要区域是Spring Security 的两个目标。
+- “认证”（Authentication），是建立一个它声明的主体的过程（“主体”一般是指用户、设备或一些可以在你的应用程序中执行动作的其他系统）。
+- “授权”（Authorization）指确定一个主体是否允许在你的应用程序执行某个动作的过程。为了抵达需要授权的点，主体的身份已经有认证过程建立。
+
+**实现登录、认证和、授权的步骤：**
+
+1. 于POM文件中引入Spring Security：
+
+   ```xml
+   <dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-security</artifactId>
+   </dependency>
+   ```
+
+2. 编写Spring Security的配置：
+
+   访问https://spring.io/guides/gs/securing-web/可以查看Spring Securing的快速向导。
+
+   ```java
+   package xuegao.learnSpringBoot.security.config;
+   
+   import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+   import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+   
+   /**
+    * @EnableWebSecurity：
+    *  用于开启WebSecurity模式。
+    *  该注解已经带有@Configuration，所以本配置类无需再添加。
+    * */
+   @EnableWebSecurity
+   public class MySecurityConfig extends WebSecurityConfigurerAdapter {
+   
+   }
+   ```
+
+3. 控制请求的访问权限：
+
+   先重写父类的configure(HttpSecurity http)方法，添加一些访问规则，限制指定角色访问指定路径：
+
+   ```java
+   @EnableWebSecurity
+   public class MySecurityConfig extends WebSecurityConfigurerAdapter {
+   
+       @Override
+       protected void configure(HttpSecurity http) throws Exception {
+           //super.configure(http);//不调用父类的这个构造器，因为其包含了一些默认配置
+           /*
+           自定义请求的授权规则（antMatchers表示ant风格的路径匹配）：
+               http.授权请求().路径匹配("/").允许全部()
+               .路径匹配("/level1/**").允许角色("VIP11")
+               后面的省略……
+           */
+           http.authorizeRequests().antMatchers("/").permitAll()
+               .antMatchers("/level1/**").hasRole("VIP1")
+               .antMatchers("/level2/**").hasRole("VIP2")
+               .antMatchers("/level3/**").hasRole("VIP3");
+       }
+   }
+   ```
+
+   访问“武林秘籍管理系统”，尝试查看秘籍时会收到403错误，并提示Access Denied：
+
+   ![image-20200425232441397](SpringBootAdvanced.assets\image-20200425232441397.png)
+
+   开启自动配置的登录功能：
+
+   ```java
+   @Override
+   protected void configure(HttpSecurity http) throws Exception {
+   	/*省略……*/
+       
+       /*
+       开启自动配置的登录功能，这是它的默认策略：
+           一、访问/login会前往登录页
+           二、登录错误时会重定向到/login?error
+       */
+       http.formLogin();
+   }
+   ```
+
+   重启项目，再次尝试查看秘籍，会看到这样的界面：
+
+   ![image-20200425232830432](SpringBootAdvanced.assets\image-20200425232830432.png)
+
+   查看该页面的源码，会发现表单中有条name属性为_csrf的隐藏输入域，这是用来预防CSRF的。什么是CSRF呢？CSRF（Cross-site request forgery）跨站请求伪造。而HttpSecurity会启用CSRF功能，会为表单添加CSRF的值，提交时携带从而预防CSRF：
+   
+   ```html
+   <input name="_csrf" type="hidden" value="f3c1e6d3-9bc2-4904-8f5b-48c982cfc2a9" />
+   ```
+   
+   这时还没有配置用户组可以通过重写userDetailsService方法来配置（仅用作演示，不安全）：
+   
+   ```java
+   @EnableWebSecurity
+   public class MySecurityConfig extends WebSecurityConfigurerAdapter {
+   	/*省略……*/
+       
+       @Bean
+       @Override
+       public UserDetailsService userDetailsService() {
+           UserDetails bess = User.withDefaultPasswordEncoder().username("bess").password("123456").roles("VIP1").build();
+           UserDetails daisy = User.withDefaultPasswordEncoder().username("daisy").password("123456").roles("VIP1","VIP2").build();
+           UserDetails william = User.withDefaultPasswordEncoder().username("william").password("123456").roles("VIP1","VIP2","VIP3").build();
+   
+           return new InMemoryUserDetailsManager(bess,daisy,william);
+       }
+   }
+   ```
+   
+   重启项目，再次尝试查看秘籍，例如以daisy的身份登录，你会发现能访问普通和高级的武功秘籍。
+   
+   在实际生产环境环境中，使用通过数据库加载才是最合适的做法，但那就十分复杂了，原视频没讲，我也先不搞了。你需要的话可以自行查找资料。可以参考：https://www.jianshu.com/p/c3b79a625d84
+
+## 5.3 权限控制和注销
+
+开启注销功能很简单，还是在MySecurityConfig类中的configure(HttpSecurity http)方法，调用http对象的logout方法即可：
+
+```java
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+	/*省略……*/
+
+    /*
+    开启注销功能，不做配置时会使用如下默认策略：
+        一、访问/logout将注销用户，清空session
+        二、注销成功后将前往/login?logout页面
+    */
+    http.logout();
+}
+```
+
+由于Spring Security要求发出的/logout请求，为POST请求，所以在resources\templates\welcome.html的body标签里添加这样一段代码：
+
+```html
+<!--发出/logout请求，Spring Security要求为POST请求-->
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="登出">
+</form>
+```
+
+启动项目，访问武林秘籍管理系统并登录账号，在点击“登出”：
+
+![image-20200426200956987](SpringBootAdvanced.assets\image-20200426200956987.png)
+
+就会成功注销账号并跳转到这里（http://localhost:8080/login?logout）：
+
+![image-20200426201035135](SpringBootAdvanced.assets\image-20200426201035135.png)
+
+上面是默认的logout策略，接下来自定义策略，例如注销账号后重定向到武林秘籍管理系统：
+
+```java
+http.logout().logoutSuccessUrl("/");//登出后前往路径：”/“。
+```
+
+重启项目，此时点击登出时前往的就是武林秘籍管理系统了。
+
+**根据登录情况实时变换页面显示效果：**
+
+在POM文件引入thymeleaf-extras-springsecurity5：
+
+```xml
+<dependency>
+    <groupId>org.thymeleaf.extras</groupId>
+    <artifactId>thymeleaf-extras-springsecurity5</artifactId>
+    <version>3.0.4.RELEASE</version>
+</dependency>
+```
+
+为了有语法提示，需要在添加xmlns:sec="https://www.thymeleaf.org/extras/spring-security"。下面将整个welcome.html页面贴出来了：
+
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <title>Insert title here</title>
+</head>
+<body>
+   <h1 align="center">欢迎光临武林秘籍管理系统</h1>
+   <!--如果未认证，显示：“游客您好……”-->
+   <div sec:authorize="!isAuthenticated()">
+      <h2 align="center">游客您好，如果想查看武林秘籍 <a th:href="@{/login}">请登入</a></h2>
+   </div>
+   <!--如果已认证，显示“登出按钮”-->
+   <div sec:authorize="isAuthenticated()">
+      <!--sec:authentication="name"会取出用户名，principal.authorities能得到该用户拥有的角色-->
+      <h2><span sec:authentication="name"></span>您好，您拥有的角色有：<span sec:authentication="principal.authorities"></span></h2>
+      <!--发出/logout请求，Spring Security要求为POST请求-->
+      <form th:action="@{/logout}" method="post">
+         <input type="submit" value="登出">
+      </form>
+   </div>
+   <hr>
+
+   <!--有VIP1角色时生效-->
+   <div sec:authorize="hasRole('VIP1')">
+      <h3>普通武功秘籍</h3>
+      <ul>
+         <li><a th:href="@{/level1/1}">罗汉拳</a></li>
+         <li><a th:href="@{/level1/2}">武当长拳</a></li>
+         <li><a th:href="@{/level1/3}">全真剑法</a></li>
+      </ul>
+   </div>
+
+   <!--有VIP2角色时生效-->
+   <div sec:authorize="hasRole('VIP2')">
+      <h3>高级武功秘籍</h3>
+      <ul>
+         <li><a th:href="@{/level2/1}">太极拳</a></li>
+         <li><a th:href="@{/level2/2}">七伤拳</a></li>
+         <li><a th:href="@{/level2/3}">梯云纵</a></li>
+      </ul>
+   </div>
+
+   <!--有VIP3角色时生效-->
+   <div sec:authorize="hasRole('VIP3')">
+      <h3>绝世武功秘籍</h3>
+      <ul>
+         <li><a th:href="@{/level3/1}">葵花宝典</a></li>
+         <li><a th:href="@{/level3/2}">龟派气功</a></li>
+         <li><a th:href="@{/level3/3}">独孤九剑</a></li>
+      </ul>
+   </div>
+</body>
+</html>
+```
+
+重启项目后，刷新武林秘籍管理系统页面的效果，将没有登出按钮和下面的秘籍列表：
+
+<img src="SpringBootAdvanced.assets\image-20200426223231063.png" alt="image-20200426223231063" style="zoom:80%;" />
+
+例如登录daisy用户，显示效果是这样的：
+
+<img src="SpringBootAdvanced.assets\image-20200426223350449.png" alt="image-20200426223350449" style="zoom:80%;" />
+
+## 5.4 实现“记住我”功能和定制登录页
+
+**实现“记住我”功能：**
+
+还是在MySecurityConfig类中的configure(HttpSecurity http)方法，只需添加一行http.rememberMe();即可实现该功能：
+
+```java
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+	/*省略……*/
+
+    /*
+    开启“记住我”功能：
+        登入成功后：生成名为remember-me的cookie给浏览器保存，日后再次访问时该cookie通过检查就可免登录。
+        登出成功后：删除名为remember-me的cookie。
+    */
+	http.rememberMe();
+}
+```
+
+重新访问管理系统，进入登录页时会发现多了个“Remember me on this computer.”复选框：
+
+<img src="SpringBootAdvanced.assets\image-20200426225634105.png" alt="image-20200426225634105" style="zoom:80%;" />
+
+若不勾选直接登录，那么退出浏览器后再次访问管理系统又需要重新登录了，而勾选上后就能避免该点，实现免登录。
+
+这是通过Cokie做到的，登录管理系统后打开“开发人员工具”，查看Cookice信息时能看到remember-me，还显示了过期时间：
+
+![image-20200426230817853](SpringBootAdvanced.assets\image-20200426230817853.png)
+
+当点击登出时该Cookie会立即被删除：
+
+![image-20200426230917371](SpringBootAdvanced.assets\image-20200426230917371.png)
+
+在网络中查看logout请求的响应标头的Set-Cookie（意思是立即清除remember-me这个cookie）：
+
+![image-20200426234202582](SpringBootAdvanced.assets\image-20200426234202582.png)
+
+**定制登录页：**
+
+在xuegao.learnSpringBoot.security.controller.KungfuController中这个方法处理了/userLogin请求：
+
+```java
+//登录页
+@GetMapping("/userLogin")
+public String loginPage() {
+   return PREFIX+"login";
+}
+```
+
+该方法映射的页面login.html：
+
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>登入</title>
+</head>
+<body>
+	<h1 align="center">欢迎登入武林秘籍管理系统</h1>
+	<hr>
+	<div align="center">
+		<!--
+		以POST方式发出/login请求，Spring Security默认视为登录请求处理。
+		一旦定制了MySecurityConfig类configure方法下的http.loginPage()：
+			那么发往loginPage里填写的路径的请求将视为登录请求处理，除非特意声明http.loginProcessingUrl("/login")。
+		-->
+		<form th:action="@{'/userLogin'}" method="post">
+			<!--这俩的name属性要和MySecurityConfig类configure方法下的http.usernameParameter("username").passwordParameter("password")配置的值一致，Spring Security才能取到值-->
+			账户：<input name="username"/><br>
+			密码：<input name="password"><br/>
+			<input type="submit" value="登入">
+		</form>
+	</div>
+</body>
+</html>
+```
+
+MySecurityConfig类configure方法下的http.formLogin()配置：
+
+```java
+/*
+开启登录功能，这是它的默认策略（不做配置时会使用默认策略）：
+    一、访问/login会前往登录页
+    二、登录错误时会重定向到/login?error
+定制登录页：
+    一、通过loginPage方法定制登录页。
+    二、以POST方式发出/login请求，Spring Security默认视为登录请求处理。
+    三、通过usernameParameter()、passwordParameter()方法从/userLogin页面的，name属性为指定值的input标签取值。
+	四、一旦定制了loginPage，那么loginPage的POST请求就是用于处理登录，相当于http.loginProcessingUrl("/userLogin")，除非特意声明http.loginProcessingUrl("/login")。
+*/
+http.formLogin().usernameParameter("username").passwordParameter("password").loginPage("/userLogin");
+```
+
+重启项目，点击“请登入”：
+
+![image-20200427212523787](SpringBootAdvanced.assets\image-20200427212523787.png)
+
+就会跳转到自定义的登录页（/userLogin），输入账户密码后应能成功登入：
+
+![image-20200427212551996](SpringBootAdvanced.assets\image-20200427212551996.png)
+
+值得注意的是，即便是自定义的登录页，HttpSecurity也会启用CSRF功能，为表单添加CSRF的值，从而预防CSRF。查看该页面的源码可发现较之项目中原来的login.html，form标签中多了name属性为_csrf的输入域（这里删除了注释内容）：
+
+```html
+<form action="/userLogin" method="post">
+    <input type="hidden" name="_csrf" value="404af71a-928b-4949-a10c-8fb59cd9ab32"/>
+    账户：<input name="username"/><br/>
+    密码：<input name="password"><br/>
+	<input type="checkbox" name="rememberMe">记住我<br/>
+	<input type="submit" value="登入">
+</form>
+```
+
+**为自定义的登录页添加“记住我”功能：**
+
+MySecurityConfig类configure方法下http.rememberMe()相关配置：
+
+```java
+//rememberMeParameter的参数默认为rememberMe，调用该方法可以自定义参数值，从而向/userLogin页面的，name属性为指定值的input标签取值。
+http.rememberMe().rememberMeParameter("rememberMe");
+```
+
+login.html里，发往/userLogin的表单内，添加name属性为rememberMe的输入域：
+
+```html
+<form th:action="@{'/userLogin'}" method="post">
+	省略……
+    
+   <!--这个name属性要和MySecurityConfig类configure方法下的http.rememberMeParameter("rememberMe")配置的值一致，“记住我”功能才能生效-->
+   <input type="checkbox" name="rememberMe">记住我<br/>
+
+   <input type="submit" value="登入">
+</form>
+```
+
+重启项目访问登录页能看到多了“记住我”：
+
+![image-20200427220705948](SpringBootAdvanced.assets\image-20200427220705948.png)
+
+勾选上再登录，然后关闭浏览器，再访问武林秘籍管理系统就会发现成功实现了“记住我”功能。
+
+## 5.5 Spring Security使用ajax实现异步登录
+
+参考博文：https://blog.csdn.net/qq_34869990/article/details/103360678 
+
+**自定义登录处理逻辑：**
+
+编写自定义登录成功和登录失败处理逻辑(返回json数据，而不是页面跳转)，系统默认登录成功会跳回上一个页面，我们需要进行错误提示，所以需要自定义ajax处理。
+
+1. 登录成功处理器：
+
+   ```java
+   @Component
+   public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+   
+       @Override
+       public void onAuthenticationSuccess(
+               HttpServletRequest httpServletRequest,
+               HttpServletResponse httpServletResponse,
+               Authentication authentication) throws IOException, ServletException {
+   
+           //装载消息
+           HashMap<String, Object> map = new HashMap<>();
+           map.put("code",200);//HTTP状态码。200表示OK，即正常状态。
+           map.put("message","登录成功");
+           String stringJson = new JSONObject(map).toString();//将map转为JSON格式
+   
+           httpServletRequest.getSession().setAttribute("username",authentication.getName());//设置当前Session中，username键对应的值是当前登录用户的用户名。
+           httpServletResponse.setContentType("application/json;charset=UTF-8");//设置内容类型
+           PrintWriter out = httpServletResponse.getWriter();
+           out.write(stringJson);
+           out.flush();
+           out.close();
+       }
+   }
+   ```
+
+2. 登录失败处理器：
+
+   ```java
+   @Component
+   public class MyAuthenticationFailHandler implements AuthenticationFailureHandler {
+   
+       @Override
+       public void onAuthenticationFailure(
+               HttpServletRequest request,
+               HttpServletResponse response,
+               AuthenticationException exception) throws IOException, ServletException {
+   
+           //装载消息
+           HashMap<String, Object> map = new HashMap<>();
+           map.put("code",300);//HTTP状态码。300表示Multiple Choices。
+           map.put("message",exception.getMessage()+"请检查是否有账号或密码错误");
+           String stringJson = new JSONObject(map).toString();//将map转为JSON格式
+   
+           response.setContentType("application/json;charset=UTF-8");//设置内容类型
+           PrintWriter out = response.getWriter();
+           out.write(stringJson);
+           out.flush();
+           out.close();
+       }
+   }
+   ```
+
+## 5.6 获取当前登录用户信息
+
+参考文章：https://www.hangge.com/blog/cache/detail_2717.html 。
+
+方法一：通过注入Principal接口获取用户信息。
+
+- 在运行过程中，Spring 会将 Username、Password、Authentication、Token 注入到 Principal 接口中，我们可以直接获取使用。
+
+- ```java
+  @GetMapping("getCurrentLoginUsername")
+  public String hello(Principal principal) {
+  	return principal.getName();//如果未登录，principal将为null。
+  }
+  ```
+
+# 六、分布式
+
+## 6.1 Dobbo简介
+
+**分布式应用：**
+
+在分布式系统中，国内常用zookeeper+dubbo组合，而Spring Boot推荐使用全栈的Spring，即Spring Boot加Spring Cloud。
+
+分布式系统：
+
+![image-20200427231918934](SpringBootAdvanced.assets\image-20200427231918934.png)
+
+- 单一应用架构
+  当网站流量很小时，只需一个应用，将所有功能都部署在一起，以减少部署节点和成本。此时，用于简化增删改查工作量的数据访问框架(ORM)是关键。
+- 垂直应用架构
+  当访问量逐渐增大，单一应用增加机器带来的加速度越来越小，将应用拆成互不相干的几个应用，以提升效率。此时，用于加速前端页面开发的Web框架(MVC)是关键。
+- 分布式服务架构
+  当垂直应用越来越多，应用之间交互不可避免，将核心业务抽取出来，作为独立的服务，逐渐形成稳定的服务中心，使前端应用能更快速的响应多变的市场需求。此时，用于提高业务复用及整合的分布式服务框架(RPC)是关键。
+- 流动计算架构
+  当服务越来越多，容量的评估，小服务资源的浪费等问题逐渐显现，此时需增加一个调度中心基于访问压力实时管理集群容量，提高集群利用率。此时，用于提高机器利用率的资源调度和治理中心(SOA)是关键。
+
+**Zookeeper和Dubbo：**
+
+- Zookeeper
+
+  ZooKeeper 是一个分布式的，开放源码的分布式应用程序协调服务。它是为分布式应用提供一致性服务的软件，提供的功能包括：配置维护、域名服务、分布式同步、组服务等。
+
+- Dubbo
+
+  Dubbo是Alibaba开源的分布式服务框架，它最大的特点是按照分层的方式来架构，使用这种方式可以使各个层之间解耦合（或者最大限度地松耦合）。从服务模型的角度来看，Dubbo采用的是一种非常简单的模型，要么是提供方提供服务，要么是消费方消费服务，所以基于这一点可以抽象出服务提供方（Provider）和服务消费方（Consumer）两个角色。
+
+  ![image-20200427235153276](SpringBootAdvanced.assets\image-20200427235153276.png)
+
+## 6.2 Docker安装Zookeeper
+
+拉取镜像：
+
+```powershell
+docker pull zookeeper
+```
+
+在Docker Hub里找到zookeeper官方镜像，你可以直接访问该链接：https://hub.docker.com/_/zookeeper。在其Description中有关于如何使用该镜像的说明：
+
+- ```sh
+  docker run --name some-zookeeper --restart always -d zookeeper
+  ```
+
+- This image includes `EXPOSE 2181 2888 3888 8080` (the  zookeeper client port, follower port, election port, AdminServer port  respectively), so standard container linking will make it automatically  available to the linked containers. Since the Zookeeper "fails fast"  it's better to always restart it.
+
+参考该说明，运行镜像，暴露zookeeper客户端端口（2181）：
+
+- ```shell
+  docker run --name helloZookeeper --restart always -p 2181:2181 -d zookeeper:latest
+  ```
+
+使用docker ps命令查看运行是否成功即可（复制代码块里的文本到记事本里即可正常查看）：
+
+```shell
+root@instance-hxkkn97p:~# docker ps
+CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                                                                                        NAMES
+5354644e214b        zookeeper:latest      "/docker-entrypoint.…"   2 minutes ago       Up 2 minutes        2888/tcp, 3888/tcp, 0.0.0.0:2181->2181/tcp, 8080/tcp                                         helloZookeeper
+```
+
+## 6.3 SpringBoot、Dubbo以及Zookeeper整合
+
+创建空工程：
+
+![image-20200428211617411](SpringBootAdvanced.assets\image-20200428211617411.png)
+
+先创建dubbo相关的：
+
+![image-20200428211807524](SpringBootAdvanced.assets\image-20200428211807524.png)
+
+在项目视图中创建模块：
+
+![image-20200428211936965](SpringBootAdvanced.assets\image-20200428211936965.png)
+
+也通过顶部导航栏的File→New→Module...创建：
+
+![image-20200428212022189](SpringBootAdvanced.assets\image-20200428212022189.png)
+
+**创建生产者模块：**
+
+需要创建的仍然是个SpringBoot工程：
+
+![image-20200428212233910](SpringBootAdvanced.assets\image-20200428212233910.png)
+
+创建provider-ticket工件：
+
+![image-20200428212845165](SpringBootAdvanced.assets\image-20200428212845165.png)
+
+照例添加Spring Web场景：
+
+![image-20200428213243100](SpringBootAdvanced.assets\image-20200428213243100.png)
+
+文件名和位置：
+
+![image-20200428213310074](SpringBootAdvanced.assets\image-20200428213310074.png)
+
+创建好模块后，创建TicketService接口及其实现类：
+
+```java
+package xuegao.learnSpringBoot.dubbo.providerTicket.service;
+
+public interface TicketService {
+    public String getTicket();
+}
+```
+
+```java
+package xuegao.learnSpringBoot.dubbo.providerTicket.service;
+
+public class TicketServiceImpl implements TicketService{
+    @Override
+    public String getTicket() {
+        return "《流浪地球》";
+    }
+}
+```
+
+**创建消费者模块：**
+
+创建consumer-user工件：
+
+![image-20200428220829690](SpringBootAdvanced.assets\image-20200428220829690.png)
+
+照例添加Spring Web场景：
+
+![image-20200428213243100](SpringBootAdvanced.assets\image-20200428213243100.png)
+
+文件名和位置：
+
+![image-20200428225436703](SpringBootAdvanced.assets\image-20200428225436703.png)
+
+创建UserService类。这时若想要在本模块调用provider-ticket模块的TicketServiceImpl，就可以用Dubbo来实现：
+
+![image-20200428231640452](SpringBootAdvanced.assets\image-20200428231640452.png)
+
+**整合Dubbo：**
+
+访问https://github.com/apache/dubbo-spring-boot-project/blob/master/README_CN.md，这里有如何添加Dubbo Spring Boot 工程的说明。另外还需要引入Zookeeper客户端工具，所以在provider-ticket模块的POM文件里添加如下依赖：
+
+```xml
+<!-- Dubbo Spring Boot Starter -->
+<dependency>
+   <groupId>org.apache.dubbo</groupId>
+   <artifactId>dubbo-spring-boot-starter</artifactId>
+   <version>2.7.6</version>
+</dependency>
+<!--引入Zookeeper客户端工具。 https://mvnrepository.com/artifact/com.github.sgroschupf/zkclient -->
+<dependency>
+   <groupId>com.github.sgroschupf</groupId>
+   <artifactId>zkclient</artifactId>
+   <version>0.1</version>
+</dependency>
+```
+
+然后……然后我跟着老师做后面的内容，启动项目时我一直报错，各种踩坑，精神折磨/(ㄒoㄒ)/~~。总结一下碰到了日志依赖、连接超时、curator-framework依赖、curator-recipes依赖的问题。
+
+我参考了如下博文：
+
+- https://blog.csdn.net/wohaqiyi/article/details/81009689
+- https://www.cnblogs.com/yaofengdoit/p/12215878.html
+- https://blog.csdn.net/u013042707/article/details/79920824
+- https://blog.csdn.net/u010938610/article/details/85318907
+
+这里直接将我的最终POM文件贴出来，但不见得能解决你的问题，毕竟版本变动也是很要命的：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <parent>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-parent</artifactId>
+      <version>2.2.6.RELEASE</version>
+      <relativePath/> <!-- lookup parent from repository -->
+   </parent>
+   <groupId>xuegao.learnSpringBoot.dubbo</groupId>
+   <artifactId>provider-ticket</artifactId>
+   <version>0.0.1-SNAPSHOT</version>
+   <name>provider-ticket</name>
+   <description>卖票者</description>
+
+   <properties>
+      <java.version>11</java.version>
+      <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
+      <dubbo.version>2.7.6</dubbo.version>
+   </properties>
+
+   <dependencyManagement>
+      <dependencies>
+         <!-- Spring Boot -->
+         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>${spring-boot.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+
+         <!-- Apache Dubbo  -->
+         <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-dependencies-bom</artifactId>
+            <version>${dubbo.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+
+         <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo</artifactId>
+            <version>${dubbo.version}</version>
+            <exclusions>
+               <exclusion>
+                  <groupId>org.springframework</groupId>
+                  <artifactId>spring</artifactId>
+               </exclusion>
+               <exclusion>
+                  <groupId>javax.servlet</groupId>
+                  <artifactId>servlet-api</artifactId>
+               </exclusion>
+               <exclusion>
+                  <groupId>log4j</groupId>
+                  <artifactId>log4j</artifactId>
+               </exclusion>
+            </exclusions>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+
+   <dependencies>
+      <!-- Dubbo Spring Boot Starter -->
+      <dependency>
+         <groupId>org.apache.dubbo</groupId>
+         <artifactId>dubbo-spring-boot-starter</artifactId>
+         <version>2.7.6</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.dubbo</groupId>
+         <artifactId>dubbo</artifactId>
+      </dependency>
+      <!--这个zkclient和原教程中的应该没什么不同，一定要排除它对log4j、slf4j-log4j12的依赖。 https://mvnrepository.com/artifact/com.101tec/zkclient -->
+      <dependency>
+         <groupId>com.101tec</groupId>
+         <artifactId>zkclient</artifactId>
+         <version>0.11</version>
+         <exclusions>
+            <exclusion>
+               <groupId>log4j</groupId>
+               <artifactId>log4j</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.slf4j</groupId>
+               <artifactId>slf4j-log4j12</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+
+      <!--
+      springboot集成dubbo时出现了java.lang.ClassNotFoundException: org.apache.curator.framework.CuratorFrameworkFactory，
+      原因是缺少curator依赖。
+      -->
+      <!-- https://mvnrepository.com/artifact/org.apache.curator/curator-framework -->
+      <dependency>
+         <groupId>org.apache.curator</groupId>
+         <artifactId>curator-framework</artifactId>
+         <version>4.0.1</version>
+      </dependency>
+      <!--同时是报java.lang.ClassNotFoundException。 https://mvnrepository.com/artifact/org.apache.curator/curator-recipes -->
+      <dependency>
+         <groupId>org.apache.curator</groupId>
+         <artifactId>curator-recipes</artifactId>
+         <version>4.2.0</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-web</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-test</artifactId>
+         <scope>test</scope>
+         <exclusions>
+            <exclusion>
+               <groupId>org.junit.vintage</groupId>
+               <artifactId>junit-vintage-engine</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+   </dependencies>
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+         </plugin>
+      </plugins>
+   </build>
+
+</project>
+```
+
+为TicketServiceImpl类添上两个注解：
+
+```java
+package xuegao.learnSpringBoot.dubbo.providerTicket.service;
+
+import org.apache.dubbo.config.annotation.Service;
+import org.springframework.stereotype.Component;
+
+@Component//添加到Spring IOC容器中
+@Service//将服务发布出去（注意这是Dubbo的@Service注解）
+public class TicketServiceImpl implements TicketService{
+
+    @Override
+    public String getTicket() {
+        return "《流浪地球》";
+    }
+}
+```
+
+在SpringBoot Profile中配置dubbo：
+
+```properties
+#指定本应用的名称
+dubbo.application.name=provider-ticket
+#填写注册中心的位置
+dubbo.registry.address=zookeeper://192.168.0.3:2181
+#指定要发布的服务（扫描指定位置下有的服务）
+dubbo.scan.base-packages=xuegao.learnSpringBoot.dubbo.providerTicket.service
+#指定超时时间，默认超时时间太短，而我的服务器在云端，不够响应时间
+dubbo.config-center.timeout=10000
+```
+
+此时你启动provider-ticket模块应该是能正常启动的。
+
+确认能正常启动后将目光放到consumer-user模块，将provider-ticket模块POM文件里properties、dependencyManagement、dependencies标签的内容直接复制过去。
+
+然后为consumer-user模块的SpringBoot Profile添加这三行配置：
+
+```properties
+#指定本应用的名称
+dubbo.application.name=provider-ticket
+#填写注册中心的位置
+dubbo.registry.address=zookeeper://192.168.0.3:2181
+#指定超时时间，默认超时时间太短，而我的服务器在云端，不够响应时间
+dubbo.config-center.timeout=10000
+```
+
+为了让xuegao.learnSpringBoot.dubbo.consumerUser.service.UserService能消费到xuegao.learnSpringBoot.dubbo.providerTicket.service.TicketService的票票，需要将TicketService本身以全类名的方式复制到consumer-user模块中去：
+
+![image-20200501020201387](SpringBootAdvanced.assets\image-20200501020201387.png)
+
+通过@Reference注解在UserService类远程引用TicketService：
+
+```java
+package xuegao.learnSpringBoot.dubbo.consumerUser.service;
+
+import org.apache.dubbo.config.annotation.Reference;
+import org.springframework.stereotype.Service;
+import xuegao.learnSpringBoot.dubbo.providerTicket.service.TicketService;
+
+@Service//这回使用Spring的@Service，将本组件添加到Spring IOC容器中
+public class UserService {
+
+    @Reference//远程引用注解
+    TicketService ticketService;
+
+    public void getTicket(){
+        String ticket = ticketService.getTicket();
+        System.out.println("得到票了："+ticket);
+    }
+}
+```
+
+在consumer-user模块的单元测试中测试是否能远程调用成功：
+
+```java
+package xuegao.learnSpringBoot.dubbo.consumerUser;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import xuegao.learnSpringBoot.dubbo.consumerUser.service.UserService;
+
+import javax.annotation.Resource;
+
+@SpringBootTest
+class ConsumerUserApplicationTests {
+   @Resource(name = "userService")
+   UserService userService;
+
+   @Test
+   void contextLoads() {
+      userService.getTicket();
+   }
+
+}
+```
+
+运行测试后的控制台输出：
+
+```shell
+得到票了：《流浪地球》
+```
+
+这样就成功了，我看到弹幕上有人说：“provider少了一层api的包”。事实上老师也确实对Dubbo教的很浅，我觉得可以参考官方文档进行进一步学习。因为是阿里巴巴开发的，所以中文文档还是很香的：http://dubbo.apache.org/zh-cn/docs/user/quick-start.html。
+
+## 6.4 SpringCloud-Eureka注册中心
+
+**SpringCloud：**
+
+Spring Cloud是个分布式的整体解决方案。Spring Cloud 为开发者提供了在分布式系统（配置管理、服务发现、熔断、路由、微代理、控制总线、一次性token、全局锁、leader选举、分布式session、集群状态）中快速构建的工具，使用Spring Cloud的开发者可以快速的启动服务或构建应用、同时能够快速和云平台资源进行对接。
+
+SpringCloud分布式开发五大常用组件：
+
+- 服务发现——Netflix Eureka
+- 客服端负载均衡——Netflix Ribbon
+- 断路器——Netflix Hystrix
+- 服务网关——Netflix Zuul
+- 分布式配置——Spring Cloud Config
+
+**搭建项目：**
+
+创建空工程：
+
+![image-20200428211617411](SpringBootAdvanced.assets\image-20200428211617411.png)
+
+填写项目名：
+
+![image-20200501232220653](SpringBootAdvanced.assets\image-20200501232220653.png)
+
+新建SpringBoot模块：
+
+![image-20200501232457869](SpringBootAdvanced.assets\image-20200501232457869.png)
+
+作为SpringCloud-Eureka注册中心：
+
+![image-20200501234726135](SpringBootAdvanced.assets\image-20200501234726135.png)
+
+添加Eureka Server场景依赖，从而作为注册中心：
+
+![image-20200501235000105](SpringBootAdvanced.assets\image-20200501235000105.png)
+
+模块名及位置：
+
+![image-20200501235107227](SpringBootAdvanced.assets\image-20200501235107227.png)
+
+完成后再创建个模块，名为provider-ticket：
+
+![image-20200501235827622](SpringBootAdvanced.assets\image-20200501235827622.png)
+
+这回依赖的是Eureka Discovery Client，从而去连接注册中心（该图少了Spring Web场景）：
+
+![image-20200502000159674](SpringBootAdvanced.assets\image-20200502000159674.png)
+
+再来创建服务消费者模块：
+
+![image-20200502003430798](SpringBootAdvanced.assets\image-20200502003430798.png)
+
+同样也是添加Eureka Discovery Client，从而去连接注册中心（该图少了Spring Web场景）：
+
+![image-20200502003602712](SpringBootAdvanced.assets\image-20200502003602712.png)
+
+**配置注册中心：**
+
+consumer-user和provider-ticket模块需要有注册中心才能运转，所以需要先将eureka-server模块启动，但是启动前需要先对eureka-server模块做一些配置。
+
+于application.yaml文件配置EurekaServer：
+
+```yaml
+server:
+  port: 8761
+
+eureka:
+  instance:
+    hostname: eureka-server #本eureka实例的主机名
+  client:
+    register-with-eureka: false #不将本模块添加“注册中心”，因为自己就是“注册中心”。
+    fetch-registry: false #不从“注册中心”里获取服务的注册信息，因为自己就是“注册中心”。
+    #配置“注册中心”的注册地址
+    service-url:
+      defaultZone: http://localhost:8761/eureka #默认为http://localhost:8761/defaultZone
+```
+
+还需要在主配置类注解@EnableEurekaServer来启用“注册中心”功能：
+
+```java
+package xuegao.learnSpringBoot.springCloud.eurekaServer;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+/**
+ * 本模块为SpringCloud-Eureka注册中心。
+ * 注册中心的使用方法：
+ *     一、配置EurekaServer
+ *     二、使用@EnableEurekaServer启用“注册中心”功能
+ * */
+@EnableEurekaServer//启用“注册中心”功能
+@SpringBootApplication
+public class EurekaServerApplication {
+
+   public static void main(String[] args) {
+      SpringApplication.run(EurekaServerApplication.class, args);
+   }
+
+}
+```
+
+启动eureka-server模块，在浏览器访问http://localhost:8761/，这里展示了eureka-server实例的状态：
+
+![image-20200502014307769](SpringBootAdvanced.assets\image-20200502014307769.png)
+
+## 6.5 注册服务
+
+在provider-ticket模块创建这两个类：
+
+```java
+package xuegao.learnSpringBoot.springCloud.providerTicket.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class TicketService {
+    public String getTicket(){
+        return "《唐人街探案3》";
+    }
+}
+```
+
+```java
+package xuegao.learnSpringBoot.springCloud.providerTicket.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import xuegao.learnSpringBoot.springCloud.providerTicket.service.TicketService;
+import javax.annotation.Resource;
+
+@RestController
+public class TicketController {
+    @Resource(name = "ticketService")
+    TicketService ticketService;
+
+    @GetMapping("getTicket")
+    public String getTicket(){
+        return ticketService.getTicket();
+    }
+}
+```
+
+于本模块的application.yaml配置本应用：
+
+```yaml
+server:
+  port: 8001 #provider-ticket的端口
+
+spring:
+  application:
+    name: provider-ticket #本应用的名称
+
+eureka:
+  instance:
+    prefer-ip-address: true #使用IP地址来连接到”注册中心“
+  client:
+    register-with-eureka: true #将本模块添加“注册中心“
+    fetch-registry: true #从“注册中心”里获取服务的注册信息
+    service-url:
+      defaultZone: http://localhost:8761/eureka  #“注册中心”的注册地址
+```
+
+确保eureka-server模块已启动后再启动本模块，然后访问http://localhost:8761/就能看到该应用的出现：
+
+<img src="SpringBootAdvanced.assets/image-20200504203814988.png" alt="image-20200504203814988" style="zoom:80%;" />
+
+访问http://localhost:8001/getTicket应该能得到电影票：
+
+![image-20200504204122050](SpringBootAdvanced.assets/image-20200504204122050.png)
+
+**踩坑提醒：**
+
+当没有配置contextPath的时，服务端配置的eureka.client.serviceUrl.defaultZone和客户端是一样，且必须为（客户端和服务端都不能换，即使换成一样的也不行）:
+
+```properties
+eureka.client.serviceUrl.defaultZone= http://localhost:8761/eureka/
+```
+
+如果配置了contextPath，那么就要将服务端配置的contextPath名，加到客户端的defaultZone的访问路径端口号后面：
+
+- 例如在服务端做这样的配置：
+
+  ```properties
+  server.context-path=/pancake
+  ```
+
+- 那么客户端就要这样配置：
+
+  ```properties
+  eureka.client.serviceUrl.defaultZone=http://localhost:8763/pancake/eureka/
+  ```
+
+**同应用，多实例：**
+
+修改xuegao.learnSpringBoot.springCloud.providerTicket.service.TicketService类的getTicket方法，添加println语句：
+
+```java
+public class TicketService {
+    public String getTicket(){
+        System.out.println("provider-ticket应用，于8001端口。");
+        return "《唐人街探案3》";
+    }
+}
+```
+
+打包provider-ticket模块：
+
+![image-20200504205437065](SpringBootAdvanced.assets/image-20200504205437065.png)
+
+将打包好的jar包重命名为provider-ticket-0.0.1-SNAPSHOT-8001port.jar（名字随便取）：
+
+![image-20200504210052784](SpringBootAdvanced.assets/image-20200504210052784.png)
+
+修改xuegao.learnSpringBoot.springCloud.providerTicket.service.TicketService类的getTicket方法：
+
+```java
+public class TicketService {
+    public String getTicket(){
+        System.out.println("provider-ticket应用，于8002端口。");
+        return "《唐人街探案3》";
+    }
+}
+```
+
+修改provider-ticket模块的端口号为8002：
+
+```yaml
+server:
+  port: 8002 #provider-ticket的端口
+```
+
+重新打包本模块，将新生成的jar包重名为provider-ticket-0.0.1-SNAPSHOT-8002port.jar（名字随便取）：
+
+![image-20200504210447158](SpringBootAdvanced.assets/image-20200504210447158.png)
+
+通过终端分别将两者都启动起来（使用两个窗口分别启动）：
+
+```shell
+java -jar provider-ticket-0.0.1-SNAPSHOT-8001port.jar
+```
+
+```shell
+java -jar provider-ticket-0.0.1-SNAPSHOT-8002port.jar
+```
+
+访问http://localhost:8761/查看，能发现provider-ticket应用拥有了多个实例：
+
+![image-20200504211627332](SpringBootAdvanced.assets/image-20200504211627332.png)
+
+## 6.6 服务发现和消费
+
+配置consumer-user模块：
+
+```yaml
+server:
+  port: 8200 #本应用的端口
+
+spring:
+  application:
+    name: consumer-user #本应用的名称
+
+eureka:
+  instance:
+    prefer-ip-address: true #使用IP地址来连接到”注册中心“
+  client:
+    register-with-eureka: true #将本应用添加“注册中心“
+    fetch-registry: true #从“注册中心”里获取服务的注册信息
+    service-url:
+      defaultZone: http://localhost:8761/eureka/  #“注册中心”的注册地址
+```
+
+于consumer-user模块的主配置类开启“发现服务”功能，并向IOC容器添加RestTemplate，用它来发送http请求：
+
+```java
+package xuegao.learnSpringBoot.springCloud.consumerUser;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
+
+@EnableDiscoveryClient//开启发现服务功能，消费类型的应用需要使用该注解，才能消费“注册中心”中的服务。
+@SpringBootApplication
+public class ConsumerUserApplication {
+
+   public static void main(String[] args) {
+      SpringApplication.run(ConsumerUserApplication.class, args);
+   }
+
+   //RestTemplate可以用来帮助我们发送http请求
+   @LoadBalanced//启用负载均衡机制，发送http请求的时候可以用到。当同个应用有多个实例时，会雨露均沾的使用多个实例的资源。
+   @Bean
+   public RestTemplate restTemplate(){
+         return new RestTemplate();
+   }
+}
+```
+
+创建UserController，通过URL消费服务：
+
+```java
+package xuegao.learnSpringBoot.springCloud.consumerUser.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
+
+@RestController
+public class UserController {
+    @Resource(name = "restTemplate")
+    RestTemplate restTemplate;
+
+    @GetMapping("buyTicket")
+    public String buyTicket(String name){
+        //通过URL得到对象，指定为String类型，不需要指定服务的主机位置及端口号。
+        String ticket = restTemplate.getForObject("http://PROVIDER-TICKET/getTicket", String.class);
+
+        return name+"购买了"+ticket;
+    }
+}
+```
+
+启动consumer-user模块，查看一下应用们是否都开启了：
+
+![image-20200504234109514](SpringBootAdvanced.assets/image-20200504234109514.png)
+
+通过访问http://localhost:8200/buyTicket消费服务，可以带上name：
+
+![image-20200504234306377](SpringBootAdvanced.assets/image-20200504234306377.png)
+
+一边刷新网址，一边观察Console的输出情况，你会发现provider-ticket的两个实例会依次被使用，而不会某个实例被疯狂使用，而其它的冷冷清清、无人问津：
+
+![image-20200504234739089](SpringBootAdvanced.assets/image-20200504234739089.png)
+
+![image-20200504234751510](SpringBootAdvanced.assets/image-20200504234751510.png)
+
+# 七、热部署
+
+## 7.1 devtools开发热部署
+
+之前在开发中修改Java文件后，不得不重启应用才能看到效果，这浪费了大量的时间。我们希望不重启应用的情况下，程序可以自动部署（热部署）。下面将讲解四种热部署方法：
+
+1. 模板引擎（JSP、Thymeleaf等）：
+
+   1. 首先在Spring Boot中开发情况下禁用模板引擎的cache。
+   2. 编辑页面后，使用Ctrl+F9或按右上角的小锤子可以重新编译当前页面并生效。
+
+2. Spring Loaded：
+
+   1. 参考文章：https://blog.csdn.net/qq_28056641/article/details/81292612 。
+
+   2. Spring官方提供的热部署程序，实现修改类文件的热部署。
+
+   3. 下载Spring Loaded（项目地址https://github.com/spring-projects/spring-loaded）。
+
+   4. 添加runtime参数，`-javaagnet:`后填的是下载的Spring Loaded文件路径：
+
+      ```shell
+      -javaagent:C:/springloaded-1.2.5.RELEASE.jar –noverify
+      ```
+
+3. JRebel：
+
+   1. 收费的热部署插件，安装该插件使用即可。
+
+4. Spring Boot Devtools：
+
+   1. 引入依赖：
+
+      ```xml
+      <dependency>  
+             <groupId>org.springframework.boot</groupId>  
+             <artifactId>spring-boot-devtools</artifactId>   
+      </dependency> 
+      ```
+
+   2. IDEA使用Build Project（Ctrl+F9）即可实现热部署。
+
+   3. 可以设置为自动编译：
+
+      1. 设置自动编译（settings→compiler→build project automatically）。
+
+      2. 按ctrl+shift+alt+/（maintenance快捷键），勾选compiler.automake.allow.when.app.running。
+
+         ![image-20200505015827991](SpringBootAdvanced.assets/image-20200505015827991.png)
+
+      3. Intellij IEDA和Eclipse不同，Eclipse设置了自动编译之后，修改内容后保存就会自动编译，而IDEA在非RUN或DEBUG情况下才会自动编译（前提是你已经设置了Auto-Compile）。
+      
+   4. devtools可能会引起类Cast异常：
+   
+      - 参考文章：https://blog.csdn.net/m0_38043362/article/details/78064539 。
+      - 简要来说，devtools热部署会导致不同的类加载器加载相同的类，导致同个类自己转自己报错，不适用devtools或知道是哪个JAR包导致的问题，可以自定义配置。
+   
+   5. 请不要在运行环境使用devtools，它只应当用于开发环境。
+
+**使用Spring Boot Devtools：**
+
+首先准备个项目，我是使用了之前创建过的spring_initializr来做测试，你直接创建个新的也一样。
+
+这个HelloController里会响应/hello请求，并返回Hello World的字样：
+
+```java
+package xuegao.springBoot.hello.spring_initializr.controller;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloController {
+    @RequestMapping("/hello")
+    public String hello(){
+        return "Hello World!";
+    }
+}
+```
+
+那么启动项目，然后在浏览器访问验证：
+
+![image-20200505005804936](SpringBootAdvanced.assets/image-20200505005804936.png)
+
+打开项目target下对应的`.class`文件，能看到@RequestMapping里的正是/hello：
+
+![image-20200505010038962](SpringBootAdvanced.assets/image-20200505010038962.png)
+
+倘若将HelloController.java里的请求改为/hi呢：
+
+```java
+public class HelloController {
+    @RequestMapping("/hi")
+    public String hello(){
+        return "Hello World!";
+    }
+}
+```
+
+当然对应的`.class`不会立即发生改变，需要手动点右上角的🔨才能有效果：
+
+![image-20200505010400288](SpringBootAdvanced.assets/image-20200505010400288.png)
+
+![image-20200505010448202](SpringBootAdvanced.assets/image-20200505010448202.png)
+
+那么已编译文件变更为/hi请求了后能在浏览器用/hi能得到响应吗？答案是不能：
+
+![image-20200505010611473](SpringBootAdvanced.assets/image-20200505010611473.png)
+
+恰恰相反，还是原来的/hello请求才能生效。也就是说Build Project并不能对以运行的项目做更改。
+
+这时候就需要引入 DevTools啦（[点我查看2.2.6版的官方文档](https://docs.spring.io/spring-boot/docs/2.2.6.RELEASE/reference/html/using-spring-boot.html#using-boot-devtools)）：
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+    <optional>true</optional>
+</dependency>
+```
+
+重启项目，这时该项目就具有热部署能力啦，例如我再将@RequestMapping("/hi")改为@RequestMapping("/hello")，然后点击Build Project即可。这时能在Console看到LiveReload的提示：
+
+![image-20200505013708570](SpringBootAdvanced.assets/image-20200505013708570.png)
+
+另外本工具也对模板引擎页面有效。
+
+# 八、监管
+
+## 8.1 监管端点测试
+
+**监控管理：**
+
+通过引入spring-boot-starter-actuator，可以使用Spring Boot提供的准生产环境下的应用监控和管理功能。我们可以通过HTTP，JMX，SSH协议来进行操作，自动得到审计、健康及指标信息等。
+
+步骤：
+
+1. 引入spring-boot-starter-actuator。
+2. 通过http方式访问监控端点。
+3. 可进行shutdown（POST 提交，此端点默认关闭）。
+
+**创建项目：**
+
+新建actuator工件：
+
+![image-20200506010351962](SpringBootAdvanced.assets/image-20200506010351962.png)
+
+添加场景，除了Actuator外，DevTools用于热部署，Spring Web方便测试：
+
+![image-20200506010652800](SpringBootAdvanced.assets/image-20200506010652800.png)
+
+项目名：
+
+![image-20200506011023716](SpringBootAdvanced.assets/image-20200506011023716.png)
+
+**监管端点测试：**
+
+直接启动项目，观察Console的输出：
+
+![image-20200506011628871](SpringBootAdvanced.assets/image-20200506011628871.png)图中我高亮的部分说明一下：actuator2.0版本之后必须加/actuator才可以访问，且默认只暴露health和info，这和原教程中的1.0系列版本有所不同。
+
+访问/actuator/health得到的响应：
+
+```json
+{
+  "status": "UP"
+}
+```
+
+访问/actuator/info得到的响应内容目前还是为空的：
+
+```json
+{}
+```
+
+配置为公开（暴露）所有监控，以及显示health方法的具体内容：
+
+```properties
+#公开所有监控
+management.endpoints.web.exposure.include=*
+#显示health方法的具体内容（默认不显示）
+management.endpoint.health.show-details=always
+```
+
+重新编译项目，直接访问actuator会返回大量的网址链接，可以直接点进去查看：
+
+![image-20200511235158885](SpringBootAdvanced.assets/image-20200511235158885.png)
+
+各端点的用处：
+
+| **端点名**   | **描述**                    |
+| ------------ | --------------------------- |
+| *autoconfig* | 所有自动配置信息            |
+| auditevents  | 审计事件                    |
+| beans        | 所有Bean的信息              |
+| configprops  | 所有配置属性                |
+| dump         | 线程状态信息                |
+| env          | 当前环境信息                |
+| loggers      | 日志信息                    |
+| health       | 应用健康状况                |
+| heapdump     | 下载内存快照                |
+| info         | 当前应用信息                |
+| metrics      | 应用的各项指标              |
+| mappings     | 应用@RequestMapping映射路径 |
+| shutdown     | 关闭当前应用（默认关闭）    |
+| trace        | 追踪信息（最新的http请求）  |
+
+查看health页面，status为UP表示服务已上线：
+
+![image-20200511235445955](SpringBootAdvanced.assets/image-20200511235445955.png)
+
+beans是用来监控容器中的组件情况：
+
+![image-20200511235646870](SpringBootAdvanced.assets/image-20200511235646870.png)
+
+info用于查看当前应用信息，可以在Spring Profile中配置info开头的配置，Spring Actuator就会收集这些信息，可以通过info端点获取这些信息：
+
+```properties
+#填写info开头的配置，Spring Actuator就会收集这些信息，可以通过info端点获取这些信息
+info.app.id=123456789
+info.app.version=1.0.0
+```
+
+![image-20200512000359071](SpringBootAdvanced.assets/image-20200512000359071.png)
+
+只要是继承于org.springframework.boot.info.InfoProperties的配置都能出现在这里，例如org.springframework.boot.info.GitProperties就继承了它。Git可用git.properties进行配置
+
+![image-20200512090702396](SpringBootAdvanced.assets/image-20200512090702396.png)
+
+```properties
+#git.properties可以用来配置Git
+    #分支为master
+    git.branch=master
+    #提交ID为xuegao
+    git.commit.id=xuegao
+    #提交时间为2020-5-12 8:59:50
+    git.commit.time=2020-5-12 8:59:50
+```
+
+重新编译项目，访问info端点就能查看到git的信息：
+
+![image-20200512090821222](SpringBootAdvanced.assets/image-20200512090821222.png)
+
+访问heapdump会下载当前项目的内存快照，方便我们快速定位问题：
+
+![image-20200512092043143](SpringBootAdvanced.assets/image-20200512092043143.png)
+
+![image-20200512092155233](SpringBootAdvanced.assets/image-20200512092155233.png)
+
+访问mappings能查看项目的映射路径：
+
+![image-20200512092707101](SpringBootAdvanced.assets/image-20200512092707101.png)
+
+访问metrics端点能查看当前项目的监控指标：
+
+```json
+{
+  "names": [
+    "jvm.threads.states",
+    "jvm.gc.pause",
+    "http.server.requests",
+    "jvm.gc.memory.promoted",
+    "jvm.memory.max",
+    "jvm.memory.used",
+    "jvm.gc.max.data.size",
+    "jvm.memory.committed",
+    "system.cpu.count",
+    "logback.events",
+    "jvm.buffer.memory.used",
+    "tomcat.sessions.created",
+    "jvm.threads.daemon",
+    "system.cpu.usage",
+    "jvm.gc.memory.allocated",
+    "tomcat.sessions.expired",
+    "jvm.threads.live",
+    "jvm.threads.peak",
+    "process.uptime",
+    "tomcat.sessions.rejected",
+    "process.cpu.usage",
+    "jvm.classes.loaded",
+    "jvm.classes.unloaded",
+    "tomcat.sessions.active.current",
+    "tomcat.sessions.alive.max",
+    "jvm.gc.live.data.size",
+    "jvm.buffer.count",
+    "jvm.buffer.total.capacity",
+    "tomcat.sessions.active.max",
+    "process.start.time"
+  ]
+}
+```
+
+访问env能查看项目的运行环境信息：
+
+![image-20200512093713899](SpringBootAdvanced.assets/image-20200512093713899.png)
+
+configprops端点返回的是每个配置属性的信息报告。以这段为例，prefix是配置前缀，properties中的是可配置项：
+
+```json
+"healthEndpointProperties": {
+    "prefix": "management.endpoint.health",
+    "properties": {
+        "showDetails": "ALWAYS",
+        "status": {
+            "order": [],
+            "httpMapping": {}
+        },
+        "roles": [],
+        "group": {}
+    }
+},
+```
+
+之前就已经将health端点的内容设为总是显示细节：
+
+```properties
+#显示health方法的具体内容（默认不显示）
+management.endpoint.health.show-details=always
+```
+
+若要使用远程关闭，可以在SpringBoot Profile中启用远程关闭功能：
+
+```properties
+#启用远程关闭，需要用POST方式提交请求
+management.endpoint.shutdown.enabled=true
+```
+
+以POST方式提交请求，收到消息“Shutting down, bye...”：
+
+![image-20200512220738469](SpringBootAdvanced.assets/image-20200512220738469.png)
+
+看项目的控制台也能看到这样的输出：
+
+```shell
+2020-05-12 22:06:01.162  INFO 8392 --- [      Thread-13] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+```
+
+## 8.2 定制端点
+
+为什么要定制端点？为了安全，如果都是一样的访问端口和路径名，那么敏感信息将非常容易暴露。
+
+**定制方法：**
+
+定制端点一般通过endpoints+端点名+属性名来设置。
+
+修改端点id（endpoints.beans.id=mybeans）
+
+开启远程应用关闭功能（endpoints.shutdown.enabled=true）
+
+关闭端点（endpoints.beans.enabled=false）
+
+开启所需端点：
+
+- endpoints.enabled=false
+- endpoints.beans.enabled=true
+
+定制端点访问根路径：
+
+- management.context-path=/manage
+
+关闭http端点：
+
+- management.port=-1
+
+**实例：**
+
+原教程中提到了endpoints.beans.id的配置项，但是在新版本中已经不再可自定义：
+
+```properties
+#endpoints标识符不再可自定义
+endpoints.beans.id=myBean
+```
+
+但是映射路径还是可以配置的：
+
+```properties
+#自定义beans的映射路径
+management.endpoints.web.path-mapping.beans=bean
+```
+
+![image-20200512231003013](SpringBootAdvanced.assets/image-20200512231003013.png)
+
+自定义了beans端点的映射路径后，beans就不能再访问了，只能通过自己配置的路径进行访问：
+
+![image-20200512231109310](SpringBootAdvanced.assets/image-20200512231109310.png)
+
+可以开启或关闭指定端点：
+
+```properties
+#是否启用beans端点
+management.endpoint.beans.enabled=false
+```
+
+可以直接设置全部端点的开启情况，且能再指定某些端点的状态：
+
+```properties
+#是否启用所有端点，若先关闭（false）所有端点，再指定启用某些端点，那么就只有这些被启用的端点能访问
+management.endpoints.enabled-by-default=false
+#是否启用beans端点
+management.endpoint.beans.enabled=true
+```
+
+这时就只有寥寥几个端点能访问了（前面启用了远程关闭端点）：
+
+![image-20200512232348378](SpringBootAdvanced.assets/image-20200512232348378.png)
+
+定制访问端点和根路径：
+
+```properties
+#定制访问端口，可不再和项目共用端口。若设为-1，由于其不存在，所以将不能再通过任何端口访问任何端点
+management.server.port=8181
+#定制端点访问的根路径，默认为actuator，这里好像没生效
+management.server.servlet.context-path=/management
+```
+
+这时就需要访问http://localhost:8181/management/actuator才能得到消息了：
+
+```json
+{
+    "_links": {
+        "self": {
+            "href": "http://localhost:8181/management/actuator",
+            "templated": false
+        },
+        "beans": {
+            "href": "http://localhost:8181/management/actuator/bean",
+            "templated": false
+        },
+        "shutdown": {
+            "href": "http://localhost:8181/management/actuator/shutdown",
+            "templated": false
+        }
+    }
+}
+```
+
+## 8.3 自定义HealthIndicator
+
+在项目的External Libraries目录中找到health，其下面有很多健康监控功能：
+
+![image-20200513093417881](SpringBootAdvanced.assets/image-20200513093417881.png)
+
+不过在新版本中关于其它工具的健康都放到外面了：
+
+![image-20200513232620520](SpringBootAdvanced.assets/image-20200513232620520.png)
+
+例如为项目添加Redis启动器：
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+```
+
+在SpringBoot Proflie配置个无效的Redis连接地址：
+
+```properties
+spring.redis.host=localhost
+```
+
+重启项目，访问health端点就能看到出现了Redis相关的健康状态：
+
+```json
+{
+  "status": "DOWN",
+  "components": {
+    "diskSpace": {
+      "status": "UP",
+      "details": {
+        "total": 157475139584,
+        "free": 98831974400,
+        "threshold": 10485760
+      }
+    },
+    "ping": {
+      "status": "UP"
+    },
+    "redis": {
+      "status": "DOWN",
+      "details": {
+        "error": "org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis; nested exception is io.lettuce.core.RedisConnectionException: Unable to connect to localhost:6379"
+      }
+    }
+  }
+}
+```
+
+配置为正确的连接地址：
+
+```properties
+spring.redis.host=192.168.0.3
+spring.redis.password=password
+```
+
+再次访问health端点：
+
+```json
+{
+  "status": "UP",
+  "components": {
+    "diskSpace": {
+      "status": "UP",
+      "details": {
+        "total": 157475139584,
+        "free": 98831966208,
+        "threshold": 10485760
+      }
+    },
+    "ping": {
+      "status": "UP"
+    },
+    "redis": {
+      "status": "UP",
+      "details": {
+        "version": "6.0.1"
+      }
+    }
+  }
+}
+```
+
+**自定义健康状态显示器：**
+
+编写指示器，需实现HealthIndicator接口（指示器的类名的后缀必须为HealthIndicator，且指示器类必须加入容器）：
+
+```java
+package xuegao.learnSpringBoot.actuator.healthIndicator;
+
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.stereotype.Component;
+
+@Component//加入容器
+public class myAppHealthIndicator implements HealthIndicator {
+    //SpringBoot 2.2.0开始启用的getHealth方法，可以根据是否显示细节的入参来配置不同的返回信息
+    @Override
+    public Health getHealth(boolean includeDetails) {
+        return Health.up().withDetail("message","服务已正常运行").build();
+    }
+
+    //旧的健康方法
+    @Override
+    public Health health() {
+
+        return null;
+    }
+}
+```
+
+访问效果：
+
+```json
+{
+  "status": "UP",
+  "components": {
+    "diskSpace": {
+      "status": "UP",
+      "details": {
+        "total": 157475139584,
+        "free": 98831450112,
+        "threshold": 10485760
+      }
+    },
+    "myApp": {
+      "status": "UP",
+      "details": {
+        "message": "服务已正常运行"
+      }
+    },
+    "ping": {
+      "status": "UP"
+    },
+    "redis": {
+      "status": "UP",
+      "details": {
+        "version": "6.0.1"
+      }
+    }
+  }
+}
+```
+
+# 参考文献：
+
+- 《史上巨坑eureka注册，出现TransportException异常》。版权声明：本文为CSDN博主「程序员白小白」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。原文链接：https://blog.csdn.net/qq_35221138/article/details/81016171。
+- 《was unable to refresh its cache! status = Cannot execute request on any known server》。无版权声明。原文链接：https://blog.csdn.net/mbshqqb/article/details/79568450。

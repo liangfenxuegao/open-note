@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="xuegao.practice.openNote.dao.NoteMapper">
+    <!--
+    数据库中user的id字段被设置为自增的，所以无需提供id。
+        useGeneratedKeys：令MyBatis使用JDBC的getGeneratedKeys方法取出由数据库内部生成的主键，如MySQL和SQL Server这样的关系数据库管理系统的自动递增字段，默认值false。
+        keyProperty：MyBatis获取到主键值后，将值封装给该属性指定的JavaBean属性。
+        useGeneratedKeys和keyProperty只适用于insert和update标签。
+    -->
+    <insert id="addNote" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO note(title, file_path, file_type, user_id, date, `describe`)
+        VALUE (#{title}, #{filePath}, #{fileType}, #{userId}, #{date}, #{describe})
+    </insert>
+
+    <!--根据id更新filePath-->
+    <update id="updateFilePathById">
+        UPDATE note SET file_path = #{filePath}
+        WHERE id = #{id}
+    </update>
+
+    <!--根据用户ID读取笔记-->
+    <select id="getNoteByUserId" resultType="xuegao.practice.openNote.entity.Note">
+        SELECT * FROM note WHERE user_id = #{userId}
+    </select>
+
+    <!--根据id读取filePath属性-->
+    <select id="getFilePathById" resultType="string">
+        SELECT file_path FROM note WHERE id = #{id}
+    </select>
+</mapper>

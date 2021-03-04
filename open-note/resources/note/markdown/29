@@ -1,0 +1,361 @@
+参考文章：https://www.cnblogs.com/mseddl/p/11577846.html 。
+
+# Spring事务传播机制
+
+## 事务的特性
+
+- 原子性（Atomicity）：事务是一个原子操作，由一系列动作组成。事务的原子性确保动作要么全部完成，要么完全不起作用。
+- 一致性（Consistency）：一旦事务完成（不管成功还是失败），系统必须确保它所建模的业务处于一致的状态，而不会是部分完成部分失败。在现实中的数据不应该被破坏。
+- 隔离性（Isolation）：可能有许多事务会同时处理相同的数据，因此每个事务都应该与其他事务隔离开来，防止数据损坏。
+- 持久性（Durability）：一旦事务完成，无论发生什么系统错误，它的结果都不应该受到影响，这样就能从任何系统崩溃中恢复过来。通常情况下，事务的结果被写到持久化存储器中。
+
+## Spring事务的配置方式
+
+1. 编程式事务管理。
+
+   编程式事务管理是侵入性事务管理，使用TransactionTemplate或者直接使用PlatformTransactionManager，对于编程式事务管理，Spring推荐使用TransactionTemplate。
+
+2. 声明式事务管理。
+
+   声明式事务管理建立在AOP之上，其本质是对方法前后进行拦截，然后在目标方法开始之前创建或者加入一个事务，执行完目标方法之后根据执行的情况提交或者回滚。
+    编程式事务每次实现都要单独实现，但业务量大功能复杂时，使用编程式事务无疑是痛苦的，而声明式事务不同，声明式事务属于无侵入式，不会影响业务逻辑的实现，只需要在配置文件中做相关的事务规则声明或者通过注解的方式，便可以将事务规则应用到业务逻辑中。
+    显然声明式事务管理要优于编程式事务管理，这正是Spring倡导的非侵入式的编程方式。唯一不足的地方就是声明式事务管理的粒度是方法级别，而编程式事务管理是可以到代码块的，但是可以通过提取方法的方式完成声明式事务管理的配置。
+
+## 事务的传播机制
+
+事务的传播性一般用在事务嵌套的场景，比如一个事务方法里面调用了另外一个事务方法，那么两个方法是各自作为独立的方法提交还是内层的事务合并到外层的事务一起提交，这就是需要事务传播机制的配置来确定怎么样执行。
+
+常用的事务传播机制如下：
+
+- PROPAGATION_REQUIRED
+
+  Spring默认的传播机制，能满足绝大部分业务需求，如果外层有事务，则当前事务加入到外层事务，一块提交，一块回滚。如果外层没有事务，新建一个事务执行。
+
+- PROPAGATION_REQUES_NEW
+
+  该事务传播机制是每次都会新开启一个事务，同时把外层事务挂起，当当前事务执行完毕，恢复上层事务的执行。如果外层没有事务，执行当前新开启的事务即可。
+
+- PROPAGATION_SUPPORT
+
+  如果外层有事务，则加入外层事务，如果外层没有事务，则直接使用非事务方式执行。完全依赖外层的事务。
+
+- PROPAGATION_NOT_SUPPORT
+
+  该传播机制不支持事务，如果外层存在事务则挂起，执行完当前代码，则恢复外层事务，无论是否异常都不会回滚当前的代码。
+
+- PROPAGATION_NEVER
+
+  该传播机制不支持外层事务，即如果外层有事务就抛出异常。
+
+- PROPAGATION_MANDATORY
+
+  与NEVER相反，如果外层没有事务，则抛出异常。
+
+- PROPAGATION_NESTED
+
+  该传播机制的特点是可以保存状态保存点，当前事务回滚到某一个点，从而避免所有的嵌套事务都回滚，即各自回滚各自的，如果子事务没有把异常吃掉，基本还是会引起全部回滚的。
+
+传播规则回答了这样一个问题：一个新的事务应该被启动还是被挂起，或者是一个方法是否应该在事务性上下文中运行。
+
+## 事务的隔离级别
+
+事务的隔离级别定义一个事务可能受其他并发务活动活动影响的程度，可以把事务的隔离级别想象为这个事务对于事物处理数据的自私程度。
+
+在一个典型的应用程序中，多个事务同时运行，经常会为了完成他们的工作而操作同一个数据。并发虽然是必需的，但是会导致以下问题：
+
+1. 脏读（Dirty read）
+
+   脏读发生在一个事务读取了被另一个事务改写但尚未提交的数据时。如果这些改变在稍后被回滚了，那么第一个事务读取的数据就会是无效的。
+
+2. 不可重复读（Nonrepeatable read）
+
+   不可重复读发生在一个事务执行相同的查询两次或两次以上，但每次查询结果都不相同时。这通常是由于另一个并发事务在两次查询之间更新了数据。
+
+   ==不可重复读重点在修改。==
+
+3. 幻读（Phantom reads）
+
+   幻读和不可重复读相似。当一个事务（T1）读取几行记录后，另一个并发事务（T2）插入了一些记录时，幻读就发生了。在后来的查询中，第一个事务（T1）就会发现一些原来没有的额外记录。
+
+   ==幻读重点在新增或删除。==
+
+在理想状态下，事务之间将完全隔离，从而可以防止这些问题发生。然而，完全隔离会影响性能，因为隔离经常涉及到锁定在数据库中的记录（甚至有时是锁表）。完全隔离要求事务相互等待来完成工作，会阻碍并发。因此，可以根据业务场景选择不同的隔离级别。
+
+**隔离级别表：**
+
+| 隔离级别                   | 含义                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| ISOLATION_DEFAULT          | 使用后端数据库默认的隔离级别                                 |
+| ISOLATION_READ_UNCOMMITTED | 允许读取尚未提交的更改。可能导致脏读、幻读或不可重复读。     |
+| ISOLATION_READ_COMMITTED   | （Oracle 默认级别）允许从已经提交的并发事务读取。可防止脏读，但幻读和不可重复读仍可能会发生。 |
+| ISOLATION_REPEATABLE_READ  | （MYSQL默认级别）对相同字段的多次读取的结果是一致的，除非数据被当前事务本身改变。可防止脏读和不可重复读，但幻读仍可能发生。 |
+| ISOLATION_SERIALIZABLE     | 完全服从ACID的隔离级别，确保不发生脏读、不可重复读和幻影读。这在所有隔离级别中也是最慢的，因为它通常是通过完全锁定当前事务所涉及的数据表来完成的。 |
+
+## 只读
+
+如果一个事务只对数据库执行读操作，那么该数据库就可能利用那个事务的只读特性，采取某些优化措施。通过把一个事务声明为只读，可以给后端数据库一个机会来应用那些它认为合适的优化措施。由于只读的优化措施是在一个事务启动时由后端数据库实施的，  因此，只有对于那些具有可能启动一个新事务的传播行为（PROPAGATION_REQUIRES_NEW、PROPAGATION_REQUIRED、 ROPAGATION_NESTED）的方法来说，将事务声明为只读才有意义。
+
+## 事务超时
+
+为了使一个应用程序很好地执行，它的事务不能运行太长时间。因此，声明式事务的下一个特性就是它的超时。
+
+假设事务的运行时间变得格外的长，由于事务可能涉及对数据库的锁定，所以长时间运行的事务会不必要地占用数据库资源。这时就可以声明一个事务在特定秒数后自动回滚，不必等它自己结束。
+
+由于超时时钟在一个事务启动的时候开始的，因此，只有对于那些具有可能启动一个新事务的传播行为（PROPAGATION_REQUIRES_NEW、PROPAGATION_REQUIRED、ROPAGATION_NESTED）的方法来说，声明事务超时才有意义。
+
+## 回滚规则
+
+在默认设置下，事务只在出现运行时异常（runtime exception）时回滚，而在出现受检查异常（checked exception）时不回滚（这一行为和EJB中的回滚行为是一致的）。
+ 不过，可以声明在出现特定受检查异常时像运行时异常一样回滚。同样，也可以声明一个事务在出现特定的异常时不回滚，即使特定的异常是运行时异常。
+
+# Spring声明式事务配置参考
+
+事物配置中有哪些属性可以配？以下只是简单的使用参考：
+
+1. 事务的传播性：
+
+   @Transactional(propagation=Propagation.REQUIRED)
+
+2. 事务的隔离级别：
+
+   @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+
+   读取未提交数据(会出现脏读, 不可重复读) 基本不使用。
+
+3. 只读：
+
+   @Transactional(readOnly=true)
+
+   该属性用于设置当前事务是否为只读事务，设置为true表示只读，false则表示可读写，默认值为false。
+
+4. 事务的超时性：
+
+   @Transactional(timeout=30)
+
+5. 回滚：
+
+   指定单一异常类：@Transactional(rollbackFor=RuntimeException.class)
+   指定多个异常类：@Transactional(rollbackFor={RuntimeException.class, Exception.class})
+
+   该属性用于设置需要进行回滚的异常类数组，当方法中抛出指定异常数组中的异常时，则进行事务回滚。
+
+# @transactional
+
+事务管理是应用系统开发中必不可少的一部分。Spring 为事务管理提供了丰富的功能支持。Spring  事务管理分为编码式和声明式的两种方式。编程式事务指的是通过编码方式实现事务；声明式事务基于 AOP，将具体业务逻辑与事务处理解耦。声明式事务管理使业务代码逻辑不受污染,  因此在实际使用中声明式事务用的比较多。声明式事务有两种方式，一种是在配置文件（xml）中做相关的事务规则声明，另一种是基于@Transactional 注解的方式。注释配置是目前流行的使用方式，因此本文将着重介绍基于@Transactional 注解的事务管理。
+
+## 注解管理事务的实现步骤
+
+首先要启用基于注解的事务管理功能。有两种方法，如下：
+
+1. 于XML中配置：
+
+   ```xml
+   <!--配置dataSource-->
+   <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+       <property name="driverClass" value="${jdbc.driverClass}"></property>
+       <property name="jdbcUrl" value="${jdbc.jdbcUrl}"></property>
+       <property name="user" value="${jdbc.user}"></property>
+       <property name="password" value="${jdbc.password}"></property>
+   </bean>
+   <!--配置事务核心管理器，及依赖数据源。-->
+   <bean id="transactionManager"
+   class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+   	<property name="dataSource" ref="dataSource" />
+   </bean>
+   <!--开启基于注解的事务-->
+   <tx:annotation-driven />
+   ```
+
+2. 使用注解：
+
+   在项目的主配置类上添加@EnableTransactionManagement即可。 
+
+第二步，将@Transactional 注解添加到合适的方法上，并设置合适的属性信息。@Transactional 注解的属性信息如下所示：
+
+| 属性名           | 说明                                                         |
+| ---------------- | ------------------------------------------------------------ |
+| name             | 当在配置文件中有多个 TransactionManager , 可以用该属性指定选择哪个事务管理器。 |
+| propagation      | 事务的传播行为，默认值为 REQUIRED。                          |
+| isolation        | 事务的隔离度，默认值采用 DEFAULT。                           |
+| timeout          | 事务的超时时间，默认值为-1。如果超过该时间限制但事务还没有完成，则自动回滚事务。 |
+| read-only        | 指定事务是否为只读事务，默认值为 false；为了忽略那些不需要事务的方法，比如读取数据，可以设置 read-only 为 true。 |
+| rollback-for     | 用于指定能够触发事务回滚的异常类型，如果有多个异常类型需要指定，各类型之间可以通过逗号分隔。 |
+| no-rollback- for | 抛出 no-rollback-for 指定的异常类型，不回滚事务。            |
+
+除此以外，@Transactional 注解也可以添加到类级别上。当把@Transactional  注解放在类级别时，表示所有该类的公共方法都配置相同的事务属性信息。
+
+见如下代码，EmployeeService  的所有方法都支持事务并且是只读。当类级别配置了@Transactional，方法级别也配置了@Transactional，应用程序会以方法级别的事务属性信息来管理事务，换言之，方法级别的事务属性信息会覆盖类级别的相关配置信息。
+
+- ```java
+  @Transactional(propagation= Propagation.SUPPORTS,readOnly=true)
+  @Service(value ="employeeService")
+  public class EmployeeService{}
+  ```
+
+到此，您会发觉使用@Transactional 注解管理事务的实现步骤很简单。但是如果对 Spring 中的 @transaction  注解的事务管理理解的不够透彻，就很容易出现错误，比如事务应该回滚（rollback）而没有回滚事务的问题。接下来，将首先分析 Spring  的注解方式的事务实现机制，然后列出相关的注意事项，以最终达到帮助开发人员准确而熟练的使用 Spring 的事务的目的。
+
+## 注解方式的事务使用注意事项
+
+当您对 Spring 的基于注解方式的实现步骤和事务内在实现机制有较好的理解之后，就会更好的使用注解方式的事务管理，避免当系统抛出异常，数据不能回滚的问题。
+
+### 正确的设置propagation属性
+
+需要注意下面三种 propagation 可以不启动事务。本来期望目标方法进行事务管理，但若是错误的配置这三种 propagation，事务将不会发生回滚。
+
+1. TransactionDefinition.PROPAGATION_SUPPORTS：如果当前存在事务，则加入该事务；如果当前没有事务，则以非事务的方式继续运行。
+2. TransactionDefinition.PROPAGATION_NOT_SUPPORTED：以非事务方式运行，如果当前存在事务，则把当前事务挂起。
+3. TransactionDefinition.PROPAGATION_NEVER：以非事务方式运行，如果当前存在事务，则抛出异常。
+
+### 正确设置rollbackFor属性
+
+默认情况下，如果在事务中抛出了未检查异常（继承自 RuntimeException 的异常）或者 Error，则 Spring 将回滚事务；除此之外，Spring 不会回滚事务。
+
+如果在事务中抛出其他类型的异常，并期望 Spring 能够回滚事务，可以指定 rollbackFor。例：
+
+@Transactional(propagation= Propagation.REQUIRED,rollbackFor= MyException.class)
+
+通过分析 Spring 源码可以知道，若在目标方法中抛出的异常是 rollbackFor 指定的异常的子类，事务同样会回滚。
+
+### @Transactional只能用于public方法
+
+只有@Transactional 注解应用到 public 方法，才能进行事务管理。
+
+### 避免Spring的AOP自调用问题
+
+在 Spring 的 AOP 代理下，只有目标方法由外部调用，目标方法才由 Spring  生成的代理对象来管理，这会造成自调用问题。==若同一类中的其他没有@Transactional 注解的方法内部调用有@Transactional  注解的方法，有@Transactional 注解的方法的事务被忽略，不会发生回滚。==
+
+```java
+@Service
+public class OrderService {
+	//调用insert方法并不会触发insertOrder的事务
+    private void insert() {
+		insertOrder();
+	}
+
+	@Transactional
+	public void insertOrder() {
+		//insert log info
+		//insertOrder
+		//updateAccount
+	}
+}
+```
+
+insertOrder 尽管有@Transactional 注解，但它被内部方法 insert 调用，事务被忽略，出现异常事务不会发生回滚。
+
+上面的两个问题@Transactional 注解只应用到 public 方法和自调用问题，是由于使用 Spring AOP 代理造成的。若解决这两个问题，可以使用使用AspectJ 取代 Spring AOP 代理。
+
+# @EnableTransactionManagement
+
+Spring Boot 使用事务非常简单，首先使用注解 @EnableTransactionManagement 开启事务支持后，然后在访问数据库的Service方法上添加注解 @Transactional 便可。
+
+关于事务管理器：
+
+- 不管是JPA还是JDBC等都实现自接口 PlatformTransactionManager 如果你添加的是  spring-boot-starter-jdbc 依赖，框架会默认注入 DataSourceTransactionManager  实例。如果你添加的是 spring-boot-starter-data-jpa 依赖，框架会默认注入 JpaTransactionManager 实例。
+
+你可以在启动类中添加如下方法，Debug测试，就能知道自动注入的是 PlatformTransactionManager接口的哪个实现类。
+
+- ```java
+  @EnableTransactionManagement // 启注解事务管理，等同于xml配置方式的 <tx:annotation-driven />
+  @SpringBootApplication
+  public class ProfiledemoApplication {
+   
+      @Bean
+      public Object testBean(PlatformTransactionManager platformTransactionManager){
+          System.out.println(">>>>>>>>>>" + platformTransactionManager.getClass().getName());
+          return new Object();
+      }
+   
+      public static void main(String[] args) {
+          SpringApplication.run(ProfiledemoApplication.class, args);
+      }
+  }
+  ```
+
+这些SpringBoot为我们自动做了，这些对我们并不透明，如果你项目做的比较大，添加的持久化依赖比较多，我们还是会选择人为的指定使用哪个事务管理器。 方法如下：
+
+- ```java
+  @EnableTransactionManagement
+  @SpringBootApplication
+  public class ProfiledemoApplication {
+   
+      //框架会自动为我们注入dataSource
+      @Bean
+      public PlatformTransactionManager txManager(DataSource dataSource) {
+          return new DataSourceTransactionManager(dataSource);
+      }
+   
+      public static void main(String[] args) {
+          SpringApplication.run(ProfiledemoApplication.class, args);
+      }
+  }
+  ```
+
+ 在Spring容器中，我们手工注解@Bean 将被优先加载，框架不会重新实例化其他的 PlatformTransactionManager 实现类。然后在Service中，被 @Transactional 注解的方法，将支持事务。如果注解在类上，则整个类的所有方法都默认支持事务。
+
+ 对于同一个工程中存在多个事务管理器要怎么处理，请看下面的实例，具体说明请看代码中的注释。
+
+- ```java
+  @EnableTransactionManagement // 开启注解事务管理，等同于xml配置文件中的 <tx:annotation-driven />
+  @SpringBootApplication
+  public class ProfiledemoApplication implements TransactionManagementConfigurer {
+   
+      @Resource(name="txManager2")
+      private PlatformTransactionManager txManager2;
+   
+      // 创建事务管理器1
+      @Bean(name = "txManager1")
+      public PlatformTransactionManager txManager(DataSource dataSource) {
+          return new DataSourceTransactionManager(dataSource);
+      }
+   
+      // 创建事务管理器2
+      @Bean(name = "txManager2")
+      public PlatformTransactionManager txManager2(EntityManagerFactory factory) {
+          return new JpaTransactionManager(factory);
+      }
+   
+      // 实现接口 TransactionManagementConfigurer 方法，其返回值代表在拥有多个事务管理器的情况下默认使用的事务管理器
+      @Override
+      public PlatformTransactionManager annotationDrivenTransactionManager() {
+          return txManager2;
+      }
+   
+      public static void main(String[] args) {
+          SpringApplication.run(ProfiledemoApplication.class, args);
+      }
+   
+  }
+  ```
+
+- ```java
+  @Component
+  public class DevSendMessage implements SendMessage {
+   
+      // 使用value具体指定使用哪个事务管理器
+      @Transactional(value="txManager1")
+      @Override
+      public void send() {
+          System.out.println(">>>>>>>>Dev Send()<<<<<<<<");
+          send2();
+      }
+   
+      // 在存在多个事务管理器的情况下，如果使用value具体指定
+      // 则默认使用方法 annotationDrivenTransactionManager() 返回的事务管理器
+      @Transactional
+      public void send2() {
+          System.out.println(">>>>>>>>Dev Send2()<<<<<<<<");
+      }
+   
+  }
+  ```
+
+如果Spring容器中存在多个 PlatformTransactionManager 实例，并且没有实现接口 TransactionManagementConfigurer  指定默认值，在我们在方法上使用注解 @Transactional 的时候，就必须要用value指定，如果不指定，则会抛出异常。
+
+ 对于系统需要提供默认事务管理的情况下，实现接口 TransactionManagementConfigurer 指定。
+
+ 对有的系统，为了避免不必要的问题，在业务中必须要明确指定 @Transactional 的 value 值的情况下。不建议实现接口 TransactionManagementConfigurer，这样控制台会明确抛出异常，开发人员就不会忘记主动指定。
+
+# 参考文献
+
+1. https://blog.csdn.net/u010963948/article/details/79208328 。

@@ -1,0 +1,27 @@
+# Compiled class file
+*.class
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+#Eclipse项目所需要排除的
+.classpath
+.project
+.settings
+#IDEA项目所需要排除的
+.idea
+*.iml
+#排除编译后的资源
+target

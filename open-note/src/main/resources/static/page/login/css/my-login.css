@@ -1,0 +1,80 @@
+/*html、body标签的高度为100%*/
+html,body {
+	height: 100%;
+}
+
+/*设置body标签内my-login-page类型的页面样式*/
+body.my-login-page {
+	background-color: #f7f9fb;/*白色*/
+	font-size: 14px;/*字体大小14px*/
+}
+
+/*设置my-login-page、brand类的样式*/
+.my-login-page .brand {
+	width: 90px;
+	height: 90px;
+	overflow: hidden;/*当元素溢出（overflow）时，隐藏溢出部分*/
+	border-radius: 50%;/*50%圆角效果*/
+	margin: 40px auto;/*外边距*/
+	box-shadow: 0 4px 8px rgba(0,0,0,.05);/*阴影效果*/
+	position: relative;/*相对布局*/
+	z-index: 1;/*叠层样式，即高度，数值高的会遮盖住数值低的*/
+}
+
+/*选择my-login-page、brand类里的img标签*/
+.my-login-page .brand img {
+	width: 100%;
+}
+
+.my-login-page .card-wrapper {
+	width: 400px;
+}
+
+.my-login-page .card {
+	border-color: transparent;/*设置边框颜色为透明*/
+	box-shadow: 0 4px 8px rgba(0,0,0,.05);
+}
+
+.my-login-page .card.fat {
+	padding: 10px;/*内边距*/
+}
+
+.my-login-page .card .card-title {
+	margin-bottom: 30px;
+}
+
+.my-login-page .form-control {
+	border-width: 2.3px;
+}
+
+.my-login-page .form-group label {
+	width: 100%;
+}
+
+.my-login-page .btn.btn-block {
+	padding: 12px 10px;
+}
+
+.my-login-page .footer {
+	margin: 40px 0;
+	color: #888;/*文本颜色*/
+	text-align: center;/*对齐元素中的文本*/
+}
+
+/*若文档宽度小于425像素则显示如下样式*/
+@media screen and (max-width: 425px) {
+	.my-login-page .card-wrapper {
+		width: 90%;
+		margin: 0 auto;
+	}
+}
+
+/*若文档宽度小于320像素则显示如下样式*/
+@media screen and (max-width: 320px) {
+	.my-login-page .card.fat {
+		padding: 0;
+	}
+	.my-login-page .card.fat .card-body {
+		padding: 15px;
+	}
+}

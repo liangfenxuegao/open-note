@@ -1,0 +1,75 @@
+# 开源笔记
+
+参考文章一览：
+
+- 作者：Jason_M_Ho。链接：https://www.jianshu.com/p/c1ee7e4247bf 。来源：简书。著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+# Lombok
+
+## 原理
+
+Lombok本质上就是一个实现了“[JSR 269 API](https://www.jcp.org/en/jsr/detail?id=269)”的程序。在使用javac的过程中，它产生作用的具体流程如下：
+
+- javac对源代码进行分析，生成了一棵抽象语法树（AST）
+- 运行过程中调用实现了“JSR 269 API”的Lombok程序
+- 此时Lombok就对第一步骤得到的AST进行处理，找到@Data注解所在类对应的语法树（AST），然后修改该语法树（AST），增加getter和setter方法定义的相应树节点
+- javac使用修改后的抽象语法树（AST）生成字节码文件，即给class增加新的节点（代码块）
+
+## 优缺点
+
+**优点：**
+
+- 能通过注解的形式自动生成构造器、getter/setter、equals、hashcode、toString等方法，提高了一定的开发效率。
+- 让代码变得简洁，不用过多的去关注相应的方法。
+- 属性做修改时，也简化了维护为这些属性所生成的getter/setter方法等。
+
+**缺点：**
+
+- 不支持多种参数构造器的重载
+- 虽然省去了手动创建getter/setter方法的麻烦，但大大降低了源代码的可读性和完整性，降低了阅读源代码的舒适度
+
+像 lombok 这种插件，已经不仅仅是插件了，它在编译器编译时通过操作AST（抽象语法树）改变字节码生成，变相的说它就是在改变java语法，它改变了你编写源码的方式，它不像 spring 的依赖注入一样是运行时的特性，而是编译时的特性。如果一个项目有非常多这样的插件，会极大的降低阅读源代码的舒适度。
+
+lombok 只是省去了一些人工生成代码的麻烦，但是这些getter/setter等等的方法，用IDE的快捷键也可很方便的生成。况且，有时通过给getter/setter加一点点业务代码（但通常不建议这么加），能极大的简化某些业务场景的代码。
+
+用还是不用，这中间如何取舍，自然是要看项目的需要，灵活运用。
+
+## 引入
+
+lombok 是个工具类库，可以用简单的注解形式来简化代码，提高开发效率。
+
+可以使用Maven来添加依赖：
+
+```xml
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>1.18.4</version>
+    <scope>provided</scope>
+</dependency>
+
+```
+
+使用Lombok是需要安装插件的：
+
+- IDEA：安装lombok plugin。
+
+# 注解
+
+## @Data
+
+@Data 注解的主要作用是提高代码的简洁，使用这个注解可以省去代码中大量的get()、 set()、 toString()等方法。
+
+使用示例：
+
+```java
+@Data
+public class Person {
+    private String name;
+    private String address;
+    private Integer age;
+    private String hobbit;
+    private String phone;
+}
+```
+

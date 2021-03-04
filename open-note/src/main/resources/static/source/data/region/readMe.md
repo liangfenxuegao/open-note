@@ -1,0 +1,3 @@
+regionData.json中，countryArray用于存储国家或地区数组，按顺序排列。
+例如第一个country的countryId为1。
+cityMap里的stateCn和stateEn是冗余设计，多个城市属于一个state。

@@ -1,0 +1,65 @@
+# 编码
+
+Unicode是统一的字符编码标准，MySQL的Windows客户端自从5.6.2版本后提供了Unicode界面支持。
+而原来的MySQL Client是默认在dos下运行的，不够满足Windows下标准编码的需求。
+用起来也有感觉，在Unicode下运行速度比原来的在dos环境下运行要快得多，字体等也更符合编程要求。
+
+MySQL命名和命令不区分大小写。//其中命名受操作系统影响，MacOS和Windows不区分大小写，而Linux系统区分。
+
+MySQL 8.0默认UTF8MB4
+MySQL 的“utf8mb4”是真正的“UTF-8”。
+MySQL 的“utf8”是一种“专属的编码”，它能够编码的 Unicode 字符并不多。
+所有在使用“utf8”的 MySQL 和 MariaDB 用户都应该改用“utf8mb4”，永远都不要再使用“utf8”。
+在MySQL8.0.1及更高版本中将utf8mb4_0900_ai_ci作为默认排序规则。
+
+# 类型
+
+参考文章：
+
+- https://blog.csdn.net/qq_22771739/article/details/85833710
+- https://blog.csdn.net/phpstory/article/details/93474091
+
+有类型的数据中，要注意是否为“无类型数据”（unsigned）。
+
+TINYINT是2的8次方个位数。在MySQL中TINYINT(1)表示逻辑值，0为false，1表示true。
+
+bigint(20)对应Java中的Long类型。若是unsigned，则对应BigInteger类型。
+
+varchar(255)。由于varchar是变长存储的，所以实际开发中一般把varchar的宽度设为最长255，没用完它也不会浪费空间。
+
+浮点和日期等数据类型对数据的宽度没有要求，一般也不设置，默认是0。
+
+# 规范
+
+关于加表还是加字段的问题：
+加字段，只要不设置为not null，对于原有程序不会有任何影响。
+这个要看开发得代价了，有的会有大量数据拷贝得，用新表就存在旧数据得交换，
+新加字段不存在；有的情况新加字段不能解决需求问题，反而带来很多麻烦，
+新建立重新开发可能开发代价反而比较小，都不绝对说哪个好，不过一般来说新加字段应该是首选 。
+
+# 查询
+
+使用DISTINCT关键字可以取消重复行。distinct。
+
+使用is not null可以过滤为NULL的行，例子如下，忽略country_id为NULL的行：
+
+- ```mysql
+  SELECT country_id, name FROM city WHERE country_id is not null
+  ```
+
+# 插入
+
+## 将查询的结果保存到指定表
+
+语法：`INSERT INTO 指定表 查询语句 `。
+
+示例：
+
+- ```mysql
+  INSERT INTO city(state_cn, name_cn, state_code,city_code) 
+  SELECT state_cn, name_cn, state_code,city_code FROM open_note.city_cn where state_cn = "香港" or state_cn = "澳门";
+  ```
+
+## 将查询的结果保存到新表
+
+语句：`CREATE TABLE 新表名 as 查询语句`。

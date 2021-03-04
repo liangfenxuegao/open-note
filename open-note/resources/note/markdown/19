@@ -1,0 +1,454 @@
+# 开源笔记-许可
+
+**版本：1.1**
+
+**发布于2020年11月**
+
+**使用、复制和分发的子条款：**
+
+*注释：你可以为作品添加子条款。详见父条款第四条。*
+
+**使用、复制和分发的父条款：**
+
+1. 根据本许可的条款和条件，每位贡献者在此授予您永久、全世界、非排他性、免费、免版税、不可撤销的版权许可，用以复制、衍生、公开展示、公开表演、转授许可证，并以源形式或目标形式分发作品和此类衍生作品。
+2. 使用、复制和分发开源笔记许可发行的作品时，必须携带开源笔记许可。允许为链接方式携带。
+3. 一旦您在商业性质作品中使用了开源笔记许可发行的作品，您必须表示感谢，尤其是对该作品主要贡献者的感谢。当开源笔记许可发行的作品为你产生良好效益时，鼓励您为用到的作品贡献者们、开源笔记组织捐赠，但这绝非强制性的。
+4. 您可以为作品添加子许可条款，且子条款必须写在父条款前。注意您不可修改父条款，否则本许可自动作废，您将不能使用任何由开源笔记许可发行的作品。子条款不可与父条款冲突。
+5. 您可在非约束条文中添加作品贡献者、备注、使用说明书、引用资料等文本，但不可出现以开源笔记许可为名义的约束性条款，它们不属于开源笔记许可，开源笔记许可不对这些内容负责，对于属于开源笔记的约束条款应当写在子条款区。
+6. 当您使用了其它许发行的作品，请确保其对其它许可，尤其是对本许可友好，不与本许可条款冲突。加入的许可不应当是污染性的，例如GPL。不满足上述条件时您不应当加入其它许可，或不对使用到这类许可的作品附上开源笔记许可。l
+
+**非约束条文：**
+
+*注释：你可以为作品添加非约束条文。详见父条款第五条。*
+
+1. 本笔记由两份雪糕创建首版，版号1.0.0。
+2. 部分引用于其它位置的资料若没有在正文给出连接，则是在本文最后的“参考文献”中贴出。
+
+# JQuery
+
+## 介绍
+
+jQuery是一个快速，小型且功能丰富的JavaScript库。通过易于使用的API（可在多种浏览器中使用），它使HTML文档的遍历和操作，事件处理，动画和Ajax等事情变得更加简单。兼具多功能性和可扩展性，jQuery改变了数百万人编写JavaScript的方式。
+
+### 优点
+
+- 可以写多个入口函数。
+- 使用到了隐式迭代。
+- 使用到了链式编程。
+- 相较于原生JS，拥有更好的兼容性。
+- 更高的容错率。即更加健壮。
+
+### 浏览器支持
+
+jQuery有很多版本，如果需要支持Internet Explorer 6-8，Opera 12.1x或Safari 5.1+等较旧的浏览器，请使用 [jQuery 1.12](https://code.jquery.com/jquery/#jquery-all-1.x)。
+
+当前主要支持的版本如下：
+
+- Desktop
+  - Chrome: (Current - 1) and Current
+  - Edge: (Current - 1) and Current
+  - Firefox: (Current - 1) and Current, ESR
+  - Internet Explorer: 9+
+  - Safari: (Current - 1) and Current
+  - Opera: Current
+
+- Mobile
+  - Stock browser on Android 4.0+[1]
+  - Safari on iOS 7+
+
+每个版本还提供了三个文件，分别是生产、开发、映射文件，分别用于生产和开发环境，至于映射文件则是用于生产和开发文件之间的对应关系。
+
+![image-20210102215703443](JQuery.assets/image-20210102215703443.png)
+
+### 入口函数
+
+有两种写法：
+
+1. ```javascript
+   $(document).ready(funcation(){})
+   ```
+
+2. ```javascript
+   $(funcation(){})
+   ```
+
+window.onload与jQuery ready()的区别：
+
+|          | window.onload                                            | $(document).ready()                                 |
+| -------- | -------------------------------------------------------- | --------------------------------------------------- |
+| 执行时机 | 必须等待网页全部加载完毕（包括图片等），再执行包裹代码。 | 只需要等待网页中的DOM结构完毕，就能执行包裹的代码。 |
+| 执行次数 | 只能执行一次，若执行第二次，那么将覆盖上次的执行。       | 可执行多次，不会覆盖之前的执行。                    |
+| 简写形式 | 无                                                       | $(function(){});                                    |
+
+但事实上原生JS也能通过事件监听器的方式实现多个入口函数：
+
+- window.addEventListener('load', function() {})
+
+### jQuery文件结构
+
+jQuery其实是个自执行函数，其代码结构为：
+
+- ```javascript
+  (funcation(){}());
+  ```
+
+在jQuery末尾几行，有这样一段代码：
+
+- ![image-20210103195201066](JQuery.assets/image-20210103195201066.png)
+
+意思是为window对象添加jQuery和$属性，都相等，且等于jQuery。注意这个绿色的jQuery，找到创建它的地方，可以发现它是个函数。正因为它是个函数，所以入参不同，效果也不一样。
+
+总结：$和jQuery是等价的，是个函数对象。
+
+## 遍历方法
+
+### each
+
+定义和用法：
+
+- each() 方法为每个匹配元素规定要运行的函数。
+- 返回 false 可用于及早停止循环。
+
+语法：
+
+- ```javascript
+  $(selector).each(function(index,element))
+  ```
+
+- selector：选择器，例如属性选择器、类型选择器……
+
+- index：选择器的索引位置。
+
+- element：当前的元素（也可用“this”选择器）。
+
+## DOM操作
+
+### 对象
+
+原生JS选择器获取到的就是DOM对象，例如：
+
+- document.getElementById('');
+- document.getElementsByTagName('');
+
+使用`$('')`可以选择要操作的标签，引号内可以使用ID、类、属性、标签等选择器。
+
+DOM对象和jQuery对象的区别：
+
+- DOM对象：
+
+  - 只能调用DOM方法和属性。（不能调用jQuery的方法和属性）
+
+- jQuery对象：
+
+  - 只能调用jQuery的方法和属性。（不能调用DOM方法和属性）
+
+  - jQuery对象是个伪数组（数组对象），jQuery对象其实就是DOM对象的包装集。
+
+  - jQuery对象实例（使用log方法打印出来）：
+
+    ![image-20210105193833508](JQuery.assets/image-20210105193833508.png)
+
+    
+
+DOM对象和jQuery对象之间的互相转化：
+
+- 将DOM对象转为jQuery对象：
+
+  直接往$()里放DOM对象，就会得到jQuery对象。如下的$one就是jQuery对象。
+
+  ```javascript
+  let one =  document.getElementById('one');
+  let $one = $(one);
+  ```
+
+- 将jQuery对象转为DOM对象：
+
+  1. 由于jQuery对象是个伪数组，所以可以用下标来取值。如果jQuery对象包装了多个DOM对象，则需要逐一用下标取出来。
+
+     ```javascript
+     let $div = $('div');
+     let div = $div[0];
+     ```
+
+  2. 使用jQuery的get方法。
+
+     ```javascript
+     let $div = $('div');
+     let div = $div.get(0);
+     ```
+
+### 选择器
+
+使用`$("")`可以选择要操作的标签，双引号内可以使用ID、类、属性、标签等选择器，基本和CSS的选择器语法相同。
+
+**jQuery基本选择器：**
+
+| 名称       | 用法              | 描述                                 |
+| ---------- | ----------------- | ------------------------------------ |
+| ID选择器   | $('#id)           | 获取指定ID的元素                     |
+| 类选择器   | $('.class')       | 获取指定类的元素                     |
+| 标签选择器 | $('div')          | 获取指定标签的所有元素               |
+| 并集选择器 | $('div, p, li')   | 使用都好分隔，只要符合任一条件即可。 |
+| 交集选择器 | $('div.redClass') | 获取div中类为redClass的元素          |
+
+**jQuery层级选择器：**
+
+| 名称       | 用法         | 描述                                                         |
+| ---------- | ------------ | ------------------------------------------------------------ |
+| 子代选择器 | $('ul > li') | 使用`>`或`-`号获取子层级的元素。注意并不会获取孙子层级的元素。 |
+| 后代选择器 | $('ul li')   | 使用空格，代表后代选择器，获取ul下的所有li元素，包括孙子等。 |
+
+**jQuery过滤选择器：**
+
+这类选择器的前缀是冒号。利用odd和even可以实现表格的条纹效果。
+
+| 名称       | 用法          | 描述                                                   |
+| ---------- | ------------- | ------------------------------------------------------ |
+| :eq(index) | $('li:eq(2)') | 获取到的li元素列表中，选择索引号为2的元素。（从0开始） |
+| :odd       | $('li:odd')   | 获取到的li元素列表中，选择索引号为奇数的元素。         |
+| :even      | $('li:even')  | 获取到的li元素中，选择索引号为偶数的元素。             |
+
+**jQuery筛选选择器：**
+
+筛选选择器的功能与过滤选择有点类似，但是用法不同，筛选选择器主要是以方法的形式。
+
+| 方法               | 用法                       | 描述                                 |
+| ------------------ | -------------------------- | ------------------------------------ |
+| children(selector) | $('ul').children('li')     | 相当于$('ul-li')，子类选择器。       |
+| find(selector)     | $('ul').find('li')         | 相当于$('ul li')，后代选择器。       |
+| siblings(selector) | $('#first').siblings('li') | 查找兄弟节点，不包括本身。           |
+| parent()           | $('first').parent()        | 查找父亲                             |
+| eq(index)          | $('li').eq(2)              | 相当于$('li:eq(2)')。（索引从0开始） |
+| next()             | $('li').next()             | 找下一个兄弟                         |
+| prev()             | $('li').prev()             | 找上一个兄弟                         |
+
+
+
+### text
+
+用于获取和设置文本。
+
+- 获取div对象的文本：`div.text()`。不给该方法参数即可。注意会获取到该标签及其所有子标签的文本。若jQuery对象包装了多个DOM元素，则将获取所有元素的文本。
+- 设置文本：`div.text('hi')`。传入文本即可。会覆盖其原有的内容。若jQuery对象包装了多个DOM元素，则将设置所有元素的文本。
+
+### wrap
+
+定义：
+
+- wrap() 方法使用指定的 HTML 元素来包裹每个被选元素。
+
+语法：
+
+- $(*selector*).wrap(*wrappingElement*,function*(index)*)
+  - wrappingElement：必须填写。规定包裹每个被选元素的 HTML 元素。可以放入的类型有：HTML元素、JQuery对象、DOM元素。
+  - function(index)：规定返回待插入内容的函数。index，返回集合中的元素的index位置。
+
+示例：
+
+- ```javascript
+  $("button").click(function(){
+      $("p").wrap("<div></div>");
+  });
+  ```
+
+- ```javascript
+  $this.wrap($("<div/>", {
+      style: 'position:relative',
+      id: id
+  }));
+  ```
+
+### before
+
+- 在被选元素前插入内容。
+
+### after
+
+定义：
+
+- after() 方法在被选元素后插入指定的内容。
+
+语法：
+
+- $(*selector*).after(*content*,function(*index*))
+  - content：必须填写。规定要插入的内容，可包含HTML标签。可以放入的类型有：HTML元素、JQuery对象、DOM元素。
+  - function(index)：规定返回待插入内容的函数。index，返回集合中的元素的index位置。
+
+示例：
+
+- ```javascript
+  $("button").click(function(){
+      $("p").after("<p>Hello world!</p>");
+  });
+  ```
+
+- ```javascript
+  $this.after($("<div/>", {html: '显示',class: 'btn btn-primary btn-sm',id: 'passeye-toggle-'+i,})
+  ```
+
+### css
+
+设置和获取样式。
+
+- 只输入属性不输入值，将得到对应的值。若属性名含有`-`符，可以直接写，也可以用首字母大写的方式代替。例如`backgroud-color`可以写为`backgroudColor`。若jQuery对象包装了多个DOM对象，则只会获得第一个DOM对象的对应属性值。
+
+  ```javascript
+  let div =  $('div');
+  div.css('background-color');
+  ```
+
+- 同时输入属性和值，将实现设置行为。要注意的是，设置的样式是行内样式。若jQuery对象包装了多个DOM对象，则会设置每个DOM对象的对应属性值。
+
+  ```javascript
+  let div =  $('div');
+  
+  //单样式的设置方法
+  div.css('width','50%');
+  
+  //多样式设置方法，传入对象即可。属性也可以用单引号括起来。
+  div.css({
+      height: '200px',
+      'background-color': 'rgb(245, 201, 146)' 
+  });
+  ```
+
+### show
+
+显示内容，例如有组件的display为none，对其使用show即可显示之。相当于css('display', 'block')。
+
+### hide
+
+隐藏内容。例如有组件的display为block，对其使用hide即可隐藏之。相当于css('display','none')。
+
+## Ajax
+
+### jQuery.post()
+
+语法：
+
+- ```javascript
+  jQuery.post( url [, data ] [, success(data, textStatus, jqXHR) ] [, dataType ] )
+  ```
+
+post()方法是Ajax函数的简写形式，相当于：
+
+- ```javascript
+  $.ajax({
+    type: "POST",
+    url: url,
+    data: data,
+    success: success,
+    dataType: dataType
+  });
+  ```
+
+用例：
+
+- Alert 从 test.php请求的数据结果：
+
+  - ```javascript
+    $.post("test.php", function(data) {
+      alert("Data Loaded: " + data);
+    });
+    ```
+  
+- Alert 从 test.cgi请求并且发送url参数的数据结果 (HTML 或者 XML,取决于返回的结果)：
+
+  - ```javascript
+    $.post("test.php", { name: "John", time: "2pm" },
+      function(data) {
+        alert("Data Loaded: " + data);
+      });
+    ```
+
+### jQuery.getJSON()
+
+这是个Ajax函数的缩写，这相当于：
+
+```javascript
+$.ajax({
+  dataType: "json",
+  url: url,
+  data: data,
+  success: success
+});
+```
+
+语法：
+
+```javascript
+$(selector).getJSON(url,data,success(data,status,xhr))
+```
+
+数据会被附加到一个查询字符串的URL中，发送到服务器。如果该值的`data`参数是一个普通的对象，它会转换为一个字符串并使用URL编码，然后才追加到URL中。
+
+大多数情况下都会指定一个请求成功后的回调函数：
+
+```javascript
+$.getJSON('ajax/test.json', function(data) {
+  var items = [];
+ 
+  $.each(data, function(key, val) {
+    items.push('<li id="' + key + '">' + val + '</li>');
+  });
+ 
+  $('<ul/>', {'class': 'my-new-list',html: items.join('')}).appendTo('body');
+});
+```
+
+
+
+## 事件方法
+
+### mouseover
+
+mouseover事件在鼠标移动到选取的元素及其子元素上时触发。
+
+### mouseenter
+
+mouseenter事件只在鼠标移动到选取的元素上时触发。
+
+### event.preventDefault()
+
+定义和用法：
+
+- event.preventDefault()方法阻止元素发生的默认行为。
+- 例如：
+  - 当点击提交按钮阻止对表单的提交。
+  - 阻止以下URL的链接。
+- 可以使用event.isDefaultPrevented()方法来检查指定的事件上是否调用了 preventDefault() 方法。
+
+防止连接打开URL：
+
+```javascript
+$("a").click(function(event){
+    event.preventDefault();
+});
+```
+
+### event.stopPropagation()
+
+定义和用法：
+
+- event.stopPropagation() 方法阻止事件冒泡到父元素，阻止任何父事件处理程序被执行。
+- 可用 event.isPropagationStopped()方法来检查指定的事件上是否调用了该方法。
+
+阻止click事件冒泡到父元素：
+
+```javascript
+$("span").click(function(event){
+    event.stopPropagation();
+    alert("The span element was clicked.");
+});
+$("p").click(function(event){
+    alert("The p element was clicked.");
+});
+$("div").click(function(){
+    alert("The div element was clicked.");
+});
+```
+
+# 参考文献
+
+1. https://www.bilibili.com/video/BV1pt411H7D6 。《web前端基础教程4天从零玩转jQuery》。
+

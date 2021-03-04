@@ -1,0 +1,925 @@
+# 开源笔记-许可
+
+**版本：1.1**
+
+**发布于2020年11月**
+
+**使用、复制和分发的子条款：**
+
+*注释：你可以为作品添加子条款。详见父条款第四条。*
+
+**使用、复制和分发的父条款：** 
+
+1. 根据本许可的条款和条件，每位贡献者在此授予您永久、全世界、非排他性、免费、免版税、不可撤销的版权许可，用以复制、衍生、公开展示、公开表演、转授许可证，并以源形式或目标形式分发作品和此类衍生作品。
+2. 使用、复制和分发开源笔记许可发行的作品时，必须携带开源笔记许可。允许为链接方式携带。
+3. 一旦您在商业性质作品中使用了开源笔记许可发行的作品，您必须表示感谢，尤其是对该作品主要贡献者的感谢。当开源笔记许可发行的作品为你产生良好效益时，鼓励您为用到的作品贡献者们、开源笔记组织捐赠，但这绝非强制性的。
+4. 您可以为作品添加子许可条款，且子条款必须写在父条款前。注意您不可修改父条款，否则本许可自动作废，您将不能使用任何由开源笔记许可发行的作品。子条款不可与父条款冲突。
+5. 您可在非约束条文中添加作品贡献者、备注、使用说明书、引用资料等文本，但不可出现以开源笔记许可为名义的约束性条款，它们不属于开源笔记许可，开源笔记许可不对这些内容负责，对于属于开源笔记的约束条款应当写在子条款区。
+6. 当您使用了其它许发行的作品，请确保其对其它许可，尤其是对本许可友好，不与本许可条款冲突。加入的许可不应当是污染性的，例如GPL。不满足上述条件时您不应当加入其它许可，或不对使用到这类许可的作品附上开源笔记许可。
+
+**非约束条文：**
+
+*注释：你可以为作品添加非约束条文。详见父条款第五条。*
+
+1. 本笔记由两份雪糕创建首版，版号1.0.0。
+2. 部分引用于其它位置的资料若没有在正文给出连接，则是在本文最后的“参考文献”中贴出。
+
+# 值得注意
+
+JS引擎远快于渲染引擎。这是为什么要写入口函数的原因。
+
+# 类型
+
+## Iterable
+
+参考文章：https://www.cnblogs.com/xiaoyulive/p/7906548.html 。
+
+ES6引入了iterable类型，Array，Map，Set都属于iterable类型，它们可以使用**for...of循环来遍历**，都内置**forEach**方法。
+
+**Set**
+
+使用方法一，创建的的时候初始化：
+
+- ```javascript
+  let set = new Set([1, 2, 3])
+  ```
+
+使用方法二，创建空集合之后再添加元素：
+
+- ```javascript
+  let set = new Set()
+  set.add(1)
+  set.add(2)
+  set.add(3)
+  ```
+
+得到Set元素个数的方法是set.size。这是个属性，不是方法。
+
+**Array**
+
+添加元素：
+
+```javascript
+let arr = ['a', 'b', 'c', 'd', 'e']
+arr.push(10, 11) // 模仿栈进行操作，往数组末尾添加一个或多个元素(改变原数组)
+arr.unshift(0, 1) // 模仿队列进行操作，往数组前端添加一个或多个元素(改变原数组)
+console.log(arr) // [0, 1, "a", "b", 'c', "d", "e", 10, 11]
+```
+
+删除元素：
+
+```javascript
+arr.pop() // 移除最后一个元素并返回该元素值(改变原数组)
+arr.shift() // 移除最前一个元素并返回该元素值，数组中元素自动前移(改变原数组)
+console.log(arr) // ["b", "c", "d"]
+```
+
+清空数组：
+
+```javascript
+let arr = ['a', 1, 'b', 3, 'c', 2, 'd', 'e'];
+arr.length = 0;//将length设为0即可
+```
+
+> length详解:
+>
+> - 因为数组的索引总是由0开始，所以一个数组的上下限分别是：0和length-1；
+> - 当length属性被设置得更大时，整个数组的状态事实上不会发生变化，仅仅是length属性变大；
+> - 当length属性被设置得比原来小时，则原先数组中索引大于或等于length的元素的值全部被丢失。
+
+# DOM操作
+
+## 获取
+
+**getElementsByTagName**
+
+通过标签名得到元素集。
+
+由于得到的是元素集，所以需要用`item(index)`方法指定使用第几个匹配的标签。
+
+示例：
+
+- ```javascript
+  let spanSet = document.getElementsByTagName("span");
+  spanSet.item(0).setAttribute("style","display: none");
+  ```
+
+## 设置
+
+**textContent**
+
+设置标签内文本。
+
+示例：
+
+- ```javascript
+  tag.textContent = "文本"
+  ```
+
+## 属性
+
+# HTML属性
+
+## 表单
+
+**onsubmit**
+
+form标签的属性，用于提交表单时，触发指定方法：
+
+![image-20201114161539008](Javascipt.assets/image-20201114161539008.png)
+
+​	可以用return决定是否响应action属性指定的路径：
+
+![image-20201114161632340](Javascipt.assets/image-20201114161632340.png)
+
+# 方法
+
+## 数据结构
+
+**indexof**
+
+参考博文：https://www.cnblogs.com/hermitks/p/9886692.html 。
+
+使用方法：
+
+- ```javascript
+  var arr=[1,2,3,4]
+  arr.indexOf(2);//返回1
+  ```
+
+  
+
+在某些IE版本中，不支持indexOf()。解决办法是自己写查找方法：
+
+- ```javascript
+  function search(arr,dst){
+       var i = arr.length;
+       while(i-=1){
+           if (arr[i] == dst){
+              return i;
+           }
+       }
+       return false;
+  }
+  ```
+
+- ```javascript
+  //使用示例
+  var a=[1,2,3,4];
+  search(a,3);//返回2
+  ```
+
+  
+
+## window
+
+**onload**
+
+参考文章：https://www.runoob.com/w3cnote/javascript-window-onload.html 。
+
+window.onload() 方法用于在网页加载完毕后立刻执行的操作，即当 HTML 文档加载完毕后，立刻执行某个方法。window.onload() 通常用于 `<body> `元素，在页面完全载入后(包括图片、css文件等等)执行脚本代码。 
+
+语法：
+
+1. 执行指定函数：`window.onload = functionName`。
+2. 执行匿名函数：`window.onload = function(){}`。
+3. 作为HTML属性使用，例如放到body标签中：`<body onload="init()"></body>`。onload中填写要执行的函数。
+
+window.onload与jQuery ready()的区别：
+
+|          | window.onload                                            | $(document).ready()                                 |
+| -------- | -------------------------------------------------------- | --------------------------------------------------- |
+| 执行时机 | 必须等待网页全部加载完毕（包括图片等），再执行包裹代码。 | 只需要等待网页中的DOM结构完毕，就能执行包裹的代码。 |
+| 执行次数 | 只能执行一次，若执行第二次，那么将覆盖上次的执行。       | 可执行多次，不会覆盖之前的执行。                    |
+| 简写形式 | 无                                                       | $(function(){});                                    |
+
+## 校验
+
+**checkValidity**
+
+checkValidity方法用于校验表单。返回true时，表明表单内所有输入都有效。novalidate属性用于取消表单默认验证，自己来处理结果，email.checkValidity()验证方法。
+
+```javascript
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title></title>
+	</head>
+	<body>
+         <a href="http://s.jf3q.com">click here</a>
+		<form οnsubmit="testform()" novalidate>
+			<label for="email"> 邮箱：</label>
+			<input type="email" id="email" name="email"/>
+			<input type="submit" value="提交">
+		</form>
+	</body> 
+	
+	<script>
+        function testform(){
+            var email=document.getElementById('email');
+            if(email.value==''){
+                alert('请输入email！');
+                return false;
+            }else if(!email.checkValidity()){
+                alert('email的格式不正确！');
+                return false;
+            }
+        }
+	</script>
+</html>
+```
+
+## 延时
+
+**setTimeout**
+
+执行方式：异步。
+
+用法示例：
+
+- `setTimeout("testFunction()", 5000)`。意思是5秒后执行testFunction函数，仅一次。
+- `setTimeout(function(){}, 5000)`。可以使用匿名函数。
+
+**setInterval**
+
+执行方式：异步。
+
+用法示例：
+
+- `setInterval("testFunction()",5000)`。每隔5五秒执行testFunction函数，无数次。
+- `setInterval(function(){}, 5000)`。可以使用匿名函数。
+
+停止执行：
+
+- setInterval会返回标识符，而clearInterval方法能根据标识符终止循环。
+
+- 用法示例：
+
+  ```javascript
+  let sendCountDown = setInterval(function () {
+      countDown = 10;
+      countDown--;
+      if(countDown === 0){
+      	clearInterval(sendCountDown);//停止当前循环
+      }
+  },1000);
+  ```
+
+# 文件
+
+**读取JSON文件：**
+
+参考文章：https://www.jianshu.com/p/df9adc286f56 。
+
+使用原生Ajax：
+
+```javascript
+window.onload = function () {
+    var request = new XMLHttpRequest();
+    request.open("get", "demo.json");//设置请求方法与JSON文件的所在路径
+    request.send();
+    request.onload = function () {/*XHR对象获取到返回信息后执行*/
+        if (request.status == 200) {/*返回状态为200，即为数据获取成功*/
+            var json = JSON.parse(request.responseText);
+            console.log(json);
+        }
+    }
+}
+```
+
+工程化开发时（webpack/parcel）等，可以用import导入：
+
+```javascript
+import xx from 'xxx.json'
+//文件后缀可省略，如
+import xx from 'xxx'
+```
+
+# 数据存储
+
+参考文章：
+
+- https://www.runoob.com/js/js-cookies.html
+- https://www.runoob.com/jsref/prop-win-localstorage.html
+
+**Cookie：**
+
+什么是 Cookie？
+
+- Cookie 是一些数据, 存储于你电脑上的文本文件中。
+
+- 当 web 服务器向浏览器发送 web 页面时，在连接关闭后，服务端不会记录用户的信息。
+
+- Cookie 的作用就是用于解决 "如何记录客户端的用户信息":
+
+  - 当用户访问 web 页面时，他的名字可以记录在 cookie 中。
+  - 在用户下一次访问该页面时，可以在 cookie 中读取用户访问记录。
+
+- Cookie 以名/值对形式存储，如下所示:
+
+  ```
+  username=John Doe
+  ```
+
+- 当浏览器从服务器上请求 web 页面时， 属于该页面的 cookie 会被添加到该请求中。服务端通过这种方式来获取用户的信息。
+
+使用 JavaScript 创建Cookie：
+
+- JavaScript 可以使用 **document.cookie** 属性来创建 、读取、及删除 cookie。
+
+- JavaScript 中，创建 cookie 如下所示：
+  - ```javascript
+    document.cookie="username=John Doe";
+    ```
+
+- 您还可以为 cookie 添加一个过期时间（以 UTC 或 GMT 时间）。默认情况下，cookie 在浏览器关闭时删除：
+
+  - ```javascript
+    document.cookie="username=John Doe; expires=Thu, 18 Dec 2043 12:00:00 GMT";
+    ```
+
+- 您可以使用 path 参数告诉浏览器 cookie 的路径。默认情况下，cookie 属于当前页面。
+
+  - ```javascript
+    document.cookie="username=John Doe; expires=Thu, 18 Dec 2043 12:00:00 GMT; path=/";
+    ```
+
+**Window LocalStorage属性：**
+
+实例：
+
+- 使用 localStorage 创建一个本地存储的 name/value 对，name="lastname"  value="Smith", 然后检索  "lastname" 的值，并插入到 id="result" 的元素上。
+
+  - ```javascript
+    // 存储
+    localStorage.setItem("lastname", "Smith");
+    // 检索
+    document.getElementById("result").innerHTML = localStorage.getItem("lastname");
+    ```
+
+- 记录点击按钮的次数：
+
+  - ```javascript
+    if (localStorage.clickcount) {
+        localStorage.clickcount = Number(localStorage.clickcount) + 1;
+    } else {
+        localStorage.clickcount = 1;
+    }
+    document.getElementById("result").innerHTML = "你在按钮上已经点击了 " +
+    localStorage.clickcount + "次。";
+    ```
+
+定义和使用：
+
+- localStorage 和 sessionStorage 属性允许在浏览器中存储 key/value 对的数据。
+- localStorage 用于长久保存整个网站的数据，保存的数据没有过期时间，直到手动去删除。
+- localStorage 属性是只读的。
+- 提示: 如果你只想将数据保存在当前会话中，可以使用 [sessionStorage](https://www.runoob.com/jsref/prop-win-sessionstorage.html) 属性， 该数据对象临时保存同一窗口(或标签页)的数据，在关闭窗口或标签页之后将会删除这些数据。
+
+语法：
+
+- 完整写法：`window.localStorage`。
+- 保存数据语法：`localStorage.setItem("key", "value");`。
+- 读取数据语法：`var lastname = localStorage.getItem("key");`。
+- 删除数据语法：`localStorage.removeItem("key");`。
+- 删除所有数据：`localStroage.clear();`。
+
+localStorage键的获取：
+
+- ```javascript
+  var storage=window.localStorage;
+  storage.a=1;
+  storage.setItem("c",3);
+  for(var i=0;i<storage.length;i++){
+      var key=storage.key(i);
+      console.log(key);
+  }
+  ```
+
+- 使用 key() 方法，向其中出入索引即可获取对应的键。
+
+localStorage 其他注意事项：
+
+- 一般我们会将 JSON 存入 localStorage 中，但是在 localStorage 会自动将 localStorage 转换成为字符串形式。
+
+- 所以涉及到JSON与字符串类型的转化方式：
+
+  - 例如有JSON数据如下：
+
+    - ```json
+      var data = {
+          test:"text",
+          test1:"123456",
+          test2:"字段值",
+      }
+      ```
+
+  - 存储方式为如下，将 json 转化为字符串再存入：
+
+    - ```javascript
+      localStorage.setItem("data", JSON.stringify(data));
+      ```
+
+  - 取出方式：
+
+    - ```javascript
+      var data = localStorage.getItem("data");
+      data = JSON.parse(data);
+      ```
+
+localStorage 的优势：
+
+- 1、localStorage 拓展了 cookie 的 4K 限制。
+- 2、localStorage 会可以将第一次请求的数据直接存储到本地，这个相当于一个 5M 大小的针对于前端页面的数据库，相比于 cookie 可以节约带宽，但是这个却是只有在高版本的浏览器中才支持的。
+
+localStorage 的局限：
+
+- 1、浏览器的大小不统一，并且在 IE8 以上的 IE 版本才支持 localStorage 这个属性。
+- 2、目前所有的浏览器中都会把localStorage的值类型限定为string类型，这个在对我们日常比较常见的JSON对象类型需要一些转换。
+- 3、localStorage在浏览器的隐私模式下面是不可读取的。
+- 4、localStorage本质上是对字符串的读取，如果存储内容多的话会消耗内存空间，会导致页面变卡。
+- 5、localStorage不能被爬虫抓取到。
+
+localStorage 与 sessionStorage 的唯一一点区别就是 localStorage 属于永久性存储，而 sessionStorage 属于当会话结束的时候，sessionStorage 中的键值对会被清空。
+
+ localStorage 的使用也是遵循同源策略的，所以不同的网站直接是不能共用相同的 localStorage。
+
+**Window sessionStorage属性：**
+
+实例：
+
+- 使用 sessionStorage 创建一个本地存储的 name/value 对，name="lastname"  value="Smith", 然后检索  "lastname" 的值，并插入到 id="result" 的元素上。
+
+  - ```javascript
+    // 存储
+    sessionStorage.setItem("lastname", "Smith");
+    // 检索
+    document.getElementById("result").innerHTML = sessionStorage.getItem("lastname");
+    ```
+
+- 记录点击按钮的次数：
+
+  - ```javascript
+    if (sessionStorage.clickcount) {
+        sessionStorage.clickcount = Number(sessionStorage.clickcount) + 1;
+    } else {
+        sessionStorage.clickcount = 1;
+    }
+    document.getElementById("result").innerHTML = "你在按钮上已经点击了 " +
+    sessionStorage.clickcount + " 次。";
+    ```
+
+定义和使用：
+
+- localStorage 和 sessionStorage 属性允许在浏览器中存储 key/value 对的数据。
+- sessionStorage 用于临时保存同一窗口(或标签页)的数据，在关闭窗口或标签页之后将会删除这些数据。
+
+语法：
+
+- 完整写法：`window.sessionStorage`。
+- 保存数据语法：`sessionStorage.setItem("key", "value");`。
+- 读取数据语法：`var lastname = sessionStorage.getItem("key");`。
+- 删除指定键的数据语法：`sessionStorage.removeItem("key");`。
+- 删除所有数据：`sessionStorage.clear();`。
+
+# 模块化
+
+参考文章：
+
+- https://zhuanlan.zhihu.com/p/57908297
+- https://www.cnblogs.com/Yellow-ice/p/10639029.html
+
+## 什么是模块化
+
+在js出现的时候，js一般只是用来实现简单的交互，后来js开始得到重视，用来实现越来越复杂的功能，而为了维护的方便，我们也把不同功能的js抽取出来当做一个js文件，但是当项目变的复杂的时候，HTML页面可能需要加载好多个js文件，而这个时候就会出现各种命名冲突，如果js也可以像java一样，把不同功能的文件放在不同的package中，需要引用某个函数或功能的时候，import下相关的包，这样可以很好的解决命名冲突等各种问题，但是js中没有模块的概念，又怎么实现模块化呢。
+
+模块化开发是种管理方式、生产方式，一种解决问题的方案，模块就是实现特定功能的文件，有了模块，我们就可以更方便地使用别人的代码，想要什么功能，就加载什么模块，但是模块开发需要遵循一定的规范，否则就都乱套了，因此，才有了后来大家熟悉的AMD规范，CMD规范。
+
+## AMD标准
+
+AMD 即Asynchronous Module Definition，中文名是“异步模块定义”的意思，它采用异步方式加载模块，模块的加载不影响它后面语句的运行，所有依赖这个模块的语句，都定义在一个回调函数中，等到加载完成之后，这个回调函数才会运行。
+
+一般来说，AMD是 RequireJS 在推广过程中对模块定义的规范化的产出，因为平时在开发中比较常用的是require.js进行模块的定义和加载，一般是使用define来定义模块，使用require来加载模块。
+
+**定义模块：**
+
+==AMD规范只定义了一个函数define，它是全局变量，我们可以用它来定义一个模块。==
+
+```javascript
+define(id?, dependencies?, factory);
+```
+
+其中，id是定义中模块的名字，这个参数是可选的，如果没有提供该参数，模块的名字应该默认为模块加载器请求的指定脚本的名字，如果提供了该参数，模块名必须是“顶级”的和绝对的。
+
+dependencies是定义的模块中所依赖模块的数组，依赖模块必须根据模块的工厂方法优先级执行，并且执行的结果应该按照依赖数组中的位置顺序以参数的形式传入（定义中模块的）工厂方法中。
+
+factory是模块初始化要执行的函数或对象，如果为函数，它应该只被执行一次，如果是对象，此对象应该为模块的输出值。
+
+下面来看一个定义模块的例子：
+
+- 下面的代码定义了一个alpha的模块，这个模块依赖require，exports，beta，因此需要先加载它们，再执行后面的factory。
+
+- ```javascript
+  define("alpha", ["require", "exports", "beta"], function (require, exports, beta) {
+       exports.verb = function() {
+           return beta.verb();
+           //Or:
+           return require("beta").verb();
+       }
+  });
+  ```
+
+**加载模块：**
+
+require.js中采用require()语句加载模块，在定义好了模块后，我们可以使用require进行模块的加载。
+
+```javascript
+require([module], callback);
+```
+
+require要传入两个参数，第一个参数[module]，是一个数组，里面的成员就是要加载的模块，第二个参数callback，则是加载成功之后的回调函数。
+
+来看个例子：
+
+```javascript
+require(['increment'], function (increment) {
+　   increment.add(1);
+});
+```
+
+上面的代码中，比如我们现在已经定义了一个模块，名字为increment，里面有个add方法，我们现在需要用到里面的方法，只要像上面一样将模块加载进来，然后调用方法就可以了。
+
+**require.js用例：**
+
+在使用require.js时，可以通过define()定义模块，这时候里面的模块的方法和变量外部是无法访问到的，只有通过return，然后再加载这个模块，才可以进行访问。
+
+```javascript
+define('math',['jquery'], function ($) {//引入jQuery模块
+    return {
+        add: function(x,y){
+            return x + y;
+        }
+    };
+});
+```
+
+上面的代码定义了个math模块，返回了个add方法，要使用这个模块的方法，我们需要向下面这样进行访问：
+
+```javascript
+require(['jquery','math'], function ($,math) {
+    console.log(math.add(10,100));//110
+});
+```
+
+通过require，我们加载了math模块，这样就可以使用math模块里面的add方法了。
+
+## CMD标准
+
+CMD 即Common Module Definition通用模块定义，CMD规范是国内发展出来的，同时，CMD是在SeaaJS推广的过程中形成的，CMD和AMD要解决的都是同个问题，在使用上也都很像，只不过两者在模块定义方式和模块加载时机上有所不同。
+
+**定义模块：**
+
+在 CMD 规范中，一个模块就是一个文件，通过define()进行定义。
+
+```javascript
+define(factory);
+```
+
+define接受factory参数，factory可以是函数，亦可为对象或字符串。
+
+factory为对象、字符串时，表示模块的接口就是该对象、字符串，比如可以如下定义一个 JSON 数据模块。
+
+```javascript
+define({ "foo": "bar" });
+```
+
+也可以通过字符串定义模板模块：
+
+```javascript
+define('I am a template. My name is {{name}}.');
+```
+
+factory为函数时，表示是模块的构造方法，执行该构造方法，可以得到模块向外提供的接口，factory方法在执行时，默认会传入三个参数：require，exports和 module。
+
+```javascript
+define(function(require, exports, module) {
+  //模块代码
+});
+```
+
+其中，require用来加载其它模块，而exports可以用来实现向外提供模块接口：
+
+```javascript
+define(function(require, exports) {
+  // 对外提供 foo 属性
+  exports.foo = 'bar';
+  // 对外提供 doSomething 方法
+  exports.doSomething = function() {};
+});
+```
+
+module是一个对象，上面存储了与当前模块相关联的一些属性和方法，传给factory构造方法的exports参数是module.exports对象的一个引用，只通过exports参数来提供接口，有时无法满足开发者的所有需求，比如当模块的接口是某个类的实例时，需要通过module.exports来实现。
+
+```javascript
+define(function(require, exports, module) {
+  // exports 是 module.exports 的一个引用
+  console.log(module.exports === exports); // true
+  // 重新给 module.exports 赋值
+  module.exports = new SomeClass();
+  // exports 不再等于 module.exports
+  console.log(module.exports === exports); // false
+});
+```
+
+说了这么多，相信大家可能有点乱，来个简单的例子，我们看看使用AMD和CMD定义的模块的写法：
+
+```javascript
+// CMD
+define(function(require, exports, module) {
+  var a = require('./a')
+  a.doSomething()
+  // 此处略去 100 行
+  var b = require('./b') // 依赖可以就近书写
+  b.doSomething()
+  // ... 
+})
+
+// AMD 默认推荐的是
+define(['./a', './b'], function(a, b) { // 依赖必须一开始就写好
+  a.doSomething()
+  // 此处略去 100 行
+  b.doSomething()
+  ...
+}) 
+```
+
+在上面的代码中，相信大家很容易可以看出区别吧，AMD和CMD都是通过define()定义模块，AMD需要把依赖的模块先写出来，可以通过return暴露接口，CMD在定义模块需要传入require，exports和module这几个参数，要加载某个模块时，使用require进行加载，要暴露接口时，可以通过exports，module.exports和return。
+
+**加载模块：**
+
+在前面定义模块时，我们说过，当factory为函数时，require会作为默认参数传递进去，而require可以实现模块的加载。
+
+require是一个方法，接受模块标识作为唯一参数，用来获取其他模块提供的接口。
+
+```javascript
+define(function(require, exports) {
+  // 获取模块 a 的接口
+  var a = require('./a');
+  // 调用模块 a 的方法
+  a.doSomething();
+});
+```
+
+从上面定义模块和加载模块的方式上，我们也可以看出AMD和CMD主要有下面几个不同：
+
+1. AMD是RequireJS在推广过程中对模块定义的规范化产出，CMD是SeaJS在推广过程中对模块定义的规范化产出。
+2. 对于依赖的模块，AMD是提前执行，CMD是延迟执行。
+3. 对于依赖的模块，AMD推崇依赖前置，CMD推崇依赖就近。
+
+**SeaJS用例：**
+
+因为CMD是SeaJS在推广过程中对模块定义的规范化产出，因此一般在实际开发中，我们都是通过SeaJS进行模块的定义和加载。
+
+下面是个简单的例子：
+
+```javascript
+// 定义模块  myModule.js
+define(function(require, exports, module) {
+  var $ = require('jquery.js')
+  $('div').addClass('active');
+  exports.data = 1;
+});
+
+// 加载模块
+seajs.use(['myModule.js'], function(my){
+    var star= my.data;
+    console.log(star);  //1
+});
+```
+
+上面的代码中定义了myModule.js模块，因为该模块依赖于jquery.js，因此在需要使用该模块时可以使用require进行模块的加载，然后通过exports暴露出接口，通过SeaJS的use方法我们可以加载该模块，并且使用该模块暴露出的接口。
+
+## ES6标准
+
+在之前的javascript中是没有模块化概念的。如果要进行模块化操作，需要引入第三方的类库。随着技术的发展，前后端分离，前端的业务变的越来越复杂化。直至ES6带来了模块化，才让javascript第一次支持了module。ES6的模块化分为导出（export）与导入（import）两个模块。
+
+在ES6没有出来之前，社区制定了一些模块加载方案，最主要的有 CommonJS 和  AMD 两种，前者用于服务器，后者用于浏览器，ES6 在语言标准的层面上，实现了模块功能，而且实现得相当简单，完全可以取代 CommonJS 和 AMD 规范，成为浏览器和服务器通用的模块解决方案。
+
+es6中的模块化有一个比较大的特点，就是实现尽量的静态化，比如说在CommonJS中我们要加载fs中的几个方法，需要这样写：
+
+```javascript
+// CommonJS模块
+let { stat, exists, readFile } = require('fs');
+
+// 等同于
+let _fs = require('fs');
+let stat = _fs.stat;
+let exists = _fs.exists;
+let readfile = _fs.readfile;
+```
+
+上面的代码其实是加载了fs中的所有方法，生成一个对象，再从这个对象上读取方法，这种加载其实叫做运行时加载，也就是只有运行时才能得到这个对象，不能实现在编译时实现静态优化。
+
+ES6 模块不是对象，而是通过export命令显式指定输出的代码，再通过import命令输入。
+
+```javascript
+//ES6模块
+import { stat, exists, readFile } from 'fs';
+```
+
+上面代码的实质是从fs模块加载 3 个方法，其他方法不加载，这种加载称为“编译时加载”或者静态加载，即 ES6 可以在编译时就完成模块加载，效率要比 CommonJS 模块的加载方式高，当然，这也导致了没法引用 ES6 模块本身，因为它不是对象。
+
+**在浏览器中执行模块：**
+
+参考文章：
+
+- 版权声明：本文为CSDN博主「neweastsun」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+  原文链接：https://blog.csdn.net/neweastsun/article/details/104060748
+
+首先创建新文件message.js并增加下列代码：
+
+```javascript
+export let message = 'ES6 Modules';
+```
+
+在es6中message.js是一个模块，包含message变量。export语句暴露message变量给其他模块。
+
+其次，创建新的文件app.js使用message.js模块。app.js模块创建h1元素并添加至html页中。import语句从message.js模块中导入message变量。
+
+```javascript
+import { message } from './message.js'
+ 
+const h1 = document.createElement('h1');
+h1.textContent = message
+ 
+document.body.appendChild(h1)
+```
+
+第三步，创建新的html页面文件使用app.js模块：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ES6 Modules</title>
+</head>
+<body>
+	<script type="module" src="./app.js"></script>
+</body>
+</html>
+```
+
+注意在script标签中加载type=“module”。
+
+**export的用法：**
+
+在ES6中每一个模块即是一个文件，在文件中定义的变量，函数，对象在外部是无法获取的。如果你希望外部可以读取模块当中的内容，就必须使用export来对其进行暴露（输出）。
+
+先来看个例子，来对变量进行模块化。先来创建test.js文件，将该变量export：
+
+- export let myName = '两份雪糕';
+
+然后可以创建个index.js文件，用import引入该变量：
+
+- ```javascript
+  import {myName} from './test.js';
+  console.log(myName);//输出为两份雪糕
+  ```
+
+若要输出多个变量可以将这些变量包装成对象进行模块化输出：
+
+- ```javascript
+  /*test模块*/
+  //定义变量
+  let name = "两份雪糕";
+  let age = 20;
+  let introduce = function(){
+  	return '我叫' + name + '，' + age + '岁。'
+  }
+  //输出变量
+  export{name,age,introduce}
+  ```
+
+- ```javascript
+  /*引用test模块*/
+  import {name,age,introduce} from './test.js';
+  //打印
+  console.log(name + age + introduce());
+  ```
+
+as能实现取别名功能：
+
+- ```javascript
+  /*test模块*/
+  //定义变量
+  let name = "两份雪糕";
+  let age = 20;
+  let introduce = function(){
+  	return '我叫' + name + '，' + age + '岁。'
+  }
+  //输出变量
+  export{
+  	name as myName,
+      age as myAge,
+      introduce as myIntroduce
+  }
+  ```
+
+- ```javascript
+  /*引用test模块*/
+  import {myName,myAge,myIntroduce} from './test.js';
+  //打印
+  console.log(myName + myAge + myIntroduce());
+  ```
+
+- 使用星号能导入整个模块：
+
+  - ```javascript
+    /*引用test模块*/
+    import * as info from './test.js';
+    //打印
+    console.log(info.myName + info.myAge + info.myIntroduce());
+    ```
+
+  - 星号使用到了整体加载功能。即用星号（`*`）指定一个对象，所有输出值都加载在这个对象上面。
+
+**默认导出：**
+
+一个模块只能有一个默认导出，对于默认导出，导入的名称可以和导出的名称不一致。
+
+- ```javascript
+  /*test.js文件*/
+  export default function(){
+      return '默认导出一个方法'
+  }
+  ```
+
+- ```javascript
+  /*引入test.js文件*/
+  import myFunction from './test.js';//注意无需使用花括号
+  console.log(myFunction());//输出：“默认导出一个方法”。
+  ```
+
+可以将所有需要导出的变量放入同个对象中，然后用export default：
+
+- ```javascript
+  /*test.js文件*/
+  export default {
+      myFunction(){
+          return '默认导出一个方法'
+      },
+      myName:'雪糕'
+  }
+  ```
+
+- ```javascript
+  /*引入test.js文件*/
+  import myObject from "./test.js";
+  console.log(myObject.myFunction(),myObject.myName);
+  ```
+
+默认导出与之前常规的export并不冲突：
+
+- ```javascript
+  /*test.js文件*/
+  export default function(){
+      return '默认导出一个方法'
+  }
+  export var myName = '雪糕';
+  ```
+
+- ```javascript
+  /*引入test.js文件*/
+  import myFunction,{myName} from "./test.js";
+  console.log(myFn(),myName);
+  ```
+
+import时重命名：
+
+- 若导入的多个文件中，变量名字相同，即会产生命名冲突的问题，为了解决该问题，ES6提供了重命名方法，当在导入名称时可以这样做：
+
+  - ```javascript
+    /*test1.js*/
+    export let myName="我来自test1.js";
+    ```
+
+  - ```javascript
+    /*test2.js*/
+    export let myName="我来自test2.js";
+    ```
+
+  - ```javascript
+    /*同时引入test1和test2模块*/
+    import {myName as name1} from "./test1.js";
+    import {myName as name2} from "./test2.js";
+    console.log(name1);//我来自test1.js
+    console.log(name2);//我来自test2.js
+    ```
+
+
+
+
+
+

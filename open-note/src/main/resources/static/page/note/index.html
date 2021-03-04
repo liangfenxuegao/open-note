@@ -1,0 +1,114 @@
+<!--TODO 封面显示功能待开发-->
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Jekyll v4.1.1">
+    <title>个人笔记</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/album/">
+
+    <link rel="stylesheet" href="../../library/frame/bootstrap-4.4.1-dist/css/bootstrap.min.css">
+    <link href="note.css" rel="stylesheet">
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <header>
+        <div class="collapse bg-dark" id="navbarHeader">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8 col-md-7 py-4">
+                        <h4 class="text-white">关于</h4>
+                        <p class="text-muted">开源笔记，类似百科，人们可以共同编辑一份笔记，并且版权属于全人类。
+                            我们为此构建了方便的查阅体验，并且计划提供永久免费的电子书阅读服务，做有价值的服务。</p>
+                    </div>
+                    <div class="col-sm-4 offset-md-1 py-4">
+                        <h4 class="text-white">联系</h4>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-white">反馈问题</a></li>
+                            <li><a href="#" class="text-white">官方微博</a></li>
+                            <li><a href="#" class="text-white">联系我们</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="navbar navbar-dark bg-dark shadow-sm">
+            <div class="container d-flex justify-content-between">
+                <a href="/" class="navbar-brand d-flex align-items-center">
+                    <strong>首页</strong>
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader"
+                        aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <main id="bodyMain" role="main">
+        <section class="jumbotron text-center">
+            <div class="container">
+                <h1>您主笔的笔记</h1>
+                <p class="lead text-muted">
+                    感谢您撰写的笔记，您可以查看、编辑、或新增笔记。点击下方按钮，您可以上传markdown类型的文件，或者直接在线撰写笔记。
+                    （计划在未来的版本中支持docx类型的文件）
+                </p>
+                <p>
+                    <a href="#" class="btn btn-primary my-2">上传笔记</a>
+                    <button @click="saveNoteIdToSession('0')" class="btn btn-secondary my-2">撰写笔记</button>
+                </p>
+            </div>
+        </section>
+        <div class="album py-5 bg-light">
+            <div class="container">
+                <div class="row">
+                    <!--
+                        使用Vue的组件，根据接口提供的noteList数据，渲染组件。
+                        并监听组件抛出的select-note-id事件，该事件抛出的值将作为saveNoteIdToSession方法的参数，并调用该方法。
+                    -->
+                    <preview-note
+                            v-for="note in noteList"
+                            :key="note.id"
+                            :note="note"
+                            v-on:select-note-id="saveNoteIdToSession"
+                    ></preview-note>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-muted">
+        <div class="container">
+            <p class="float-right">
+                <a href="#">回到顶部</a>
+            </p>
+            <p>版权所有 &copy; 开源笔记</p>
+        </div>
+    </footer>
+
+    <script src="../../library/JavaScript/jquery-3.5.1.min.js"></script>
+    <script src="../../library/frame/bootstrap-4.4.1-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../library/JavaScript/vue-2.6.12-development.js"></script>
+    <script src="note.js"></script>
+</body>
+</html>

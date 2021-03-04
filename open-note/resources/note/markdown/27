@@ -1,0 +1,95 @@
+# 注解
+
+## @RequestParam
+
+该注解只支持基本数据类型。
+
+# 参数
+
+## 接收多个对象参数
+
+参考文章：https://blog.csdn.net/dear_little_bear/article/details/104565425/ 。
+
+需求：
+
+- SpringMVC接收多个对象参数。
+
+- 前端代码：
+
+  ```javascript
+  let json = {
+      "user":{"id":9527,"userName":"zcy","realName":"钢铁侠"},
+      "city":{"id":998,"address":"纽约"}
+  };
+  
+  $.ajax({
+      url:"http://localhost:8080/test",
+      type:"post",
+      cache:false,
+      contentType:"application/json",
+      data:JSON.stringify(json),
+      success:function(data){
+          alert(data);                          
+      }
+  });
+  ```
+
+方法一，使用包装类：
+
+- 例如需要接收User和City这两个类型的对象，则可以创建包装类如下。
+
+  ```java
+  public class UserCity {
+   
+      private User user;
+   
+      private City city;
+   
+      public User getUser() {
+          return user;
+      }
+   
+      public void setUser(User user) {
+          this.user = user;
+      }
+   
+      public Info getCity() {
+          return city;
+      }
+   
+      public void setCity(Info city) {
+          this.city = city;
+      }
+  }
+  ```
+
+- 于Controller定义方法：
+
+  ```java
+  @PostMapping("test")
+  public boolean test(@RequestBody UserCity userCity){
+      User user = userCity.getUser();
+      Info city = userCity.getCity();
+      System.out.println(user + city);
+      return true;
+  }
+  ```
+
+方法二，使用Map对象接收：
+
+- 于Controller定义方法：
+
+  ```java
+  @RequestMapping(value = "/show")
+  public String test(@RequestBody  Map<String,Object> map){
+  
+      //拿到Object之后，可以使用反序列化得到具体对象。
+      Object user = map.get("user");
+      Object info = map.get("info");
+  
+      return "success";
+  }
+  ```
+
+
+

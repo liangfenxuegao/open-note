@@ -1,0 +1,57 @@
+<!--本页面的重置密码仅适用于已登录状态-->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="utf-8">
+	<meta name="author" content="两份雪糕">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>重置密码</title>
+	<link rel="stylesheet" href="../../library/frame/bootstrap-4.4.1-dist/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/my-login.css">
+</head>
+<body class="my-login-page">
+	<section class="h-100">
+		<div class="container h-100">
+			<div class="row justify-content-md-center align-items-center h-100">
+				<div class="card-wrapper">
+					<div class="brand">
+						<a href="/index.html">
+							<img src="image/logo.png" alt="飞鸟">
+						</a>
+					</div>
+					<div class="card fat">
+						<div class="card-body">
+							<h4 class="card-title">重置密码</h4>
+							<form method="POST" class="my-login-validation" novalidate>
+								<div class="form-group">
+									<label for="newPassword">新密码</label>
+									<input id="newPassword" type="password" class="form-control" name="password" required autofocus data-eye>
+									<div class="invalid-feedback">
+										必须输入密码
+									</div>
+									<div class="form-text text-muted">
+										请确保您的密码安全且易于记忆
+									</div>
+								</div>
+
+								<div class="form-group m-0">
+									<button type="submit" class="btn btn-primary btn-block">
+										重置密码
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="footer">
+						版权所有 &copy; 2020 &mdash; 开源笔记
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<script src="../../library/JavaScript/jquery-3.4.0.js"></script>
+	<script src="../../library/frame/bootstrap-4.4.1-dist/js/bootstrap.min.js"></script>
+	<script src="js/my-login.js"></script>
+</body>
+</html>

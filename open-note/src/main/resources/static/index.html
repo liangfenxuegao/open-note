@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Jekyll v4.1.1">
+    <title>开源笔记</title>
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/blog/">
+    <link rel="stylesheet" href="library/frame/bootstrap-4.4.1-dist/css/bootstrap.min.css">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+    <!-- 此模板的字体样式 -->
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
+    <!-- 此模板的自定义样式 -->
+    <link href="source/css/openNote.css" rel="stylesheet">
+</head>
+<body>
+    <div id="headerContainer" class="container">
+        <header class="blog-header py-3">
+            <div class="row flex-nowrap justify-content-between align-items-center">
+                <div class="col-4 pt-1">
+                    <a class="text-muted" href="#">订阅</a>
+                    <a class="text-muted" href="#" aria-label="Search">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor"
+                             stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img"
+                             viewBox="0 0 24 24" focusable="false">
+                            <title>搜索</title>
+                            <circle cx="10.5" cy="10.5" r="7.5"/>
+                            <path d="M21 21l-5.2-5.2"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="col-4 text-center">
+                    <a class="blog-header-logo text-dark" href="#">开源笔记</a>
+                </div>
+                <div class="col-4 d-flex justify-content-end align-items-center">
+                    <a class="text-primary mx-3" href="page/personalData/index.html">{{username}}</a>
+                    <a id="loginButton" class="btn btn-sm btn-outline-secondary" :href="loginButtonHref">{{loginButton}}</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="nav-scroller py-1 mb-2">
+            <nav class="nav d-flex justify-content-between">
+                <a class="p-2 text-muted" href="#">首页</a>
+                <a class="p-2 text-muted" href="#">频道</a>
+                <a class="p-2 text-muted" href="#">期刊</a>
+                <a class="p-2 text-muted" href="#">仓库</a>
+                <a class="p-2 text-muted" href="#">链接</a>
+                <a class="p-2 text-muted" href="#">关于</a>
+                <a class="p-2 text-muted" href="#">创作</a>
+                <a class="p-2 text-muted" href="#">动态</a>
+                <a class="p-2 text-muted" href="#">消息</a>
+                <a class="p-2 text-muted" href="#">设置</a>
+            </nav>
+        </div>
+
+        <div class="jumbotron p-4 p-md-5 text-white rounded bg-dark">
+            <div class="col-md-6 px-0">
+                <h1 class="display-4 font-italic">SpringBoot Advanced</h1>
+                <p class="lead my-3">学习缓存、消息、检索、任务、分步式、热部署、监管等内容。</p>
+                <p class="lead mb-0"><a href="#" class="text-white font-weight-bold">继续阅读……</a></p>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                    <div class="col p-4 d-flex flex-column position-static">
+                        <strong class="d-inline-block mb-2 text-primary">世界</strong>
+                        <h3 class="mb-0">Bootstrap</h3>
+                        <div class="mb-1 text-muted">9月12日</div>
+                        <p class="card-text mb-auto">Bootstrap 是全球最受欢迎的前端组件库，用于开发响应式布局、移动设备优先的WEB项目。</p>
+                        <a href="#" class="stretched-link">继续阅读</a>
+                    </div>
+                    <div class="col-auto d-none d-lg-block">
+                        <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg"
+                             preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
+                             aria-label="Placeholder: Thumbnail">
+                            <title>Placeholder</title>
+                            <rect width="100%" height="100%" fill="#55595c"/>
+                            <text x="50%" y="50%" fill="#eceeef" dy=".3em">图示</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                    <div class="col p-4 d-flex flex-column position-static">
+                        <strong class="d-inline-block mb-2 text-success">设计</strong>
+                        <h3 class="mb-0">Photoshop CC</h3>
+                        <div class="mb-1 text-muted">2019年8月12日</div>
+                        <p class="mb-auto">从照片编辑和合成到数字绘画、动画和图形设计，一流的图像处理和图形设计。</p>
+                        <a href="#" class="stretched-link">继续阅读</a>
+                    </div>
+                    <div class="col-auto d-none d-lg-block">
+                        <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg"
+                             preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
+                             aria-label="Placeholder: Thumbnail"><title>Placeholder</title>
+                            <rect width="100%" height="100%" fill="#55595c"/>
+                            <text x="50%" y="50%" fill="#eceeef" dy=".3em">图示</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main role="main" class="container">
+        <div class="row">
+            <div class="col-md-8 blog-main">
+                <h3 class="pb-4 mb-4 font-italic border-bottom">
+                    推荐阅读
+                </h3>
+
+                <div class="blog-post">
+                    <h2 class="blog-post-title">MyBatis</h2>
+                    <p class="blog-post-meta">2020年1月15日 <a href="#">两份雪糕</a></p>
+
+                    <p>MyBatis是Apache的开源项目iBatis, 2010年6月这个项目由Apache Software Foundation迁移到了Google Code，随着开发团队转投Google Code旗下，iBatis3.x正式更名为MyBatis，代码于2013年11月迁移到 Github。</p>
+                    <hr>
+                    <p>iBatis来源于“internet”和“abatis”的组合，其是基于 Java 的持久层框架。 iBatis提供的持久层框架包括SQL Maps和Data Access Objects（DAO）。</p>
+                    <blockquote>
+                        <p>MyBatis是优秀的持久层框架，它支持<strong>定制化SQL、存储过程以及高级映射</strong>。相较于Hibernate，MyBatis属于半自动化的轻量级框架。</p>
+                    </blockquote>
+                    <p>MyBatis避免几乎所有的JDBC代码和手动设置参数以及获取结果集。MyBatis可用简单的XML或注解来配置和映射原生类型、接口和Java的POJO（Plain Old Java Objects，普通老式Java对象）为数据库中的记录。</p>
+
+                    <h2>增删改查</h2>
+                    <p>MyBatis的真正强大在于它的映射语句，这是它的魔力所在。由于它的异常强大，映射器的XML文件就显得相对简单。如果拿它跟具有相同功能的JDBC代码进行对比，你会立即发现省掉了将近95%的代码。MyBatis 为聚焦于SQL而构建，以尽可能地为你减少麻烦。</p>
+                    <h3>resultMap</h3>
+                    <p>resultMap元素是MyBatis中最重要最强大的元素。</p>
+                    <pre><code>Example code block</code></pre>
+                    <p>它可以让你从90%的JDBC ResultSets数据提取代码中解放出来，并在一些情形下允许你进行JDBC不支持的操作。实际上，在为一些比如连接的复杂语句编写映射代码的时候，resultMap能够代替实现同等功能的长达数千行的代码。ResultMap的设计思想是，对于简单的语句根本不需要配置显式的结果映射，而对于复杂一点的语句只需要描述它们的关系就行了。</p>
+
+                    <h3>动态SQL</h3>
+                    <p>MyBatis的强大特性之一便是它的动态SQL。如果你有使用JDBC或其它类似框架的经验，你就能体会到根据不同条件拼接SQL语句的痛苦。例如拼接时要确保不能忘记添加必要的空格，还要注意去掉列表最后一个列名的逗号。利用动态SQL特性可以彻底摆脱这种痛苦。</p>
+                    <ul>
+                        <li>动态SQL元素和JSTL或基于类似XML的文本处理器相似。</li>
+                        <li>在MyBatis之前的版本中，有很多元素需要花时间了解。MyBatis 3大大精简了元素种类，现在只需学习原来一半的元素便可。</li>
+                        <li>MyBatis采用功能强大的基于 OGNL的表达式来淘汰其它大部分元素。</li>
+                    </ul>
+                    <p>OGNL（ObjectGraphNavigationLanguage）对象图导航语言，强大的表达式语言，通过它可以非常方便的来操作对象属性。类似于EL、SpEL等。</p>
+                    <ol>
+                        <li>访问对象属性：person.name</li>
+                        <li>调用方法：person.getName()</li>
+                        <li>逻辑运算符：in,notin,>,>=,<,<=,==,!=</li>
+                    </ol>
+                    <p>OGNL会对字符串和数字进行转换判断，也就是说OGNL认为”0”和0是相等的。</p>
+                </div><!-- /.blog-post -->
+
+                <div class="blog-post">
+                    <h2 class="blog-post-title">Maven</h2>
+                    <p class="blog-post-meta">2020年2月22日 <a href="#">两份雪糕</a></p>
+
+                    <p>Maven是Apache下的项目管理工具，它由纯Java语言开发，可以通过一小段描述信息来管理项目的构建，报告和文档的项目管理工具软件。</p>
+                    <blockquote>
+                        <p>使用Maven构建的项目不需要使用IDE（Eclipse、IDEA等）运行，也无需预先在系统内安装Tomcat，可<strong>直接在命令行启动项目</strong>。</p>
+                    </blockquote>
+                    <p>Scope依赖作用域也可称作依赖范围。maven中的依赖，会根据程序所处的阶段和场景发生变化，所以maven用scope属性来做限制</p>
+                    <p>Maven的dependencyManagement元素提供了管理依赖版本号的方式。在dependencyManagement元素中声明所依赖的jar包的版本号等信息，那么所有子项目再次引入此依赖jar包时则无需显式的列出版本号。Maven会沿着父子层级向上寻找拥有dependencyManagement 元素的项目，然后使用它指定的版本号。</p>
+                </div><!-- /.blog-post -->
+
+                <div class="blog-post">
+                    <h2 class="blog-post-title">Vue</h2>
+                    <p class="blog-post-meta">2020年4月12日 <a href="#">两份雪糕</a></p>
+
+                    <p>
+                        Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的**渐进式框架**。与其它大型框架不同的是，Vue 被设计为可以自底向上逐层应用。 Vue 的核心库只关注视图层，不仅易于上手，还便于与第三方库或既有项目整合。
+                        另一方面，当与现代化的工具链以及各种支持类库结合使用时，Vue 也完全能够为复杂的单页应用提供驱动。
+                    </p>
+                    <ul>
+                        <li>Vue.js 自身不是全能框架，它只聚焦于视图层。</li>
+                        <li>它非常容易学习，非常容易与其它库或已有项目整合。</li>
+                        <li>在与相关工具和支持库一起使用时，Vue.js 也能完美地驱动复杂的单页应用。</li>
+                    </ul>
+                    <p>组件系统是 Vue 的重要概念，因为它是一种抽象，允许我们使用小型、独立和通常可复用的组件构建大型应用。仔细想想，几乎任意类型的应用界面都可以抽象为组件树。</p>
+                    <p>虽然 Vue 内部没有使用自定义元素，不过在应用使用自定义元素、或以自定义元素形式发布时，依然有很好的互操作性。Vue CLI 也支持将 Vue 组件构建成为原生的自定义元素。</p>
+                </div><!-- /.blog-post -->
+
+                <nav class="blog-pagination">
+                    <a class="btn btn-outline-primary" href="#">旧</a>
+                    <a class="btn btn-outline-secondary disabled" href="#" tabindex="-1" aria-disabled="true">新</a>
+                </nav>
+
+            </div><!-- /.推荐阅读 -->
+
+            <aside class="col-md-4 blog-sidebar">
+                <div class="p-4 mb-3 bg-light rounded">
+                    <h4 class="font-italic">公告</h4>
+                    <p class="mb-0">
+                        笔记顾名思义就是为书籍做的笔记，这里您可以查阅开源笔记推荐的内容，也可以在右上角搜索您想查找的笔记。
+                        不过这里开源笔记对笔记的含义进行了拓展，它不仅能成为您学校课本的线上笔记，还可以引用链接成为某个网站（例如慕课、哔哩哔哩）文章、视频的笔记。
+                        您还可以发布或编辑线上期刊或书籍。如果想对期刊做出大改动，你还可以使用分叉功能将内容划到您的仓库里。
+                    </p>
+                </div>
+
+                <div class="p-4">
+                    <h4 class="font-italic">大事记</h4>
+                    <ol class="list-unstyled mb-0">
+                        <li><a href="#">2020年6月</a></li>
+                        <li><a href="#">2020年2月</a></li>
+                        <li><a href="#">2019年11月</a></li>
+                        <li><a href="#">2019年4月</a></li>
+                        <li><a href="#">2018年12月</a></li>
+                        <li><a href="#">2018年7月</a></li>
+                        <li><a href="#">2018年3月</a></li>
+                        <li><a href="#">2017年10月</a></li>
+                    </ol>
+                </div>
+
+                <div class="p-4">
+                    <h4 class="font-italic">官方账号</h4>
+                    <ol class="list-unstyled">
+                        <li><a href="#">微博</a></li>
+                        <li><a href="#">知乎</a></li>
+                        <li><a href="#">哔哩哔哩</a></li>
+                    </ol>
+                </div>
+            </aside><!-- /.侧边栏 -->
+
+        </div><!-- /.行 -->
+
+    </main><!-- /.容器 -->
+
+    <footer class="blog-footer">
+        <p><a href="#">回到顶部</a></p>
+        版权所有 © 2020 开源笔记
+    </footer>
+
+    <script src="/library/JavaScript/jquery-3.4.0.js"></script>
+    <script src="library/frame/bootstrap-4.4.1-dist/js/bootstrap.bundle.js"></script><!--bootstrap.bundle.js 和 bootstrap.bundle.min.js 文件中包含了popper.js-->
+    <script src="/library/JavaScript/vue-2.6.12-development.js"></script>
+    <script src="source/js/openNote.js"></script>
+</body>
+</html>

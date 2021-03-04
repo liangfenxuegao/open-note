@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- MyBatis全局配置 -->
+<configuration>
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/><!-- 是否开启自动驼峰命名规则映射，true为开启 -->
+        <setting name="jdbcTypeForNull" value="OTHER"/><!-- 当没有为参数提供特定的JDBC类型时，为空值指定JDBC类型。比如NULL、VARCHAR或OTHER。（Oracle不支持OTHER），而MySQL支持，且支持NULL。 -->
+
+        <!--注意，启用懒加载后，可能会导致报错，简要来说就是无法序列化空对象。参考文章：https://blog.csdn.net/qq_41264440/article/details/107570886 。-->
+        <setting name="lazyLoadingEnabled" value="true"/><!-- 延迟加载的全局开关。当开启时，所有关联对象都会延迟加载。 -->
+        <setting name="aggressiveLazyLoading" value="false"/><!-- 开启时，任何方法的调用都会加载该对象的所有属性。否则，每个属性会按需加载 -->
+
+        <setting name="cacheEnabled" value="false"/><!-- 关闭二级缓存 -->
+    </settings>
+
+    <!-- 别名处理器，用于为Java类型取别名 -->
+    <typeAliases>
+        <!--
+        使用typeAlias标签可以逐一指定：
+            不使用alias属性时默认为类名首字母小写。使用alias自然就是指定的别名，这里指定为staff。
+            <typeAlias alias="staff" type="xuegao.learnSpringBoot.dataMybatis.bean.Employee"/>
+         -->
+        <!--package标签：MyBatis会在包名下面搜索需要的Java Bean。在没有注解的情况下，会使用Bean首字母小写的非限定类名来作为别名。-->
+        <package name="xuegao.practice.openNote.entity"/>
+    </typeAliases>
+</configuration>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="utf-8">
+	<meta name="author" content="两份雪糕">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>登录开源笔记</title>
+	<link rel="stylesheet" href="../../library/frame/bootstrap-4.4.1-dist/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/my-login.css">
+</head>
+
+<body class="my-login-page">
+	<section class="h-100">
+		<div class="container h-100">
+			<div class="row justify-content-md-center h-100">
+				<div class="card-wrapper">
+					<!--使用CSS的display: none隐藏本按钮。本按钮是用于显示“注册失败提示框”的，不需要显示给用户。-->
+					<button id="activationPromptBox" data-toggle="modal" data-target="#promptBox" style="display: none"></button>
+					<!-- 注册失败提示框 -->
+					<div class="modal fade" id="promptBox" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="exampleModalLabel">提示</h5>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span><!--右上的关闭按钮-->
+									</button>
+								</div>
+								<div class="modal-body">
+									登录失败，请检查是否有账号或密码错误。
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="brand">
+						<a href="/index.html">
+							<img src="image/logo.png" alt="飞鸟">
+						</a>
+					</div>
+					<div class="card fat">
+						<div class="card-body">
+							<h4 class="card-title">登录</h4>
+							<form id="form-login" action="/user/login" method="POST" class="my-login-validation" novalidate>
+								<div class="form-group">
+									<label for="username">账户</label>
+									<input id="username" type="text" class="form-control" name="username" placeholder="输入昵称或邮箱" value="" required autofocus>
+									<div class="invalid-feedback">
+										必须要输入账户
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="password">密码
+										<a href="forgot.html" class="float-right">
+											忘记密码？
+										</a>
+									</label>
+									<input id="password" type="password" class="form-control" name="password" required data-eye>
+								    <div class="invalid-feedback">
+								    	必须要输入密码
+							    	</div>
+								</div>
+
+								<div class="form-group">
+									<div class="custom-checkbox custom-control">
+										<input type="checkbox" name="rememberMe" id="rememberMe" class="custom-control-input">
+										<label for="rememberMe" class="custom-control-label">记住我</label>
+									</div>
+								</div>
+
+								<div class="form-group m-0">
+									<button id="loginButton" type="button" class="btn btn-primary btn-block " onclick="login()">
+										登录
+										<span style="display: none" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><!--旋转图标-->
+									</button>
+								</div>
+								<div class="mt-4 text-center">
+									没有账户？ <a href="register.html">去注册</a>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="footer">
+						版权所有 &copy; 2020 &mdash; 开源笔记
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<script src="/library/JavaScript/jquery-3.4.0.js"></script>
+	<script src="../../library/frame/bootstrap-4.4.1-dist/js/bootstrap.bundle.js"></script><!--bootstrap.bundle.js 和 bootstrap.bundle.min.js 文件中包含了popper.js-->
+	<script src="js/my-login.js"></script>
+	<script type="text/javascript">
+		function login() {
+			let loginButtonSpan = document.getElementById("loginButton").getElementsByTagName("span");
+			//显示旋转图标
+			loginButtonSpan.item(0).setAttribute("style","");
+			//4秒后执行该匿名函数（异步）
+			setTimeout(function () {
+				loginButtonSpan.item(0).setAttribute("style","display: none");//关闭旋转图标
+			},4000);
+			//发送登录请求
+			$.ajax({
+				type: "POST",//方法类型
+				url: "/user/login",//发起POST请求的/user/login。由xuegao.practice.openNote.security.SecurityConfig处理
+				data: $('#form-login').serialize(),//序列化数据（序列化为标准格式）
+				dataType:"json",//期望服务器返回的数据类型是json
+				cache:false,
+				success:function (result) {
+					if(result.code === 200){
+						window.location.assign("/");//登录成功，重定向到首页。
+					}else {
+						//显示登录失败弹窗（Spring Security会返回HTTP错误码）
+						let activationPromptBox = document.getElementById("activationPromptBox");
+						activationPromptBox.click();
+					}
+				},
+				error:function () {
+					alert("抱歉，服务端异常！");
+				}
+			});
+		}
+	</script>
+</body>
+</html>

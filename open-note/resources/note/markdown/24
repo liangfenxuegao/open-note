@@ -1,0 +1,106 @@
+scratches and consoles的作用：
+
+- 提供了两种临时的文件编辑环境，通过这两种临时的编辑环境，你可以写一些文本内容或者一些代码片段。
+- 两种 Scratches 分别是：`Scratch files 和 Scratch buffers`。
+  - `Scratch files`：Scratch files 有着完整的运行和 debug 功能等等，这些文件需要指定编程语言类型并且指定后缀。
+  - `Scratch buffers`：Scratch buffers 仅仅是为了简单的编辑记录，所以不需要指定编程语言并且指定后缀，默认文件类型是 .txt。需要注意的是，Scratch buffers 最多只能创建 5 个，超过 5 个将开始重用以前的，并且以前文件的内容会被重置。
+
+# 快捷键
+
+## 注释
+
+| 快捷键       | 动作               |
+| ------------ | ------------------ |
+| Ctrl+/       | 注释本行           |
+| Ctrl+Shift+/ | 在光标处生成注释符 |
+
+## 导航
+
+| 快捷键   | 动作                                                         |
+| -------- | ------------------------------------------------------------ |
+| 功能键F4 | 选中某个类后按F4，能呼出Hierarchy视窗，其在导航栏的Navigate→Type Hierarchy。 |
+
+# 路径
+
+参考文章：https://www.cnblogs.com/royhoo/p/7455538.html 。
+
+在多模块开发的过程中，遇到了蛋疼的路径问题，JUnit和项目的Run路径是不同的。
+
+JUnit的默认运行路径：
+
+- 点击Edit Configurations...打开Run/Debug Configurations
+  - ![image-20210228211308179](IDEA.assets/image-20210228211308179.png)
+- 在Templates中找到
+  - ![image-20210228212016334](IDEA.assets/image-20210228212016334.png)
+
+项目的默认运行路径：
+
+- 点击Application，再点击Working directory，选择$ContentRoot$即可和JUnit保持一致，但这会同时设置所有项目启动目录：
+  - ![image-20210228215140589](IDEA.assets/image-20210228215140589.png)
+- 若当前项目有启动方法，则能实现更细颗粒度的设置，即具体对某个启动方法的路径设置：
+  - ![image-20210228220508303](IDEA.assets/image-20210228220508303.png)
+
+# 报错
+
+## 不支持发行版本5
+
+参考文章：https://blog.csdn.net/qq_22076345/article/details/82392236 。
+
+ 在Intellij idea中新建了一个Maven项目，运行时报错如下：Error : java 不支持发行版本5。
+
+![img](IDEA.assets/20180904232438840.png)
+
+报错应该是项目编译配置使用的Java版本不对，需要检查一下项目及环境使用的Java编译版本配置。需要检查的设置项有项目、模块、设置：
+
+1. ![image-20210201233111916](IDEA.assets/image-20210201233111916.png)
+2. ![image-20210201233034718](IDEA.assets/image-20210201233034718.png)
+3. ![image-20210201233311274](IDEA.assets/image-20210201233311274.png)
+
+然而这本质上是Maven设置上的问题，在IDE中调整是治标不治本的，有两种方法，一种是调整Maven的settings.xml文件，一种是使用插件调整项目的编译级别。
+
+调整settings.xml。参考文章：https://blog.csdn.net/qq_42583206/article/details/108375173 。
+
+- 方法是于Maven目录下的conf/settings.xml文件中的profiles标签中，添加关于jdk的profile。
+
+- ```xml
+  <profile>
+      <id>jdk11</id>
+      <activation>
+          <jdk>11</jdk>
+          <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+          <maven.compiler.source>11</maven.compiler.source>
+          <maven.compiler.target>11</maven.compiler.target>
+          <maven.compiler.compilerVersion>11</maven.compiler.compilerVersion>
+      </properties>
+  </profile>
+  ```
+
+使用插件调整项目的编译级别：
+
+- 它能单独设置项目的编辑级别，配置方法是在项目的pom.xml文件中配置。
+
+- 一般会用到properties来预设键值对。
+
+  ```xml
+  <properties>
+      <java.version>11</java.version>
+      <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+  </properties>
+  <build>
+      <plugins><!-- 插件库 -->
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>${maven-compiler-plugin.version}</version>
+              <configuration>
+                  <source>${java.version}</source>
+                  <target>${java.version}</target>
+                  <encoding>UTF-8</encoding>
+              </configuration>
+          </plugin>
+      </plugins>
+  </build>
+  ```
+

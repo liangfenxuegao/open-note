@@ -1,0 +1,2425 @@
+# 开源笔记-许可
+
+**版本：1.1**
+
+**发布于2020年4月**
+
+**使用、复制和分发的子条款：**
+
+*注释：你可以为作品添加子条款。详见父条款第四条。*
+
+**使用、复制和分发的父条款：**
+
+1. 根据本许可的条款和条件，每位贡献者在此授予您永久、全世界、非排他性、免费、免版税、不可撤销的版权许可，用以复制、衍生、公开展示、公开表演、转授许可证，并以源形式或目标形式分发作品和此类衍生作品。
+2. 使用、复制和分发开源笔记许可发行的作品时，必须携带开源笔记许可。允许为链接方式携带。
+3. 一旦您在商业性质作品中使用了开源笔记许可发行的作品，您必须表示感谢，尤其是对该作品主要贡献者的感谢。当开源笔记许可发行的作品为你产生良好效益时，鼓励您为用到的作品贡献者们、开源笔记组织捐赠，但这绝非强制性的。
+4. 您可以为作品添加子许可条款，且子条款必须写在父条款前。注意您不可修改父条款，否则本许可自动作废，您将不能使用任何由开源笔记许可发行的作品。子条款不可与父条款冲突。
+5. 您可在非约束条文中添加作品贡献者、备注、使用说明书、引用资料等文本，但不可出现以开源笔记许可为名义的约束性条款，它们不属于开源笔记许可，开源笔记许可不对这些内容负责，对于属于开源笔记的约束条款应当写在子条款区。
+6. 当您使用了其它许发行的作品，请确保其对其它许可，尤其是对本许可友好，不与本许可条款冲突。加入的许可不应当是污染性的，例如GPL。不满足上述条件时您不应当加入其它许可，或不对使用到这类许可的作品附上开源笔记许可。
+
+**非约束条文：**
+
+*注释：你可以为作品添加非约束条文。详见父条款第五条。*
+
+1. 本笔记主要依据尚硅谷的《尚硅谷GitHub教程(新版git已上传，推荐观看)》及其弹幕，由两份雪糕创建首版，版号1.0.0。该教程在哔哩哔哩的链接：https://www.bilibili.com/video/BV1pW411A7a5
+2. 本笔记的“IDEA特别篇”依据尚硅谷《尚硅谷-Eclipse&IDEA中Maven和Git快速配置及使用》中关于IDEA的内容及其弹幕编辑。
+3. 本笔记参考了菜鸟教程：https://www.runoob.com/git/git-tutorial.html 。
+4. 开发环境：Eclipse IDE、IntelliJ IDEA、Windows系统、VMware、CentOS。
+5. 建议学习前已有Liunx相关知识。另外由于教程是面向Java后端的，所以Java后端方向的开发者更加适用，建议学习前已有Maven相关知识。
+6. 部分引用于其它位置的资料若没有在正文给出连接，则是在本文最后的“参考文献”中贴出。
+
+# Git Bash使用说明
+
+可以在Options更改设置：
+
+![image-20200613002026629](Git笔记.assets/image-20200613002026629.png)
+
+单击鼠标右键可以弹出许多有用的选项，其中Paste除了Shift+Ins这个快捷键，还可以直接通过鼠标中键实现该功能：
+
+![image-20200613002132282](Git笔记.assets/image-20200613002132282.png)
+
+Copy功能，若是在Git Bash视窗内，则直接用鼠标选中想要复制的文本，就已经完成复制操作了。
+
+# Git笔记
+
+## 一、什么是Git？
+
+![image-20200609221943083](Git笔记.assets/image-20200609221943083.png)
+
+Git 是个开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目。
+
+## 二、版本控制介绍
+
+版本控制工具应该具备的功能：
+
+- 协同修改：
+  - 多人并行不悖的修改服务器端同个文件。
+- 数据备份：
+  - 不仅保存目录和文件的当前状态，还能保存每个提交过的历史状态。
+- 版本管理：
+  - 在保存每个版本的文件信息的时候要做到不保存重复数据，以节约储存空间，提高运行效率。这方面SVN（也是版本控制工具）采用的是增量式管理的方式，而Git采取了文件系统快照的方式。
+- 权限控制：
+  - 对团队中参与开发的人员进行权限控制。
+  - 对团队外开发者贡献的代码进行审核（Git独有）。
+- 历史记录：
+  - 查看修改人、修改时间、修改内容、日志信息。
+  - 将本地文件恢复到某个历史状态。
+- 分支管理：
+  - 允许开发团队在工作过程中多条生产线同时推进任务，进一步提高效率。
+
+版本控制简介：
+
+- 版本控制：
+  - 工程设计领域中使用版本控制管理工程蓝图的设计过程。在IT开发过程中也可以使用版本控制思想管理代码的版本迭代。
+- 版本控制工具：
+  - 思想：版本控制。
+  - 实现：版本控制工具。
+  - 集中式版本控制工具：CVS、SVN、VSS等。
+    - 集中式的特点是有个中心服务器，储存主要数据，而客户端只保存当前状态，所以容易出现单点故障问题。
+    - ![image-20200609215934310](Git笔记.assets/image-20200609215934310.png)
+  - 分步式版本控制工具：Git、Mercurial、Bazaar、Darcs等。
+    - 本地就有完整的历史储存。
+    - ![image-20200609215949764](Git笔记.assets/image-20200609215949764.png)
+
+
+
+## 三、Git优势
+
+- 大部分操作在本地完成，不需要联网。
+- 完整性保证。（通过哈希值校验实现）
+- 尽可能添加数据而不是删除或修改数据。（减少不可逆操作）
+- 分支操作非常快捷流畅。
+- 与Linux命令全面兼容。
+
+## 四、安装Git
+
+你可以在Git官网找到下载链接，不过好像被墙了，即便没被墙下载速度也慢的一批：https://git-scm.com/downloads
+
+开源笔记（待上线）为您提供了安装包。
+
+推荐在腾讯软件中心下载：https://pc.qq.com/search.html#!keyword=git
+
+选择普通下载就可以了：
+
+![image-20200610124311211](Git笔记.assets/image-20200610124311211.png)
+
+如果你电脑上有软件管家应该也能找到Git：
+
+![image-20200610124134683](Git笔记.assets/image-20200610124134683.png)
+
+
+
+下载好后打开，选择安装路径：
+
+![image-20200610133935221](Git笔记.assets/image-20200610133935221.png)
+
+保持默认，继续Next：
+
+![image-20200610134329639](Git笔记.assets/image-20200610134329639.png)
+
+这里是设置在开始菜单中的名称，也默认即可：
+
+![image-20200610134501313](Git笔记.assets/image-20200610134501313.png)
+
+这里可以选择默认用于的Git编辑器，默认为vim，和Liunx更配，不过我不太喜欢vim（用得蛋疼）：
+
+![image-20200610135309394](Git笔记.assets/image-20200610135309394.png)
+
+这里是对环境变量的设置，使用默认即可：
+
+![image-20200610140436993](Git笔记.assets/image-20200610140436993.png)
+
+默认：
+
+![image-20200610142117718](Git笔记.assets/image-20200610142117718.png)
+
+关于换行符风格，默认：
+
+![image-20200610142413467](Git笔记.assets/image-20200610142413467.png)
+
+选择执行Git命令的默认终端，为了和Liunx保持一致，所以还是使用默认选项（另一个选项的是Windows的控制台）：
+
+![image-20200610142620525](Git笔记.assets/image-20200610142620525.png)
+
+选择git pull的默认行为（教程里没说，那还是默认吧）：
+
+![image-20200610143403499](Git笔记.assets/image-20200610143403499.png)
+
+启用额外的特色功能，保持默认：
+
+![image-20200610143711682](Git笔记.assets/image-20200610143711682.png)
+
+实验性质的新功能，默认不启用，所以直接点Install：
+
+![image-20200610144218851](Git笔记.assets/image-20200610144218851.png)
+
+安装完毕：
+
+![image-20200610144944625](Git笔记.assets/image-20200610144944625.png)
+
+这时在文件资源管理器、桌面，点击鼠标右键，能看到多了两个关于Git的选项：
+
+![image-20200610145125037](Git笔记.assets/image-20200610145125037.png)
+
+## 五、Git结构
+
+![image-20200610154857184](Git笔记.assets/image-20200610154857184.png)
+
+## 六、Git和代码托管中心
+
+代码托管中心的任务：维护远程库。
+
+局域网环境：
+
+- GitLab服务器。
+
+外网环境下：
+
+- GitHub。
+- 码云。
+
+## 七、本地库和远程仓库的交互方式
+
+- 团队内部协作：
+
+  ![image-20200610185323338](Git笔记.assets/image-20200610185323338.png)
+
+- 跨团队协作：
+
+  ![image-20200610200504655](Git笔记.assets/image-20200610200504655.png)
+
+## 八、本地库初始化
+
+命令：git init。
+
+效果（在你想要初始化Git的位置右击鼠标打开Git Bash，输入git init即可）：
+
+![image-20200610203809130](Git笔记.assets/image-20200610203809130.png)
+
+![image-20200610203826777](Git笔记.assets/image-20200610203826777.png)
+
+提示：.git目录中存放的是本地库相关的子目录和文件，不要删除，也不要胡乱修改。
+
+## 九、设置签名
+
+签名形式：
+
+- 用户名。
+- 邮箱。
+
+作用：
+
+- 区分不同开发人员的身份。
+
+注意：
+
+- 签名和登录远程库(代码托管中心)的账号、密码没有任何关系。
+
+命令：
+
+- 项目级别/仓库级别：仅在当前本地库范围内有效。
+
+  - 命令：git config
+    - 配置用户名：git config user.name liangfenxuegao
+    - 配置邮箱：git config user.email liangfenxuegao@foxmail.com
+  - 配置信息的保存位置在项目的`.git/config`文件里：
+    - ![image-20200611192831839](Git笔记.assets/image-20200611192831839.png)
+
+- 系统用户级别：登录当前操作系统的用户范围。
+  
+  - 当前操作系统的用户会显示在控制台中，例如这里就是用户liang。
+    
+    ![image-20200610223649141](Git笔记.assets/image-20200610223649141.png)
+  
+  - 命令：git config --global
+  
+    - 配置用户名：git config --global user.name menyuqianxun
+    - 配置邮箱：git config --global user.email menyuqianxun@foxmail.com
+  
+  - 配置信息的保存位置在`~/.gitconfig`文件里，~就是home目录：
+  
+    ![image-20200611194202526](Git笔记.assets/image-20200611194202526.png)
+  
+- 级别优先级。
+
+  - 就近原则：项目级别优先于系统用户级别。
+  - 若只有系统用户级别的签名，就以系统用户级别的签名为准。
+  - 不允许两种签名都没有。
+
+## 十、添加提交以及查看状态操作
+
+状态查看：
+
+- git status：查看工作区、暂存区状态。
+
+  ![image-20200611200527764](Git笔记.assets/image-20200611200527764.png)
+
+  - on beanch master：处于主分支。
+  - No commits yet：尚无提交（本地库没有已提交的内容）。
+  - nothing to commit：没有可提交的（暂存区没有可提交的内容）。
+    - create/copy files and use "git add" to track：新建或复制文件并使用`git add`命令来追踪（监视）它。
+
+- git status -s：简短输出。
+
+- 若在此目录下添加文件，再使用git status命令，效果如下：
+
+  ![image-20200611202648298](Git笔记.assets/image-20200611202648298.png)
+
+  - Untracked files就列出了尚未监视的文件。
+
+添加监视：
+
+- git add：将工作区的“新建/修改”添加到暂存区。
+
+  - 将之前创建的test.txt添加到暂存区：
+
+    ![image-20200611202825945](Git笔记.assets/image-20200611202825945.png)
+
+- 使用git add命令后，再用git status命令查看状态：
+
+  ![image-20200611203749289](Git笔记.assets/image-20200611203749289.png)
+
+- 可以看到提示可用`git rm --cached <file>`将指定文件重新移出暂存区。
+
+提交：
+
+- git commit
+
+  - git commit -m "commit message" [file name]：可以带-m参数来直接添加commit message，还能直接指定commit的文件名。
+
+- 使用提交命令后，会进入这个样子的编辑器，需要填写commit时的相关信息：
+
+  ![image-20200611212227241](Git笔记.assets/image-20200611212227241.png)
+
+- 例如写入这样一段信息：
+
+  ![image-20200611212912340](Git笔记.assets/image-20200611212912340.png)
+
+- 保存并退出后会看到这样一段打印信息：
+
+  ![image-20200611213408707](Git笔记.assets/image-20200611213408707.png)
+
+  - 意思是这是主分支的root-commit，81919ec是该commit对应的hash值，紧跟着的是刚刚我写入的信息：“我的首次commit：new file test.txt”。（没想到乱码了，🤦‍，情理之中，意料之外吧）
+
+  - 1 file changed：一个文件被改变。
+
+  - 1 insertion(+)：加入了一行（加号表示增加）。
+
+    - insertion值其实和commit的文件有关，例如这里提交了test.txt，其内容为：
+
+      ![image-20200611214402787](Git笔记.assets/image-20200611214402787.png)
+
+    - 总共有一行，所以insertions值为1。
+
+- 这时用git status查看状态：
+
+  ![image-20200611215108199](Git笔记.assets/image-20200611215108199.png)
+
+  - 由于这时缓存区为空，工作区的文件也没有新增或更改，所以会看到working tree clean。
+
+- 修改test.txt（注意只能检测文本文件被修改，不能检测二进制文件被修改），再查看状态：
+
+  ![image-20200611222721452](Git笔记.assets/image-20200611222721452.png)
+
+  - 可以看到和首次添加test.txt时不同，git add命令变成了能to update what will be committed，而不是之前的to include in what will be committed。
+  - 使用git restore可以于该工作区撤销本次编辑内容。
+  - 最后还提示了可以使用git add或git commit -a来添加到缓存区、commit，这里特别提到两者可以同时使用，也可以单独使用。
+
+- 将修改过的test.txt文件添加到缓存区，再查看状态：
+
+  ![image-20200611230207556](Git笔记.assets/image-20200611230207556.png)
+
+- 之前是直接使用git commit命令提交的内容，这次尝试用带参命令，这样就不用进入vim编辑器了：
+
+  ![image-20200611230334309](Git笔记.assets/image-20200611230334309.png)
+
+  - 可以注意到master后面不再跟root-commit了。
+
+## 十一、添加提交命令小结
+
+- 状态查看
+  - git status：查看工作区、暂存区状态。
+  - git status -s：简短的状态报告。
+- 暂存区
+  - git add [file name ]：将工作区的“新建或修改”添加到暂存区。
+  - git rm --cached [file name]：将指定文件重新移出暂存区。
+- 提交
+  - git commit ：提交，会进入vim编辑器。
+  - git commit -m "commit message" [file name]：提交时直接填写commit message，并指定具体文件。
+
+## 十二、版本穿梭测试的准备工作
+
+使用git log命令查看历史记录：
+
+![image-20200612175048460](Git笔记.assets/image-20200612175048460.png)
+
+上图中有两次提交信息，commit后紧跟着的是索引值（是个hash值），该键值指向本次commit。
+
+另外在commit message为：“My second commit, modify test.txt”的提交上，有“(HEAD -> master)”这段信息，意思是本次提交指向了master。
+
+Author的信息就是之前设置的签名，Date就更不用说了，是commit时间。
+
+为了进行版本穿梭测试，再次修改test.txt文件，并提交，查看git log：
+
+![image-20200612232302786](Git笔记.assets/image-20200612232302786.png)
+
+但这提交次数还是不够多，所以请自行多提交几次。
+
+## 十三、查看历史记录的几种不同方式
+
+当提交次数很多时，窗口是放不下的，这时可以用空格向下翻页，b向上翻页，q退出，另外我发现上下方向键和Page Up、Page Down是可以上下滚动的。
+
+另外使用格式化输出能有效减少空间占用，例如使用`git log --pretty=oneline`，意思是以漂亮的单行格式进行输出：
+
+![image-20200612234953831](Git笔记.assets/image-20200612234953831.png)
+
+也可以使用git log --oneline来控制输出格式，这种方法下hash值只会显示部分：
+
+![image-20200612235242209](Git笔记.assets/image-20200612235242209.png)
+
+若使用git reflog命令，则能看到HEAD指针移动到具体某个commit所需要的步数：
+
+![image-20200612235816383](Git笔记.assets/image-20200612235816383.png)
+
+另外说一下git log --pretty=oneline和git log --oneline都只会显示历史记录，而git reflog会显示所有记录。
+
+## 十四、前进后退历史版本操作的本质
+
+本质就是在移动HEAD指针：
+
+![image-20200613001047841](Git笔记.assets/image-20200613001047841.png)
+
+## 十五、基于索引值前进后退版本
+
+操作方法：
+
+- 基于索引值操作（推荐）
+  - git reset --hard [局部索引值]
+  - 只需要填写局部索引值就可以了，这已经足够唯一确认commit。
+
+通过git reset --hard命令实现了指定索引的HEAD指针移动，test.txt的文本内容发生了变化：
+
+![image-20200613003401862](Git笔记.assets/image-20200613003401862.png)
+
+查看历史记录：
+
+![image-20200613003801936](Git笔记.assets/image-20200613003801936.png)
+
+再尝试通过git reset --hard实现前进：
+
+![image-20200613003918474](Git笔记.assets/image-20200613003918474.png)
+
+## 十六、前进后退版本的其它方式
+
+1. 使用^符号，只能实现回退
+   1. git reset --hard HEAD^
+   2. 几个^就代表后退几步
+2. 使用~符，同样只能后退
+   1. git reset --hard HEAD~n
+   2. 表示后退n步
+3. 移动到HEAD所在位置
+   1. git reset --hard HEAD
+   2. 一般配合hard参数使用，可以令仓库、缓存区、工作区的版本一致切换到HEAD所在版本。
+
+测试下^符：
+
+- 先看下现在HEAD指针所处位置：
+
+  ![image-20200613091947768](Git笔记.assets/image-20200613091947768.png)
+
+- 回退至上个版本：
+
+  ![image-20200613092030785](Git笔记.assets/image-20200613092030785.png)
+
+测试~符：
+
+- 先看下现在HEAD指针所处位置：
+
+  ![image-20200613094748853](Git笔记.assets/image-20200613094748853.png)
+
+- 回退两步：
+
+  ![image-20200613094839502](Git笔记.assets/image-20200613094839502.png)
+
+最后看下总的历史记录：
+
+![image-20200613095146453](Git笔记.assets/image-20200613095146453.png)
+
+## 十七、hard、soft以及mixed参数对比
+
+使用git help reset命令可以查看帮助文档（是本地文档，不是在线的）：
+
+![image-20200613104753252](Git笔记.assets/image-20200613104753252.png)
+
+找到这段说明：
+
+![image-20200613105550802](Git笔记.assets/image-20200613105550802.png)
+
+reset命令的三个参数对比：
+
+- soft
+  - 只移动仓库版本（HEAD指针），暂存区和工作区版本不移动。
+- mixed
+  - 只移动仓库和暂存区版本，工作区版本不移动。
+- hard
+  - 仓库、暂存区、工作区版本都移动。
+
+实际测试soft参数：
+
+- 目前HEAD指针所在位置：
+
+  ![image-20200613175228873](Git笔记.assets/image-20200613175228873.png)
+
+- soft移动：
+
+  ![image-20200613175304171](Git笔记.assets/image-20200613175304171.png)
+
+- 这时工作区的版本并不会随之发生变化：
+
+  ![image-20200613175412570](Git笔记.assets/image-20200613175412570.png)
+
+- 查看状态：
+
+  ![image-20200613182928060](Git笔记.assets/image-20200613182928060.png)
+
+  - 之前接触过，这里的意思是工作区的修改内容以添加到暂存区，但未提交。问题是我并没有修改工作区的内容，更没有将其添加到缓存区，怎么就可以commit了呢？
+  - 这是因为使用soft提交后，仅有仓库的版本发生了变化，而暂存区、工作区的版本都没有发生变化，所以暂存区的内容可以commit到仓库中。
+
+实际测试mixed参数：
+
+- 目前HEAD指针所处位置：
+
+  ![image-20200613190042449](Git笔记.assets/image-20200613190042449.png)
+
+- mixed移动：
+
+  ![image-20200613190326730](Git笔记.assets/image-20200613190326730.png)
+
+- 工作区的版本并不会随之发生变化：
+
+  ![image-20200613175412570](Git笔记.assets/image-20200613175412570.png)
+
+- 查看状态：
+
+  ![image-20200613192142535](Git笔记.assets/image-20200613192142535.png)
+
+  - 显然，这里的意思是工作区的文件发生了修改，但尚未添加到暂存区，也未提交到仓库。
+  - 这是因为通过mixed提交使得仓库和暂存区的版本都发生了变化，相对的就是工作区的内容有所不同。
+
+## 十八、永久删除文件后找回
+
+新建aaa.txt文件：
+
+![image-20200613194821179](Git笔记.assets/image-20200613194821179.png)
+
+提交到本地仓库：
+
+![image-20200613200026152](Git笔记.assets/image-20200613200026152.png)
+
+删除aaa.txt文件，然后查看git status：
+
+![image-20200613202208719](Git笔记.assets/image-20200613202208719.png)
+
+上图中的意思是aaa.txt发生了删除行为，那么接下来将该操作同步到暂存区中：
+
+![image-20200613211755624](Git笔记.assets/image-20200613211755624.png)
+
+将操作同步到仓库：
+
+![image-20200613213030349](Git笔记.assets/image-20200613213030349.png)
+
+这样delete aaa.txt这条记录将被永久的保存下来，使用git reflog查看：
+
+![image-20200613213454985](Git笔记.assets/image-20200613213454985.png)
+
+也就是说，在这个版本中aaa.txt文件被删除了，但是，前面“new aaa.txt”这条提交还是有的对吧？所以可通过移动HEAD指针到该版本来实现文件找回：
+
+![image-20200613213957911](Git笔记.assets/image-20200613213957911.png)
+
+![image-20200613214015000](Git笔记.assets/image-20200613214015000.png)
+
+## 十九、找回添加到暂存区的删除文件
+
+新建apple.txt，并添加到暂存区和本地库：
+
+![image-20200613223017397](Git笔记.assets/image-20200613223017397.png)
+
+删除apple.txt并同步到暂存区：
+
+![image-20200613223317741](Git笔记.assets/image-20200613223317741.png)
+
+这时工作区和暂存区的apple.txt文件都被删除了，但由于没有提交到本地库，所以还是只有“new apple.txt”记录：
+
+![image-20200613223539707](Git笔记.assets/image-20200613223539707.png)
+
+这时只需要输入git reset --hard HEAD即可重新切换到HEAD指针所在的版本：
+
+![image-20200613223710609](Git笔记.assets/image-20200613223710609.png)
+
+## 二十、找回已删除文件方式的小结
+
+前提：删除前，文件存在时的状态提交到了本地库。
+
+操作：通过git reset --hard [指针位置]系列命令实现
+
+- 删除操作已经提交到本地库时，指针位置指向该文件存在时的历史记录。
+- 删除操作尚未提交到本地库时，指针位置使用HEAD即可。
+
+## 二十一、比较文件
+
+**理论说明：**
+
+- git diff [文件名]
+  - 默认进行工作区和暂存区之间的文件比较。
+- git diff [本地库中历史版本] [文件名]
+  - 比较工作区和指定历史版本之间的文件比较。
+- 不带文件名参数时将比较全部文件。
+
+**实际测试：**
+
+修改工作区中apple.txt文件内容（添加了“果然是苹果吧！”）：
+
+![image-20200613230507947](Git笔记.assets/image-20200613230507947.png)
+
+使用git diff命令比较文件，-开头的红色部分表示被删除的行，+开头的绿色部分表示新增行：
+
+![image-20200613230556200](Git笔记.assets/image-20200613230556200.png)
+
+将apple.txt添加到暂存区后再进行比较，会发现不再有不同了，这说明git diff命令不带参数时默认是工作区和暂存区相比较：
+
+![image-20200613230802791](Git笔记.assets/image-20200613230802791.png)
+
+若给出要比较的文件位置，例如这里和HEAD指针所在位置的文件进行比较，就又有区别了：
+
+![image-20200613231115248](Git笔记.assets/image-20200613231115248.png)
+
+和历史版本进行比较：
+
+![image-20200613231250575](Git笔记.assets/image-20200613231250575.png)
+
+前面都指定了文件名，若不指定文件名，则git将比较多个文件（这里我先修改了下test.txt文件里的内容）：
+
+![image-20200613232203983](Git笔记.assets/image-20200613232203983.png)
+
+## 二十二、分支概述
+
+什么是分支：
+
+- 在版本控制过程中，使用多条线同时推进多个任务。
+
+- 下图是示例，在master推进的过程中，有许多分支参与了合并。
+
+  ![image-20200614092258194](Git笔记.assets/image-20200614092258194.png)
+
+
+
+分支的好处：
+
+- 同时并行推进多个功能开发，提高开发效率。
+- 各个分支在开发过程中，如果某个分支开发失败，不会对其它分支有任何影响。失败的分支删除重新开始即可。
+
+## 二十三、分支操作
+
+- 查看已有分支：
+
+  - git branch -v
+
+    ![image-20200614101447773](Git笔记.assets/image-20200614101447773.png)
+
+- 创建分支：
+
+  - git branch [分支名]
+
+    ![image-20200614101508534](Git笔记.assets/image-20200614101508534.png)
+
+- 切换分支：
+
+  - git checkout [分支名]
+
+    ![image-20200614101520804](Git笔记.assets/image-20200614101520804.png)
+
+- 合并分支：
+
+  - 切换到hot_fix分支后，对apple.txt进行修改，并提交。
+
+    ![image-20200614102241302](Git笔记.assets/image-20200614102241302.png)
+
+    ![image-20200614102259797](Git笔记.assets/image-20200614102259797.png)
+
+  - 尝试合并分支。第一步，切换到接受修改的分支上。
+
+    - git checkout [接收修改的分支名]
+
+      ![image-20200614105352893](Git笔记.assets/image-20200614105352893.png)
+
+  - 第二步，执行merge命令。
+
+    - git merge [有新内容的分支名]
+
+      ![image-20200614105409112](Git笔记.assets/image-20200614105409112.png)
+
+    - 可以看到hot_fix分支对apple.txt的修改被合并到了master分支中
+
+## 二十四、解决合并分支后产生的冲突
+
+在master和hot_fix分支分别修改test.txt：
+
+- 修改master分支里的test.txt（记得提交到本地库）：
+
+  ![image-20200614120011358](Git笔记.assets/image-20200614120011358.png)
+
+- 修改hot_fix分支里的test.txt（记得提交到本地库）：
+
+  ![image-20200614120213036](Git笔记.assets/image-20200614120213036.png)
+
+目前处于hot_fix分支，尝试将master分支的内容合并到本分支，git提示有冲突：
+
+![image-20200614120321136](Git笔记.assets/image-20200614120321136.png)
+
+这时能看到该分支处于merging模式，查看test.txt能看到多出来一些标注：
+
+![image-20200614131705787](Git笔记.assets/image-20200614131705787.png)
+
+HEAD到分割线的是当前分支在该处的内容，分割线到`>>>>>>> master`是master分支的内容，master处会变化，为要合并进来的分支名，只不过这里是master。
+
+解决冲突：
+
+- 删除标注内容：
+
+  ![image-20200614132807490](Git笔记.assets/image-20200614132807490.png)
+
+- 修改文件到满意的程度，保存：
+
+  ![image-20200614132939295](Git笔记.assets/image-20200614132939295.png)
+
+- 查看状态：
+
+  ![image-20200614145808800](Git笔记.assets/image-20200614145808800.png)
+
+- 同步到暂存区和本地库：
+
+  - git add [文件名]
+
+    - 将修改同步到暂存区后，再查看状态。
+
+      ![image-20200614171025013](Git笔记.assets/image-20200614171025013.png)
+
+    - 这时git提示可以通过commit来结束merge状态。
+
+  - git commit -m "commit message"
+
+    - 注意此时commit一定不能带具体文件名。否则会提示：“fatal: cannot do a partial commit during a merge.”，意思是：“致命：合并期间无法执行部分提交。”。
+
+      ![image-20200614171833857](Git笔记.assets/image-20200614171833857.png)
+
+    - 提交后就会结束merge状态：
+
+      ![image-20200614172221019](Git笔记.assets/image-20200614172221019.png)
+
+## 二十五、Hash算法简介
+
+![image-20200614202455689](Git笔记.assets/image-20200614202455689.png)
+
+哈希是一系列加密算法（例如MD5、SHA1、CRC32），各种不同的哈希算法虽然加密强度不同，但是有以下几个共同点：
+
+- 不管输入数据的数据量有多大，输入同个哈希算法，得到的加密结果长度固定。
+- 哈希算法确定，输入数据确定，输出数据能够保证不变。
+- 哈希算法确定，输入数据有变化，输出数据一定有变化，而且通常变化很大。
+- 哈希算法不可逆。
+
+Git底层采用的是SHA-1算法。
+
+哈希算法可以被用来验证文件。原理如下图所示：
+
+![image-20200614203404607](Git笔记.assets/image-20200614203404607.png)
+
+Git就是靠这种机制来从根本上保证数据完整性的。
+
+## 二十六、Git版本数据管理机制
+
+集中式版本控制工具的文件管理机制：
+
+- 以文件变更列表的方式储存信息。这类系统将它们保存的信息看作是一组基本文件和每个文件随时间逐步累积的差异。
+
+  ![image-20200614212729487](Git笔记.assets/image-20200614212729487.png)
+
+Git的文件管理机制：
+
+- Git把数据看作是小型文件系统的一组快照。每次提交更新时Git都会对当前的全部文件制作快照并保存该快照的索引。为了更加高效，若文件没有修改，GIt不会再重新储存该文件，而只保留个链接指向之前储存的文件。所以Git的工作方式可称之为快照流。
+
+  ![image-20200614212747413](Git笔记.assets/image-20200614212747413.png)
+
+Git文件管理机制细节：
+
+- Git的“提交对象”（每次commit时都会创建对应提交对象）
+
+  - 每个文件都会生成哈希值（头上那段），作为blob储存在tree里，而这样的tree对象作为整体又放入到commit对象中，它们之间都是通过哈希值链接起来的。
+
+  ![image-20200614212825037](Git笔记.assets/image-20200614212825037.png)
+
+- 提交对象及其父对象形成的链条（链表结构）
+
+  ![image-20200614212841650](Git笔记.assets/image-20200614212841650.png)
+
+## 二十七、Git分支管理的本质是创建和移动指针
+
+分支的创建（下图中master和testing都是分支，98ca9是root commit的哈希值，HEAD是指针位置）：
+
+![image-20200614215907899](Git笔记.assets/image-20200614215907899.png)
+
+分支的切换（本质是移动HEAD指向的位置）：
+
+![image-20200614220308148](Git笔记.assets/image-20200614220308148.png)
+
+多分支下版本迭代，某分支的变化只会影响该分支：
+
+![image-20200614220444013](Git笔记.assets/image-20200614220444013.png)
+
+切换回master分支再更迭版本的效果：
+
+![image-20200614220630970](Git笔记.assets/image-20200614220630970.png)
+
+更迭版本：
+
+![image-20200614220647253](Git笔记.assets/image-20200614220647253.png)
+
+## 二十八、注册GitHub
+
+进入官网就可以注册啦：https://github.com/
+
+![image-20200615092124367](Git笔记.assets/image-20200615092124367.png)
+
+进入profile就可以编辑个人资料啦：https://github.com/settings/profile
+
+![image-20200615091133035](Git笔记.assets/image-20200615091133035.png)
+
+## 二十九、本地库和远程库交互方式回顾
+
+![image-20200610185323338](Git笔记.assets/image-20200610185323338.png)
+
+## 三十、测试远程交互前的准备工作
+
+创建新目录初始化本地库：
+
+![image-20200615102308071](Git笔记.assets/image-20200615102308071.png)
+
+在该目录下创建“华山剑法.txt”文件，并为之添加内容：
+
+![image-20200615102348895](Git笔记.assets/image-20200615102348895.png)
+
+添加到暂存区和本地库：
+
+![image-20200615102908174](Git笔记.assets/image-20200615102908174.png)
+
+## 三十一、创建远程库
+
+登录GitHub，点开右上角➕，选择New repository：
+
+![image-20200615105523262](Git笔记.assets/image-20200615105523262.png)
+
+Owner是用来选择所有者的，Repository name自然是仓库名，且名称就是仓库路径。你可以选择该仓库是公开的，还是私有的：
+
+![image-20200615110925294](Git笔记.assets/image-20200615110925294.png)
+
+除了GitHub，也介绍一下码云：
+
+![image-20200615111353339](Git笔记.assets/image-20200615111353339.png)
+
+创建完仓库后会自动进入该仓库：
+
+![image-20200615114035151](Git笔记.assets/image-20200615114035151.png)
+
+## 三十二、在本地创建远程库地址别名
+
+使用git remote -v可以查看已保存的别名（fetch表示取回，push表示推送）。
+
+使用git remote add [别名] [远程地址]命令可以添加别名，进入刚刚创建的仓库可以查看其的HTTPS和SSH地址，添加别名示例：
+
+![image-20200615133739991](Git笔记.assets/image-20200615133739991.png)
+
+与之对应的，还能删除：
+
+![image-20200618200543913](Git笔记.assets/image-20200618200543913.png)
+
+另外要注意的是，别名仅会在该Git本地库生效，在其它库就又没有了。
+
+## 三十三、推送操作
+
+命令：git push [别名|地址] [分支名]。
+
+实际测试：
+
+- git push ToLearnGitHub master
+
+- 输入如上命令后，会弹出如下对话框：
+  ![image-20200615193404120](Git笔记.assets/image-20200615193404120.png)
+
+- 登录后就会自动上传，我不知道为什么还弹出了OpenSSH的对话框，让我再填写了一遍账户、密码。不过最后还是上传成功了，并且之后再次推送也没有出错了：
+
+  ![image-20200615193704304](Git笔记.assets/image-20200615193704304.png)
+
+  ![image-20200615193733691](Git笔记.assets/image-20200615193733691.png)
+
+关于码云：
+
+- 使用方法是一样的，就是登录的弹窗不一样：
+
+  ![image-20200618192024391](Git笔记.assets/image-20200618192024391.png)
+
+- 如果账号密码输错了，不要慌，进入“凭据管理器”还可以改：
+
+  ![image-20200618193040904](Git笔记.assets/image-20200618193040904.png)
+
+  ![image-20200618194103021](Git笔记.assets/image-20200618194103021.png)
+
+## 三十四、克隆操作
+
+**理论说明：**
+
+命令：`git clone [别名|地址]`。
+
+效果：
+
+- 完整的把远程库下载到本地。
+- 别名信息也会有。
+- 相当于初始化了本地库。
+
+**实际测试：**
+
+打开的仓库，点击Clone按钮，复制HTTPS链接：
+
+![image-20200618201340178](Git笔记.assets/image-20200618201340178.png)
+
+创建新目录并进入：
+
+![image-20200618201624059](Git笔记.assets/image-20200618201624059.png)
+
+使用git clone [别名|地址]命令：
+
+![image-20200618201520781](Git笔记.assets/image-20200618201520781.png)
+
+效果：
+
+![image-20200618201720108](Git笔记.assets/image-20200618201720108.png)
+
+因为是克隆，所以`.git`目录也被复制下来了，连别名也有：
+
+![image-20200618201951532](Git笔记.assets/image-20200618201951532.png)
+
+## 三十五、邀请令狐冲加入团队成员
+
+为了实现模拟，我们还需要创建新的账户（已有更好）：
+
+![image-20200619214459652](Git笔记.assets/image-20200619214459652.png)
+
+在上节克隆的目录中，重新编辑“华山剑法.txt”并提交：
+
+![image-20200619221058344](Git笔记.assets/image-20200619221058344.png)
+
+如果使用xuegaoByQQ的账号登录（由于之前已经用liangfenxuegao的账号登录，所以要去“凭据管理器”里修改账号密码，也可以开虚拟机或直接用别的电脑），是没法直接push到`https://github.com/liangfenxuegao/ToLearnGitHub.git`里的，因为这是属于liangfenxuegao的仓库，必须要liangfenxuegao邀请xuegaoByQQ后，xuegaoByQQ才能push。
+
+**邀请：**
+
+进入要邀请的仓库，点击Settings→Manage accesss→Invite a collaborator来邀请合作者：
+
+![image-20200619231955606](Git笔记.assets/image-20200619231955606.png)
+
+邀请成功后的效果：
+
+![image-20200619232624206](Git笔记.assets/image-20200619232624206.png)
+
+这时候点击Pending Invite能复制邀请链接：https://github.com/liangfenxuegao/ToLearnGitHub/invitations
+
+然后登录xuegaoByQQ（这里我用的是“隐私浏览”，可以在同个浏览器登录多个账户）：
+
+![image-20200619234032120](Git笔记.assets/image-20200619234032120.png)
+
+在登录xuegaoByQQ的浏览器里访问“”邀请链接“，同意邀请即可：
+
+![image-20200619234224947](Git笔记.assets/image-20200619234224947.png)
+
+将github的凭据改为xuegaoByQQ账户的用户名及密码：
+
+![image-20200620202552300](Git笔记.assets/image-20200620202552300.png)
+
+推送：
+
+![image-20200620202612747](Git笔记.assets/image-20200620202612747.png)
+
+查看效果：
+
+![image-20200620204327922](Git笔记.assets/image-20200620204327922.png)
+
+## 三十六、远程库修改的拉取
+
+**理论说明：**
+
+命令（注意是否有空格和斜杠的使用）：
+
+- git fetch [远程库地址|别名] [远程分支名]
+- git merge [远程库地址|别名]/[远程分支名]
+- git pull [远程库地址|别名]/[远程分支名]
+
+fetch是将远程主机的最新内容拉到本地，用户在检查了以后决定是否merge到工作本机分支中。
+
+pull操作相当于同时实现fetch和merge。
+
+提示：Git 有个远程指针，指向最新版本。
+
+图示（来源见参考文献1）：
+
+![git](Git笔记.assets/git.jpg)
+
+**实际测试fetch+merge：**
+
+重新回到remote仓库，这里的”华山剑法.txt“还是之前的内容：
+
+![image-20200620205036060](Git笔记.assets/image-20200620205036060.png)
+
+fetch 远程仓库”ToLearnGitHub“（别名）的master分支，这时工作区的内容并不会直接发生变化：
+
+![image-20200620232903946](Git笔记.assets/image-20200620232903946.png)
+
+需要切换到ToLearnGitHub的master分支才能看到该内容：
+
+![image-20200620233125742](Git笔记.assets/image-20200620233125742.png)
+
+手动merge，实现对本地库内容的修改：
+
+![image-20200620234721290](Git笔记.assets/image-20200620234721290.png)
+
+**实际测试pull：**
+
+再次前往克隆的本地库，修改“华山剑法.txt“的内容后再push：
+
+![image-20200621100643060](Git笔记.assets/image-20200621100643060.png)
+
+回到原本地库，将远程库的内容pull下来：
+
+![image-20200621101838621](Git笔记.assets/image-20200621101838621.png)
+
+## 三十七、解决协同开发时冲突
+
+**理论说明：**
+
+何为冲突：
+
+- 当团队开发的时候，若两人对同处内容做出修改，就会发生冲突。
+
+要点：
+
+- 如果不是基于Git远程库的最新版本所做的修改，不能直接推送，必须先拉取再推送。
+- 远程库和本地库必须一开始保持一致才可以推送，否则无法推送。因为此时若推送成功，必有部分内容丢失。
+- 拉取下来后若进入冲入状态，则按照之前讲过的”解决合并分支后产生的冲突“（第二十四节）操作解决即可。
+
+**实际测试：**
+
+修改remote本地库的”华山剑法.txt“，并push到远程库（以liangfenxuegao的身份）：
+
+![image-20200621121138614](Git笔记.assets/image-20200621121138614.png)
+
+切换到克隆的本地库，修改同行内容，放入的是不同的文本：
+
+![image-20200621122250267](Git笔记.assets/image-20200621122250267.png)
+
+修改Windows凭据，以xuegaoByQQ的身份push，发现遇到错误（其实用liangfenxuegao的身份push同样会出现错误，这里只不过是为了模仿真实情况）：
+
+![image-20200621124944846](Git笔记.assets/image-20200621124944846.png)
+
+这是因为出现了冲突，需要先pull远程库最新版本，这时会进入合并模式。打开”华山剑法.txt”，调整内容后再push（不知道为什么又让我输了一遍账号密码）：
+
+![image-20200621125832817](Git笔记.assets/image-20200621125832817.png)
+
+![image-20200621130322162](Git笔记.assets/image-20200621130322162.png)
+
+![image-20200621131013875](Git笔记.assets/image-20200621131013875.png)
+
+效果：
+
+![image-20200621131154055](Git笔记.assets/image-20200621131154055.png)
+
+## 三十八、跨团队协作操作演示
+
+跨团队协作方式回顾：
+
+![image-20200610200504655](Git笔记.assets/image-20200610200504655.png)
+
+场景：
+
+- 岳不群希望令狐冲去研究葵花宝典，但是令狐冲显然不会，所以他叫来了东方不败帮忙。
+- 但东方不败和他不是同个团队的，所以需要用到跨团队操作演示。
+- 东方不败只需要fork岳不群的远程库，就能得到属于自己的远程库。做好修改后，再pull request，由岳不群审核并merge。
+
+**实际测试：**
+
+提示：为了方便，我就不再继续注册GitHub账户了，直接将xuegaoByQQ视为东方不败的账户。
+
+以东方不败的身份登录GitHub，找到岳不群的仓库，点击Fork：
+
+![image-20200621173746473](Git笔记.assets/image-20200621173746473.png)
+
+Fork后等待一下，该仓库就成功Fork到自己名下了（下面还有一行小字，forked from liangfenxuegao/ToLearnGitHub，说明了Fork的来源）：
+
+![image-20200621174503228](Git笔记.assets/image-20200621174503228.png)
+
+将该仓库clone到本地：
+
+![image-20200621181707204](Git笔记.assets/image-20200621181707204.png)
+
+需要说的是Fork后，别名信息其实也会自动被修改，liangfenxuegao被改成了xuegaoByQQ：
+
+![image-20200621184216912](Git笔记.assets/image-20200621184216912.png)
+
+进入该仓库，修改“华山剑法.txt”，commit：
+
+![image-20200621183238778](Git笔记.assets/image-20200621183238778.png)
+
+接下来准备push（push前先将Windows凭据换为东方不败的），push时又有OpenSSH的弹窗让我输账号密码，估计光改Windows凭据是不够的，还需要修改OpenSSH的配置：
+
+![image-20200621184540418](Git笔记.assets/image-20200621184540418.png)
+
+push后我发现了个问题，为什么提交者是liangfenxuegao（岳不群），我明明是用得xuegaoByQQ（东方不败）的凭据，我折腾了好几次凭据，同时push好几次却依然如此：
+
+![image-20200621203523270](Git笔记.assets/image-20200621203523270.png)
+
+我尝试使用虚拟机时，Git给的提示令我恍然大悟，原来是签名的问题：
+
+![image-20200621203648838](Git笔记.assets/image-20200621203648838.png)
+
+之前我们为Git配置了全局签名，我的全局签名自然是liangfenxuegao。解决办法很简单，单独配置仓库级别的签名即可：
+
+![image-20200621203939104](Git笔记.assets/image-20200621203939104.png)
+
+重新push，泪流满面，终于成功以东方不败的身份commit更新：
+
+![image-20200621204458234](Git笔记.assets/image-20200621204458234.png)
+
+点击Pull request：
+
+![image-20200621190524469](Git笔记.assets/image-20200621190524469.png)
+
+创建新的pull request：
+
+![image-20200621190548016](Git笔记.assets/image-20200621190548016.png)
+
+GitHub会让你Comparing changes（比较变化），可以看到能选择要合并的分支，这里是将xuegaoByQQ/ToLearnGitHub的master合并到liangfenxuegao/ToLearnGitHub的master。确认变化和要合并的分支后，点击Create pull request：
+
+![image-20200621210221772](Git笔记.assets/image-20200621210221772.png)
+
+其实就是为Pull request说段话，弄好后点击下方的Create pull request：
+
+![image-20200621210816403](Git笔记.assets/image-20200621210816403.png)
+
+这时岳不群的仓库就会收到该Pull request：
+
+![image-20200621211839160](Git笔记.assets/image-20200621211839160.png)
+
+点开该pull request，能看到东方不败发的消息，甚至能回复消息：
+
+![image-20200621222158818](Git笔记.assets/image-20200621222158818.png)
+
+点击Comment，对话效果：
+
+![image-20200621222244093](Git笔记.assets/image-20200621222244093.png)
+
+用东方不败的身份查看该pull request，同样能评论：
+
+![image-20200621222608847](Git笔记.assets/image-20200621222608847.png)
+
+对话是一方面，更加关键的是对代码的审核：
+
+![image-20200621223217888](Git笔记.assets/image-20200621223217888.png)
+
+确认通过后，在Conversation里找到这段内容，点击Merge pull request即可：
+
+![image-20200621223412039](Git笔记.assets/image-20200621223412039.png)
+
+点击后是这样的，这里可以填写日志信息，用以说明本次合并操作，最后点击Confirm merge即可：
+
+![image-20200621223956321](Git笔记.assets/image-20200621223956321.png)
+
+合并完成后本Pull request就会被关闭，将无法留言：
+
+![image-20200621224405663](Git笔记.assets/image-20200621224405663.png)
+
+想再次进入时需要在这里找它：
+
+![image-20200621224420699](Git笔记.assets/image-20200621224420699.png)
+
+最后岳不群只需要在自己的本地库pull该远程库即可同步版本：
+
+![image-20200621224830903](Git笔记.assets/image-20200621224830903.png)
+
+这样就完成了跨团队协作。
+
+## 三十九、SSH免密登录
+
+如果你在学习本节此前已有SSH连接的相关知识，那就再好不过了，本节就是讲这个的。
+
+如果你的home目录里有.ssh目录，则可以先将其删除掉：
+
+- 命令：rm -rf .ssh
+
+接下来就可以运行命令生成SSH连接的公密钥：
+
+- 命令：ssh-keygen -t rsa -C liangfenxuegao@foxmail.com
+
+- 注意，-t参数用于选择加密算法，-C用于填写邮箱，这里填写的是GitHub账户的邮箱。
+
+  ![image-20200622090135957](Git笔记.assets/image-20200622090135957.png)
+
+这时~/.ssh目录下就有了这两个文件：
+
+![image-20200622090501485](Git笔记.assets/image-20200622090501485.png)
+
+将id_rsa.pub文件内的全部文本复制，访问https://github.com/settings/keys ，点击New SSH key
+
+![image-20200622090901022](Git笔记.assets/image-20200622090901022.png)
+
+将内容复制到这里来并为其取个标题：
+
+![image-20200622091102519](Git笔记.assets/image-20200622091102519.png)
+
+这样就添加成功了：
+
+![image-20200622091349301](Git笔记.assets/image-20200622091349301.png)
+
+还是回到liangfenxuegao的远程库，点开Clone，在点击Use SSH，复制SSH链接地址：
+
+![image-20200622092249228](Git笔记.assets/image-20200622092249228.png)
+
+找到自己的本地库，添加SSH别名：
+
+![image-20200622092533821](Git笔记.assets/image-20200622092533821.png)
+
+修改“华山剑法.txt”的内容，提交之，最后push：
+
+![image-20200622092905699](Git笔记.assets/image-20200622092905699.png)
+
+![image-20200622092929284](Git笔记.assets/image-20200622092929284.png)
+
+测试成功：
+
+![image-20200622092958045](Git笔记.assets/image-20200622092958045.png)
+
+## 四十、Eclipse的Git插件简介
+
+Eclipse从很早开始就已经自带Git插件：
+
+![image-20200622100650310](Git笔记.assets/image-20200622100650310.png)
+
+点开Configuration，能看到它自己找到了home目录下的.gitconfig文件：
+
+![image-20200622100942244](Git笔记.assets/image-20200622100942244.png)
+
+这里的意思是在当前工作区内没有检测到任何Git版本库：
+
+![image-20200622101257565](Git笔记.assets/image-20200622101257565.png)
+
+## 四十一、在Eclipse中把工程初始化为本地库
+
+**准备工作：**
+
+新建Maven工程：
+
+![image-20200622123305692](Git笔记.assets/image-20200622123305692.png)
+
+![image-20200622124335322](Git笔记.assets/image-20200622124335322.png)
+
+随便添加一些内容：
+
+![image-20200622140431640](Git笔记.assets/image-20200622140431640.png)
+
+**将工程初始化为本地库：**
+
+右键工程👉Team👉Share Project后会看到该对话窗（原教程中多了选择仓库类型的步骤，我没有SVN，所以直接进入Git的对话界面），然后进行如下动图所示操作即可：
+
+![将工程初始化为本地库](Git笔记.assets/将工程初始化为本地库.gif)
+
+这时候再查看Repository Settings就有内容了，这些是本工程的相关信息：
+
+![image-20200622145213091](Git笔记.assets/image-20200622145213091.png)
+
+## 四十二、在Eclipse中设置本地库范围签名
+
+点击Entry就能在本地库范围内，为config文件添加键值对：
+
+![image-20200622150326746](Git笔记.assets/image-20200622150326746.png)
+
+示例：
+
+![image-20200622150414958](Git笔记.assets/image-20200622150414958.png)
+
+## 四十三、介绍Eclipse中Git图标的含义
+
+之前将工程初始化本地库后，能发现图标发生了变化，这是可视化的查看文件的Git状态，这时GIt会检查所有文件的状态：
+
+![image-20200622152439139](Git笔记.assets/image-20200622152439139.png)
+
+打开Team→Git→Label Decorations，能查看、启禁用、编辑，图标和文本的含义：
+
+![image-20200622152114191](Git笔记.assets/image-20200622152114191.png)
+
+## 四十四、介绍Eclipse特定文件介绍，及为什么要忽略它们
+
+Eclipsse特定文件：
+
+- .classpath文件。
+
+- .project文件。
+
+- .setting目录下所有文件。
+
+- 这些都是Eclipse为了管理我么创建的工程而维护的文件，和开发的代码没有直接关系。最好在Git中忽略它们。
+
+  ![image-20200622194932601](Git笔记.assets/image-20200622194932601.png)
+
+忽略Eclipse特定文件的原因：
+
+- 团队中很难保证大家使用相同的IDE工具，而IDE工具不同时，相关工程特定文件就有可能不同，若将这些文件加入版本控制，那么开发时很可能就需要为这些文件解决冲突。
+
+## 四十五、忽略Eclipse中的特定文件
+
+Git官方有个名为gitignore的项目，存放了各类语言使用Git时一般要忽略的文件：
+
+- https://github.com/github/gitignore
+
+- Java的：https://github.com/github/gitignore/blob/master/Java.gitignore
+
+- 照葫芦画瓢，这是适用于Eclipse IDE的Java项目的.gitignore文件：
+
+  ```properties
+  # Compiled class file
+  *.class
+  
+  # Log file
+  *.log
+  
+  # BlueJ files
+  *.ctxt
+  
+  # Mobile Tools for Java (J2ME)
+  .mtj.tmp/
+  
+  # Package Files #
+  *.jar
+  *.war
+  *.nar
+  *.ear
+  *.zip
+  *.tar.gz
+  *.rar
+  
+  # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+  hs_err_pid*
+  
+  #Eclipse项目所需要排除的
+  .classpath
+  .project
+  .settings
+  #排除编译后的资源
+  target
+  ```
+
+使用方法：
+
+- 若要全局生效请将引用配置放在~/gitconfig文件里：
+
+  ![image-20200622220133170](Git笔记.assets/image-20200622220133170.png)
+
+- 若仅在某个本地库有效，请将引用配置放在该本地库的.git/config文件里：
+
+  ![image-20200622220353843](Git笔记.assets/image-20200622220353843.png)
+
+- 将”适用于Eclipse IDE的Java项目的.gitignore文件”创建出来，例如这里我叫Java-Eclipse.gitignore：
+
+  ![image-20200622221013896](Git笔记.assets/image-20200622221013896.png)
+
+- 例如我仅希望其在该本地库生效，则在本地库的.git/config文件里引用（键为excludesfile，值为.gitignore文件的位置，一定要注意的是路径要使用`/`而不是`\`）：
+
+  ```properties
+  [core]
+  	symlinks = false
+  	repositoryformatversion = 0
+  	filemode = false
+  	logallrefupdates = true
+  	excludesfile = D:/development/workspace/SpringWorkspace/git/.git/Java-Eclipse.gitignore
+  ```
+
+- 在Eclipse中也能编辑：
+
+  ![image-20200622222412202](Git笔记.assets/image-20200622222412202.png)
+
+重启Eclipse，能发现Eclipse相关文件、target目录都被Git忽略了：
+
+![image-20200622221528689](Git笔记.assets/image-20200622221528689.png)
+
+## 四十六、Eclipse中本地库基本操作
+
+右键项目，Team→Add to Index，会将该目录下的文件添加到暂存区：
+
+![image-20200624184427325](Git笔记.assets/image-20200624184427325.png)
+
+右键项目，Team→Commit：
+
+![image-20200622191259063](Git笔记.assets/image-20200622191259063.png)
+
+会打开Git Stag视窗，Unstaged Changes是未添加至暂存区的，Staged Changes是暂存区，能直接拖动两个Changes里的文件进行调整，实现移入出暂存区的操作。Commit Message是本次提交的消息：
+
+![image-20200624184842765](Git笔记.assets/image-20200624184842765.png)
+
+测试提交，输入消息，再点击右下角的Commit：
+
+![image-20200624194115606](Git笔记.assets/image-20200624194115606.png)
+
+提交后能发现图标状态又变了：
+
+![image-20200624194317015](Git笔记.assets/image-20200624194317015.png)
+
+右键项目，点击Team→Show in Repositories View，能打开Git Repositories视窗：
+
+![image-20200624200535933](Git笔记.assets/image-20200624200535933.png)
+
+Git Repositories视窗，能查看该本地库的分支、历史版本、工作区结构：
+
+![image-20200624200836680](Git笔记.assets/image-20200624200836680.png)
+
+## 四十七、将本地工程推送到远程库
+
+于GitHub创建个新仓库，用于存放xuegao.learn.git项目，复制其SSH或HTTPS链接：
+
+![image-20200624214004886](Git笔记.assets/image-20200624214004886.png)
+
+右键项目，Team→Remote→Push：
+
+![image-20200624213852226](Git笔记.assets/image-20200624213852226.png)
+
+如果剪贴板里有链接文本，Eclipse会自动填充内容。如果你用的是HTTPS链接，可点击Store in Secure Store来保存账号密码：
+
+![image-20200624214509103](Git笔记.assets/image-20200624214509103.png)
+
+可以点击Add All Branches Spec，将所有检测到的分支都添加进来：
+
+![image-20200624214850099](Git笔记.assets/image-20200624214850099.png)
+
+可以直接Finish，也可以再Next，若Next的话，还能编辑本次push的Message Details：
+
+![image-20200624220957164](Git笔记.assets/image-20200624220957164.png)
+
+push成功：
+
+![image-20200624221404440](Git笔记.assets/image-20200624221404440.png)
+
+## 四十八、将远程库的工程克隆到本地
+
+原教程中演示了Oxygen、Kepler两个版本的Eclipse，我使用的是基于Eclipse的Spring Tool Suite 4，细分版本为： 4.5.1.RELEASE。
+
+**具体演示：**
+
+点击Import：
+
+![image-20200625102957759](Git笔记.assets/image-20200625102957759.png)
+
+选择Projects from Git：
+
+![image-20200625103045082](Git笔记.assets/image-20200625103045082.png)
+
+选择仓库源，可以从本地或URI导入，这里选择Clone URI：
+
+![image-20200625104336181](Git笔记.assets/image-20200625104336181.png)
+
+复制远程库的HTTPS或SSH地址：
+
+![image-20200625104801853](Git笔记.assets/image-20200625104801853.png)
+
+选择要克隆的分支：
+
+![image-20200625105249411](Git笔记.assets/image-20200625105249411.png)
+
+选择要克隆到的本地位置：
+
+![image-20200625110210251](Git笔记.assets/image-20200625110210251.png)
+
+但如果将项目放在Eclipse工作区的外面，一般会很混乱，不利于开发，所以选择克隆到Eclipse工作区内：
+
+![image-20200625130121378](Git笔记.assets/image-20200625130121378.png)
+
+再Next后就进入该界面，此时已近下载好源码（工作区里已经能查看源码），而本界面是用来选择导入到Eclipse的方式。第一个选项是用来导入Eclipse项目，但是Eclipse特定文件已经被排除了；第二项是以创建新工程的方式导入，这会破坏目录结构；所以只有第三项是可行的，以普通工程方式打开：
+
+![image-20200625133039594](Git笔记.assets/image-20200625133039594.png)
+
+工程名：
+
+![image-20200625133439669](Git笔记.assets/image-20200625133439669.png)
+
+这时候在Project Explorer视窗就能看到该项目了，但是由于Eclipse还不认为它是个Maven项目，所以目录结构视图令人看的很不习惯：
+
+![image-20200625133929794](Git笔记.assets/image-20200625133929794.png)
+
+这时候需要右键项目，Configure→Convert to Maven Project将其转为Maven项目：
+
+![image-20200625134055330](Git笔记.assets/image-20200625134055330.png)
+
+转换成功：
+
+![image-20200625134413564](Git笔记.assets/image-20200625134413564.png)
+
+这时候Eclipse相关文件也会创建出来，这个项目就完全可用了：
+
+![image-20200625134537760](Git笔记.assets/image-20200625134537760.png)
+
+显然，用这种方式管理源码，有效的避免了使用不同IDE所带来的问题。
+
+最后说一下，在老版本的Eclipse无法将克隆的工程直接保存到当前工作区目录，所以只能将工程保存在其它地方。
+
+## 四十九、在Eclipse中解决冲突
+
+分别编辑ApplyGitToProject和git项目里同文件且同行的内容，令其不同：
+
+![image-20200625190427411](Git笔记.assets/image-20200625190427411.png)
+
+分别commit两个项目：
+
+![image-20200625194323567](Git笔记.assets/image-20200625194323567.png)
+
+![image-20200625194402440](Git笔记.assets/image-20200625194402440.png)
+
+目前为止都是没有问题的，但将两个本地库所push到同个远程库时就会出现冲突。
+
+例如首先将ApplyGitToProject的master分支推送到远程库：
+
+![image-20200625203559352](Git笔记.assets/image-20200625203559352.png)
+
+![image-20200625204024604](Git笔记.assets/image-20200625204024604.png)
+
+![image-20200625204520701](Git笔记.assets/image-20200625204520701.png)
+
+再推送git项目，发现被拒绝了，无法直接push的原因以前就已经讲过了，这里不再赘诉：
+
+![image-20200625205044834](Git笔记.assets/image-20200625205044834.png)
+
+![image-20200625205137195](Git笔记.assets/image-20200625205137195.png)
+
+所以还是要先pull：
+
+![image-20200625205442328](Git笔记.assets/image-20200625205442328.png)
+
+pull了之后，要手动处理冲突，上面是自己的，下面是远程库的：
+
+```java
+package xuegao.learn.git.bean;
+
+public class Device {
+<<<<<<< HEAD
+	String name;
+=======
+	String deviceName;
+>>>>>>> branch 'master' of git@github.com:liangfenxuegao/ApplyGitToProject.git
+}
+```
+
+Eclipse提供了Merge Tool，可以更加清晰方便的对比差异。左边是自己的，可以修改；右边的是远程库目前的内容，只读：
+
+![image-20200625210530567](Git笔记.assets/image-20200625210530567.png)
+
+![image-20200625210646627](Git笔记.assets/image-20200625210646627.png)
+
+编辑左侧内容再保存，Merge Tool会自动完成合并：
+
+![image-20200625212506924](Git笔记.assets/image-20200625212506924.png)
+
+接下来就是先commit再push即可。
+
+## 五十、Git工作流介绍
+
+概念：在项目开发中使用Git的方式。
+
+**分类：**
+
+1. 集中式工作流：
+
+   像SVN一样，集中式工作流以中央仓库作为项目所有修改的单点实体，所有修改都提交到master分支上。
+
+   这种方式与SVN的主要区别就是开发人员有本地库，而Git很多新特定并没有用到。
+
+   ![image-20200625214207722](Git笔记.assets/image-20200625214207722.png)
+
+2. GitFlow工作流
+
+   GitFlow工作流为功能开发、发布准备和维护设立了独立的分支，让发布迭代过程更流畅。严格的分支模型也为大型项目提供了一些非常必要的结构。
+
+   ![image-20200625214705824](Git笔记.assets/image-20200625214705824.png)
+
+3. Forking工作流
+
+   Forking工作流是在GitFlow基础上，充分利用了Git的Fork和pullrequest的功能以达到代码审核的目的。更适合安全可靠地管理大团队的开发者，而且能接受不信任贡献者的提交。
+
+   ![image-20200625215227797](Git笔记.assets/image-20200625215227797.png)
+
+**GitFlow工作流详解：**
+
+1. 分支种类：
+
+   - 主干分支 mater
+
+     主要负责管理正在运行的生产环境代码。永远保持与正在运行的生产环境完全一致。
+
+   - 开发分支 develop
+
+     主要负责管理正在开发过程中的代码。一般情况下应该是最新的代码。
+
+   - Bug修理分支 hotfix
+
+     主要负责管理生产环境下出现的紧急修复的代码。从主干分支分出，修理完毕并测试上线后，并回主干分支。并回后，视情况可以删除该分支。
+
+   - 准生产分支 release
+
+     较大的版本上线前，会从开发分支中分出准生产分支，进行最后阶段的集成测试。该版本上线后，会合并到主干分支。生产环境运行一段阶段较稳定后可以视情况删除。
+
+   - 功能分支 feature
+
+     为了不影响较短周期的开发工作，一般把中长期开发模块，会从开发分支中独立出来。开发完成后会合并到开发分支。
+
+2. GitFlow工作流举例：
+
+   ![image-20200625225528462](Git笔记.assets/image-20200625225528462.png)
+
+## 五十一、分支实战说明
+
+令狐冲创建了featureA分支，push到远程库，岳不群将其pull下来，审查无误后将featureA分支merge到master分支中，最后push到远程库：
+
+![image-20200625230025862](Git笔记.assets/image-20200625230025862.png)
+
+## 五十二、分支实战操作
+
+假设ApplyGitToProject是令狐冲的本地库，令狐冲于本项目创建分支：
+
+![image-20200626114413528](Git笔记.assets/image-20200626114413528.png)
+
+![image-20200626114748595](Git笔记.assets/image-20200626114748595.png)
+
+可以看到这时项目已经切换到hot_fix了：
+
+![image-20200626114948251](Git笔记.assets/image-20200626114948251.png)
+
+在Switch to可以切换分支，Other里会显示所有分支及其它内容：
+
+![image-20200626115203288](Git笔记.assets/image-20200626115203288.png)
+
+在Git Repositories视窗也能切换分支：
+
+![image-20200626115303130](Git笔记.assets/image-20200626115303130.png)
+
+于hot_fix分支编辑Device.java文件，然后Commit and Push：
+
+![image-20200626120716706](Git笔记.assets/image-20200626120716706.png)
+
+![image-20200626120637811](Git笔记.assets/image-20200626120637811.png)
+
+点击Commit and Push后会弹出该对话框，点击Preview，再Push即可：
+
+![image-20200626121643917](Git笔记.assets/image-20200626121643917.png)
+
+![image-20200626121706179](Git笔记.assets/image-20200626121706179.png)
+
+这样带hot_fix分支的版本就推送到远程库了。假设git是岳不群的本地库，则首先需要在git项目pull远程库：
+
+![image-20200626152319255](Git笔记.assets/image-20200626152319255.png)
+
+Eclipse提示发现了hot_fix分支：
+
+![image-20200626152438401](Git笔记.assets/image-20200626152438401.png)
+
+右键项目，Team→Switch To→Other，切换到远程库的hot_fix分支：
+
+![image-20200626153420139](Git笔记.assets/image-20200626153420139.png)
+
+![image-20200626153542040](Git笔记.assets/image-20200626153542040.png)
+
+点击Check Out后会弹出名为Check out remote-tracking branch对话框。若需要处理该分支，则需要选择Check out as New Branch；如果只是想查看该分支，可以选择Check out Commit：
+
+![image-20200626155357613](Git笔记.assets/image-20200626155357613.png)
+
+点击Check out as New Local Branch后，会进入这个对话框，点击Finish即可切换到hot_fix分支：
+
+![image-20200626155721862](Git笔记.assets/image-20200626155721862.png)
+
+在hot_fix分支审核完毕后（可修改代码），切换回master分支，将hot_fix合并到master分支。
+
+![image-20200626190931674](Git笔记.assets/image-20200626190931674.png)
+
+选择要合并的分支，这里选择本地的hot_fix分支，然后点击Merge：
+
+![image-20200626191052354](Git笔记.assets/image-20200626191052354.png)
+
+这时如果有冲突，还需要手动处理冲突：
+
+![image-20200626191804819](Git笔记.assets/image-20200626191804819.png)
+
+处理好后先commit再push即可（如果没有冲突则无需commit直接push即可）：
+
+![image-20200626191857356](Git笔记.assets/image-20200626191857356.png)
+
+## 五十三、安装CentOS
+
+推荐到镜像网站下载镜像，例如https://mirrors.tuna.tsinghua.edu.cn/centos/8/isos/x86_64/ ，7.7GB的是带桌面环境的标准版的，1.6GB是带桌面的最小化版本，624MiB好像是网络安装版，我下载的是1.6GB的：
+
+![image-20200627131857947](Git笔记.assets/image-20200627131857947.png)
+
+**使用VMware15安装CentOS 8：**
+
+![image-20200627094317140](Git笔记.assets/image-20200627094317140.png)
+
+![image-20200627144704899](Git笔记.assets/image-20200627144704899.png)
+
+![image-20200627144734971](Git笔记.assets/image-20200627144734971.png)
+
+![image-20200627230533960](Git笔记.assets/image-20200627230533960.png)
+
+CentOS 8的Linux内核版本应该是4以上的，所以选择”其它 Linux 4.x 64位“，如果不过VMware15支持CentOS 7，如果你下载的是CentOS 7应该是可以直接选择CentOS 7（其实我觉得CentOS 8也可以直接选择版本为CentOS 7，应该不会出问题）：
+
+![image-20200627145939942](Git笔记.assets/image-20200627145939942.png)
+
+名称和安装位置：
+
+![image-20200627230835927](Git笔记.assets/image-20200627230835927.png)
+
+处理器配置。它的数量和单个的内核数应该和你的物理机对应上，例如我设置的是1个8核，与物理机对应的好处是更加高效使用CPU资源：
+
+![image-20200627150715622](Git笔记.assets/image-20200627150715622.png)
+
+怎么看数量和内核数呢？打开任务管理器的性能选项卡就能查看，就是那个插槽和逻辑处理器：
+
+![image-20200627095659740](Git笔记.assets/image-20200627095659740.png)
+
+内存（推荐居然只有768MB，哈哈）：
+
+![image-20200627150842830](Git笔记.assets/image-20200627150842830.png)
+
+网络配置：
+
+![image-20200627150937126](Git笔记.assets/image-20200627150937126.png)
+
+我也不知道啥玩意：
+
+![image-20200627151004846](Git笔记.assets/image-20200627151004846.png)
+
+![image-20200627151027893](Git笔记.assets/image-20200627151027893.png)
+
+磁盘配置：
+
+![image-20200627151057550](Git笔记.assets/image-20200627151057550.png)
+
+![image-20200627230952198](Git笔记.assets/image-20200627230952198.png)
+
+![image-20200627231051668](Git笔记.assets/image-20200627231051668.png)
+
+到这步时注意一下，点击“自定义硬件”：
+
+![image-20200627231130070](Git笔记.assets/image-20200627231130070.png)
+
+点击”处理器“，在虚拟化引擎框里，两个都打勾，能提升性能：
+
+![image-20200627095022815](Git笔记.assets/image-20200627095022815.png)
+
+点击”新 CD/DVD (IDE)“里，选择”使用 ISO 映像文件“，添加系统镜像文件位置：
+
+![image-20200627231421460](Git笔记.assets/image-20200627231421460.png)
+
+设置好后点击“关闭”，再点击“完成”即可。然后点击”开启此虚拟机“，开始安装系统。选择第一个，回车：
+
+![image-20200627192638159](Git笔记.assets/image-20200627192638159.png)
+
+选择语言，如果你英语好，选择英文也是不错的（另外由于政治立场不同，所以指责一下这里将台湾单列）：
+
+![image-20200627192957810](Git笔记.assets/image-20200627192957810.png)
+
+点击继续后会进入该界面：
+
+![image-20200627195528829](Git笔记.assets/image-20200627195528829.png)
+
+时间和日期：
+
+![image-20200627195638590](Git笔记.assets/image-20200627195638590.png)
+
+安装目标位置：
+
+![image-20200627232048215](Git笔记.assets/image-20200627232048215.png)
+
+软件选择，推荐选择默认的服务器环境，会直接预装不少必要的软件：
+
+![image-20200728184305061](Git笔记.assets/image-20200728184305061.png)
+
+开始安装：
+
+![image-20200627201527619](Git笔记.assets/image-20200627201527619.png)
+
+安装过程中可以设置根密码和创建新用户，这里我只设置了的根密码，暂未创建新用户：
+
+![image-20200627201630392](Git笔记.assets/image-20200627201630392.png)
+
+安装完毕，点击重启：
+
+![image-20200627202629988](Git笔记.assets/image-20200627202629988.png)
+
+选择第一个，回车：
+
+![image-20200627202701557](Git笔记.assets/image-20200627202701557.png)
+
+这时候会进入该界面。选择登录root账户，输入之前设置好的root密码即可：
+
+![image-20200627202833272](Git笔记.assets/image-20200627202833272.png)
+
+现在是没有网络的，可以输dhclient，能自动获取IP地址，就能连上网络了：
+
+![image-20200629220539303](Git笔记.assets/image-20200629220539303.png)
+
+![image-20200628110920973](Git笔记.assets/image-20200628110920973.png)
+
+这时候切换到/etc/sysconfig/network-scripts里，尝试使用vim打开ifcfg-ens33会提示“未找到命令”，这是因为我们没有安装vim，这时候可用的只有vi编辑器（我发现好神奇的事，当我在我本机用SSH连接到该虚拟机时，Windows Terminal里看到的居然是中文消息，而在虚拟机里同样的命令又是英文消息）：
+
+![image-20200628233934593](Git笔记.assets/image-20200628233934593.png)
+
+使用`dnf install vim*`安装vim：
+
+![image-20200628234120252](Git笔记.assets/image-20200628234120252.png)
+
+瞄一眼ifcfg-ens33。BOOTPROTO=dhcp表示使用DHCP服务获取IP地址，ONBOOT=no表示不在开机时启用本配置：
+
+![image-20200629115427068](Git笔记.assets/image-20200629115427068.png)
+
+接下来我们要配置ifcfg-ens33文件。配置前先查看网络配置，打开虚拟网络编辑器：
+
+![image-20200629142914454](Git笔记.assets/image-20200629142914454.png)
+
+选择VMent8，NAT模式的那个网卡，点击NAT设置：
+
+![image-20200629142953285](Git笔记.assets/image-20200629142953285.png)
+
+能查看子网验码和网关：
+
+![image-20200629143106670](Git笔记.assets/image-20200629143106670.png)
+
+接下来点击DHCP设置，能查看IP地址池的范围：
+
+![image-20200629143213754](Git笔记.assets/image-20200629143213754.png)
+
+![image-20200629143259743](Git笔记.assets/image-20200629143259743.png)
+
+根据这些信息，我做如下配置，目的是使用静态IP地址。使用vim打开ifcfg-ens33：
+
+![image-20200704160514238](Git笔记.assets/image-20200704160514238.png)
+
+我来分别解释一下什么意思BOOTPROTO=static表示为静态网络配置，ONBOOT=yes表示开机时就启用本配置，IPADDR自然是IP地址，NETMASK就是子网掩码，GATEWAY是网关，DNS是域名服务器。
+
+配置好后用nmcli c reload命令重启网络服务（适用CentOS 8），如果是CentOS 7，则需要用 service network restart命令。我就踩坑了用了service network restart，发现不行，于是我直接重启系统，配置也能生效。后来查到CentOS 8应该使用nmcli c reload命令。查看当前网络配置：
+
+![image-20200704163119096](Git笔记.assets/image-20200704163119096.png)
+
+此时应当仍能连上外网：
+
+![image-20200704163735803](Git笔记.assets/image-20200704163735803.png)
+
+接下来教程中使用了款名为SecureFX的工具（用于文件传输，我更习惯用FileZilla），点击“连接图标”：
+
+![image-20200704171908621](Git笔记.assets/image-20200704171908621.png)
+
+在弹出的对话框中点击“新建会话”：
+
+![image-20200704172415091](Git笔记.assets/image-20200704172415091.png)
+
+选择SSH2协议：
+
+![image-20200704172518695](Git笔记.assets/image-20200704172518695.png)
+
+填写主机名、端口（默认22）、用户名：
+
+![image-20200704172831737](Git笔记.assets/image-20200704172831737.png)
+
+选择用SFTP协议：
+
+![image-20200704172936562](Git笔记.assets/image-20200704172936562.png)
+
+填写会话名称及其描述：
+
+![image-20200704174536374](Git笔记.assets/image-20200704174536374.png)
+
+再次点击"连接"，能看到刚刚创建的会话（我把它放到liangfenxuegao目录里了）：
+
+![image-20200704171908621](Git笔记.assets/image-20200704171908621.png)
+
+![image-20200704182913325](Git笔记.assets/image-20200704182913325.png)
+
+开启该会话，输入密码，就能用SFTP向该虚拟机传输文件了：
+
+![image-20200704185354626](Git笔记.assets/image-20200704185354626.png)
+
+## 五十四、安装Gitlab前的准备和介绍
+
+GitLab官网：https://about.gitlab.com/
+
+GitLab安装说明页：https://about.gitlab.com/install/
+
+在安装说明页里，有官方Linux包供下载：
+
+![image-20200706111230729](Git笔记.assets/image-20200706111230729.png)
+
+显然GitLab也支持安装到Docker里：
+
+![image-20200706111511888](Git笔记.assets/image-20200706111511888.png)
+
+点击CentOS 8，会弹出安装说明，首先需要安装GitLab的必要依赖（如果你和我之前安装CentOS时一样选择的服务器环境，则curl、policycoreutils、openssh-server都已经安装好并启用了），并且令防火墙允许HTTP、HTTPS、SSH访问。然后安装并启用postfix，用于发送邮件，如果你要使用其他解决方案发送邮件，则跳过安装postfix的步骤，在安装GitLab之后配置外部SMTP服务器。：
+
+![image-20200706113122890](Git笔记.assets/image-20200706113122890.png)
+
+另外我注意到CentOS 8开始使用dnf作为rpm的包管理工具了，它将替代yum，详见参考文献5《了解 DNF 和 YUM 异同，理解为何 DNF 可以替代 YUM》。
+
+接下来添加GitLab包仓库：
+
+```
+curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh | sudo bash
+```
+
+最后安装此GitLab包，并指定进入GitLab实例的域名（注意要使用http，除非你要折腾https）：
+
+```
+sudo EXTERNAL_URL="http://gitlab.example.com" dnf install -y gitlab-ce
+```
+
+这样就安装好了，不同版本的GitLab界面可能不一样，不用太在意：
+
+![image-20200710114128237](Git笔记.assets/image-20200710114128237.png)
+
+安装好后就可以重启系统了，另外说一下教程中先下载RPM包在安装的方法。
+
+**离线安装：**
+
+离线安装包安装位置：https://packages.gitlab.com/gitlab/gitlab-ce
+
+教程中所用包的下载地址：https://packages.gitlab.com/gitlab/gitlab-ce/packages/el/7/gitlab-ce-10.8.2-ce.0.el7.x86_64.rpm
+
+将下载好的离线包安装到/opt目录下。
+
+首先下载gitlab的RPM包，然后执行如下命令（这应该是将该gitlab包添加到rpm包管理器中）：
+
+```
+sudo rpm -ivh /opt/gitlab-ce-10.8.2-ce.0.el7.x86_64.rpm
+```
+
+先安装必要依赖再安装GitLab：
+
+```
+sudo yum install -y curl policycoreutils-python openssh-server cronie
+sudo lokkit -s http -s ssh
+sudo yum install postfix
+sudo service postfix start
+sudo chkconfig postfix on
+```
+
+```
+curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh | sudo bash
+```
+
+```
+sudo EXTERNAL_URL="http://gitlab.example.com" yum -y install gitlab-ce
+```
+
+重启系统。
+
+## 五十五、配置并启动GitLab服务器
+
+初始化配置gitlab（初始化过程是蛮久的）：
+
+```
+gitlab-ctl reconfigure
+```
+
+启动gitlab服务：
+
+```
+gitlab-ctl start
+```
+
+停止gitlab服务：
+
+```
+gitlab-ctl stop
+```
+
+gitlab默认是开机自启动的，若不需要，则可以用如下命令取消：
+
+```
+systemctl disable gitlab-ctl.service
+```
+
+若需要开机自启动，则使用：
+
+```
+systemctl enable gitlab-ctl.service
+```
+
+
+
+## 五十六、浏览器访问GitLab首页
+
+直接输入该虚拟机的IP地址，访问。这里需要为GitLab的root账户初始化密码：
+
+![image-20200710122329290](Git笔记.assets/image-20200710122329290.png)
+
+如果访问失败可以尝试开启80端口，或直接关闭防火墙，下面是开启80端口tcp协议的命令：
+
+```
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+```
+
+另外我使用火狐浏览器时遇到了奇怪的问题，输入IP竟然直接变成了域名访问，这可以通过换浏览器或使用私密窗口解决。
+
+成功访问到首页并初始化好密码后，登录root账户：
+
+![image-20200710123317731](Git笔记.assets/image-20200710123317731.png)
+
+成功了，这基本上就可以当GitHub或Gitee用啦：
+
+![image-20200710123642157](Git笔记.assets/image-20200710123642157.png)
+
+另外，如果要使用域名访问，还需要配置域名服务器或在本机的hotos文件添加映射，例如WIndows的hotos文件在：
+
+![image-20200710124935256](Git笔记.assets/image-20200710124935256.png)
+
+# IDEA特别篇
+
+《尚硅谷GitHub教程(新版git已上传，推荐观看)》是没有IDEA相关内容的，所以我还特意去学习了《尚硅谷-Eclipse&IDEA中Maven和Git快速配置及使用》里关于IDEA的内容。
+
+## 一、全局配置
+
+创建个空工程：
+
+![image-20200722102048063](Git笔记.assets/image-20200722102048063.png)
+
+取个名字：
+
+![image-20200722164607270](Git笔记.assets/image-20200722164607270.png)
+
+添加SDK，声明语言版本，一般和SDK对应即可，然后点击右下角的OK：
+
+![image-20200722164803574](Git笔记.assets/image-20200722164803574.png)
+
+在设置中找到Git选项，由于之前我们已经安装好Git了（安装程序自动配置了环境变量），所以IDEA自动找到了git.exe的位置：
+
+![image-20200722104357792](Git笔记.assets/image-20200722104357792.png)
+
+接下来添加GitHub账户，点击Add account或点击右上交的加号，输入用户名和密码即可（修改Server应该就可以使用别的远程库服务，例如Gitee或者自己搭建的GitLab等）：
+
+![image-20200722153153379](Git笔记.assets/image-20200722153153379.png)
+
+点击加号可以继续添加账户：
+
+![image-20200722153536299](Git笔记.assets/image-20200722153536299.png)
+
+点击√可以设置默认账户：
+
+![image-20200722161817751](Git笔记.assets/image-20200722161817751.png)
+
+## 二、创建本地库
+
+在上节创建的xuegao-learn-git工程里创建新模块：
+
+![image-20200722163613616](Git笔记.assets/image-20200722163613616.png)
+
+配置该模块：
+
+![image-20200722170736196](Git笔记.assets/image-20200722170736196.png)
+
+完成后会弹出如下对话框（Non-Project Files Protection：非项目文件保护），选择I want to edit this file anyway即可：
+
+![image-20200722171210722](Git笔记.assets/image-20200722171210722.png)
+
+现在来初始化Git本地库，在导航栏点击VCS👉Import into Version Control👉Create Git Repository：
+
+![image-20200722172406832](Git笔记.assets/image-20200722172406832.png)
+
+这里将整个工程，即xuegao-learn-git目录里所有内容都纳入Git的管理范围：
+
+![image-20200722173058742](Git笔记.assets/image-20200722173058742.png)
+
+点击OK后会发现文件名颜色变红了（意思是该文件仅存在于工作区），且右上方多出了关于Git的操作按钮：
+
+![image-20200722173409704](Git笔记.assets/image-20200722173409704.png)
+
+![image-20200722173519265](Git笔记.assets/image-20200722173519265.png)
+
+在Settings👉Version Control中，能看到已添加版本控制的目录：
+
+![image-20200722174804406](Git笔记.assets/image-20200722174804406.png)
+
+在xuegao-learn-git-hello模块中创建文件（例如创建个.java文件），创建后会弹出Add File to Git对话框。如果选择Add，该文件将直接添加到暂存区；若选择Cancel，则可以之后手动添加：
+
+![image-20200722183628022](Git笔记.assets/image-20200722183628022.png)
+
+**配置要忽略的文件：**
+
+右击模块，有两种配置方法：
+
+![image-20200722184944272](Git笔记.assets/image-20200722184944272.png)
+
+若使用选项一，则将提示是否在当前工作区创建.gitgnore文件：
+
+![image-20200723105627188](Git笔记.assets/image-20200723105627188.png)
+
+教程里推荐使用选项二，即.git/info/exclude，该选择将直接编辑已有的exclude文件，无需创建新的文件。
+
+我配置的排除文件：
+
+```properties
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+# For a project mostly in C, the following would be a good set of
+# exclude patterns (uncomment them if you want to use them):
+# *.[oa]
+# *~
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+#Eclipse项目所需要排除的
+.classpath
+.project
+.settings
+#IDEA项目所需要排除的
+.idea
+*.iml
+#排除编译后的资源
+target
+```
+
+另外这个选项是用来添加的（每次点击时都会添加/xuegao-learn-git-hello/，即当前模块名），以后要打开该文件请用VCS👉Git👉Open .git/info/exclude：
+
+![image-20200723105957126](Git笔记.assets/image-20200723105957126.png)
+
+配置好后，被排除的文件会呈现褐绿色，绿色的则是已被添加到暂存区的文件：
+
+![image-20200723112923497](Git笔记.assets/image-20200723112923497.png)
+
+**添加到暂存区：**
+
+添加方法（在Git选择中点击Add即可）：
+
+![image-20200723113124646](Git笔记.assets/image-20200723113124646.png)
+
+点击Rollback回退（Add是将工作区内容存到暂存区，回退则是取消该操作）：
+
+![image-20200723113850434](Git笔记.assets/image-20200723113850434.png)
+
+或者点击这个：
+
+![image-20200723114040466](Git笔记.assets/image-20200723114040466.png)
+
+选择要回退的文件，然后点击Rollback即可：
+
+![image-20200723114148877](Git笔记.assets/image-20200723114148877.png)
+
+**提交到本地库：**
+
+提交到本地库，则是点击Commit Directory：
+
+![image-20200723113349436](Git笔记.assets/image-20200723113349436.png)
+
+或者点击这个√：
+
+![image-20200723113640400](Git笔记.assets/image-20200723113640400.png)
+
+然后会弹出Commit Changes对话框，选择要提交的文件，并添加Commit Message，最后点击Commit即可：
+
+![image-20200723114945417](Git笔记.assets/image-20200723114945417.png)
+
+提交后的颜色：
+
+![image-20200723122211008](Git笔记.assets/image-20200723122211008.png)
+
+## 三、切换版本
+
+修改hello.java文件：
+
+![image-20200723122732640](Git笔记.assets/image-20200723122732640.png)
+
+提交修改：
+
+![image-20200723122944545](Git笔记.assets/image-20200723122944545.png)
+
+以此类推实现三次更新，点击Show History查看版本历史：
+
+![image-20200723123458339](Git笔记.assets/image-20200723123458339.png)
+
+![image-20200723123413951](Git笔记.assets/image-20200723123413951.png)
+
+右键要切换的版本，复制其版本号：
+
+![image-20200723124301072](Git笔记.assets/image-20200723124301072.png)
+
+点击Reset HEAD：
+
+![image-20200723124849030](Git笔记.assets/image-20200723124849030.png)
+
+根据需求选择Reset Type，如果你希望工作区版本也会跳转到此版本，则选择Hard模式。To Commit里放的就是之前复制的版本号，弄好后点击Reset即可：
+
+![image-20200723125135240](Git笔记.assets/image-20200723125135240.png)
+
+此时工作区文件也会发生变化，并且History视窗中将看不到此次提交之后的commit，
+
+![image-20200723125413781](Git笔记.assets/image-20200723125413781.png)
+
+但是通过命令还是能够查看并切换任何历史版本：
+
+![image-20200723125722590](Git笔记.assets/image-20200723125722590.png)
+
+## 四、创建以及合并分支
+
+右键模块，Git→Repository→Branches：
+
+![image-20200723150728494](Git笔记.assets/image-20200723150728494.png)
+
+点击New Branch：
+
+![image-20200723150953984](Git笔记.assets/image-20200723150953984.png)
+
+例如新建个development分支：
+
+![image-20200723151253958](Git笔记.assets/image-20200723151253958.png)
+
+由于勾选了Checkout branch选项，所以现在已经在development分支里了。事实上在右下角就能直接看到当前所处分支，点击它就能管理分支：
+
+![image-20200723151623006](Git笔记.assets/image-20200723151623006.png)
+
+这时候点击其它分支，例如master，再点击Checkout就能切换分支：
+
+![image-20200723151704953](Git笔记.assets/image-20200723151704953.png)
+
+现在在development分支里对hello.java文件做修改，并提交修改到本地库：
+
+![image-20200723152116405](Git笔记.assets/image-20200723152116405.png)
+
+**合并分支：**
+
+切换到master分支，准备将development分支合并过来：
+
+![image-20200723152722848](Git笔记.assets/image-20200723152722848.png)
+
+VCS→Git→Merge Changes：
+
+![image-20200723153110186](Git笔记.assets/image-20200723153110186.png)
+
+选择development分支，Merge之：
+
+![image-20200723153317749](Git笔记.assets/image-20200723153317749.png)
+
+可以看到成功的于master将development分支合并过来：
+
+![image-20200723153618988](Git笔记.assets/image-20200723153618988.png)
+
+## 五、解决冲突
+
+切换到development分支，提交如下内容：
+
+![image-20200723155753462](Git笔记.assets/image-20200723155753462.png)
+
+切回master分支，提交如下内容：
+
+![image-20200723155937005](Git笔记.assets/image-20200723155937005.png)
+
+和之前一样，于master合并development分支：
+
+![image-20200723153317749](Git笔记.assets/image-20200723153317749.png)
+
+这时由于在同个位置有不同的内容，所以合并时要解决冲突。处理冲突内容时，Accept Yours以当前分支的代码为准；Accept Theirs则是以要合并过来的分支为准；Merge则手动处理冲突。
+
+![image-20200723163014293](Git笔记.assets/image-20200723163014293.png)
+
+点击Merge的话会进入该界面，左边是当前分支，右边是要合并过来的分支，中间的是最终的，你可以自由参照，确定最终内容后点击Apply即可：
+
+![image-20200723163910589](Git笔记.assets/image-20200723163910589.png)
+
+合并成功：
+
+![image-20200723164302589](Git笔记.assets/image-20200723164302589.png)
+
+![image-20200723164319481](Git笔记.assets/image-20200723164319481.png)
+
+## 六、上传本地库到GitHub
+
+在GitHub里创建个新仓库：
+
+![image-20200723171811717](Git笔记.assets/image-20200723171811717.png)
+
+创建好后复制该仓库的对应链接（关于使用SSH免密登录的内容，Git笔记第三十九节有相关讲解）：
+
+![image-20200723172142494](Git笔记.assets/image-20200723172142494.png)
+
+VCS→Git→Push：
+
+![image-20200723173620225](Git笔记.assets/image-20200723173620225.png)
+
+在弹出的对话框中点击Define remote，即配置远程地址别名，将刚刚复制的URL粘贴过来，Name自己取，默认origin：
+
+![image-20200723173856404](Git笔记.assets/image-20200723173856404.png)
+
+IDEA会检测该URL，稍等片刻后，选择版本，点击Push即可：
+
+![image-20200723174156305](Git笔记.assets/image-20200723174156305.png)
+
+上传成功：
+
+![image-20200723174707736](Git笔记.assets/image-20200723174707736.png)
+
+## 七、更新本地库
+
+在之前的学习中就已经了解到，在Push前本地库必须是基于最新远程库版本做出的修改，否则无法Push成功，需要先Pull远程库最新版本，再Merge或Rebase，最后Push。
+
+对于修改远程库，可以像之前一样模拟团队的形式，用另一个账户Push，从而推高远程库版本。这比较麻烦，事实上GitHub支持在线编辑，可以自由增删改所有文件。
+
+这里可以创建或上传文件：
+
+![image-20200724165639524](Git笔记.assets/image-20200724165639524.png)
+
+点开任意文本文件后，点击这里可以编辑文件：
+
+![image-20200724165721611](Git笔记.assets/image-20200724165721611.png)
+
+为了模拟真实情况，我先修改远程库后，再于本地库添加了新文件，并Commit：
+
+![image-20200724171129218](Git笔记.assets/image-20200724171129218.png)
+
+尝试推送到远程库会发现被拒绝：
+
+![image-20200724171535410](Git笔记.assets/image-20200724171535410.png)
+
+即有远程的改动需要合并过来。此时无论是点Merge还是Rebase，都能实现合并，并Push：
+
+![image-20200724171616434](Git笔记.assets/image-20200724171616434.png)
+
+如果点Cancel，则可以手动拉取、合并，最后Push。
+
+直接点这里就可以Pull了，Update Project实际上就是Pull：
+
+![image-20200724173148531](Git笔记.assets/image-20200724173148531.png)
+
+![image-20200724173912359](Git笔记.assets/image-20200724173912359.png)
+
+如果点Pull，则会弹出这样的对话框，有更多的可定义项：
+
+![image-20200724173831002](Git笔记.assets/image-20200724173831002.png)
+
+Pull后成功Push：
+
+![image-20200724184445238](Git笔记.assets/image-20200724184445238.png)
+
+## 八、从GitHub上克隆项目
+
+克隆的位置，VCS→Git→Clone：
+
+![image-20200724190023579](Git笔记.assets/image-20200724190023579.png)
+
+将远程库的URL复制到这里的URL文本框里，Directory填写的是要克隆到的目录，必须是个空目录，最后点击Clone即可：
+
+![image-20200724191427385](Git笔记.assets/image-20200724191427385.png)
+
+和教程不同，这里不再询问是否创建为IntelliJ IDEA项目，直接创建为IDEA项目了，并且自动识别到这是个Maven项目，这里只要选择是在当前窗口打开还是在新窗口打开：
+
+![image-20200724192032882](Git笔记.assets/image-20200724192032882.png)
+
+打开后稍等片刻，IDEA相关配置文件应该就会加载出来，这里说下Project Structure，不难发现这里用到的SDK和之前的不一样，看来并没有锁定要使用的Java版本，这可能和Maven没做相关配置有关：
+
+![image-20200724192825375](Git笔记.assets/image-20200724192825375.png)
+
+和原教程不同的是Modules也自动导入了：
+
+![image-20200724193046876](Git笔记.assets/image-20200724193046876.png)
+
+现在观察一下项目，会发现IDEA相关配置文件都是红色的，显然，它们没有被忽略：
+
+![image-20200724193218044](Git笔记.assets/image-20200724193218044.png)
+
+所以还是需要配置忽略文件，这次我们换个口味，使用添加.gitignore文件的方式，可以看到也是没有问题的：
+
+![image-20200724194228537](Git笔记.assets/image-20200724194228537.png)
+
+# 踩坑日志
+
+在搞第Git笔记五十三节的时候我踩坑了，由于我使用了VMware的自动安装，导致安装出错。
+
+**踩坑过程如下（当时我不知道会出问题，所以正常的在记笔记）：**
+
+推荐到镜像网站下载镜像，例如https://mirrors.tuna.tsinghua.edu.cn/centos/8/isos/x86_64/ ，7.7GB的是带桌面环境且为完整版的，1.6GB是最小版本，这里我下载1.6GB的：
+
+![image-20200626234607100](Git笔记.assets/image-20200626234607100.png)
+
+**使用VMware15安装CentOS8：**
+
+![image-20200627094317140](Git笔记.assets/image-20200627094317140.png)
+
+![image-20200627094354862](Git笔记.assets/image-20200627094354862.png)
+
+![image-20200627094427698](Git笔记.assets/image-20200627094427698.png)
+
+![image-20200627094522226](Git笔记.assets/image-20200627094522226.png)
+
+![image-20200627094659497](Git笔记.assets/image-20200627094659497.png)
+
+![image-20200627094722907](Git笔记.assets/image-20200627094722907.png)
+
+到这步时注意一下，点击“自定义硬件”：
+
+![image-20200627094929795](Git笔记.assets/image-20200627094929795.png)
+
+由于本镜像不带桌面环境，所以1GB内存就够了。我要说的是处理器，它的数量和单个的内核数应该和你的物理机对应上，例如我设置的是1个8核，与物理机对应的好处是更加高效使用CPU资源。至于虚拟化引擎，都打勾便是，同样能提升性能：
+
+![image-20200627095022815](Git笔记.assets/image-20200627095022815.png)
+
+怎么看数量和内核数呢？打开任务管理器的性能选项卡就能查看，就是那个插槽和逻辑处理器：
+
+![image-20200627095659740](Git笔记.assets/image-20200627095659740.png)
+
+弄好后就可以点击“关闭”，再点击“完成”即可，然后VMware就会开始安装系统：
+
+![image-20200627101353682](Git笔记.assets/image-20200627101353682.png)
+
+结果进入到这样的界面：
+
+![image-20200627103017328](Git笔记.assets/image-20200627103017328.png)
+
+我显然遇到了问题，它报错了：“Section %packages” does not end with %end“，下方还有Pane is dead，我也搞不懂是什么情况，所以问度娘，得到的答案是尝试将CD/DVD(IDE)的”启动时连接“关闭（我猜测是自动安装搞的鬼）：
+
+![image-20200627103302052](Git笔记.assets/image-20200627103302052.png)
+
+重启启动系统会进入该界面，选择第一个即可：
+
+![image-20200627104401173](Git笔记.assets/image-20200627104401173.png)
+
+# 参考文献：
+
+1. git fetch & pull详解。作者：Runner_Jack。版权信息：Copyright © 2020 Runner_Jack。文章链接：https://www.cnblogs.com/runnerjack/p/9342362.html 。日期：2018-07-20 16:46。
+2. 打开cenos8时出现:pane is dead的解决方案。作者：Maste_hang。版权信息：原创。文章链接：https://blog.csdn.net/qq_39504519/article/details/106840272 。日期：2020-06-18 18:08:15。
+3. 马哥 CentOS 8的系统和内核版本查询相关。作者：Blog.@_@XIAO。版权信息：原创。文章链接：https://blog.csdn.net/qq478754704/article/details/103096785 。日期：2019-11-16 12:57:27。
+4. CentOS7关于网络的设置。作者：akipa11。版权信息：原创。文章链接：https://blog.csdn.net/akipa11/article/details/81414875 。日期：2018-08-06 20:53:48。
+5. 了解 DNF 和 YUM 异同，理解为何 DNF 可以替代 YUM。作者：服务账户。版权信息：©2020 DAEHUB 版权所有。文章链接：https://www.daehub.com/archives/10066.html。日期：2019-12-20。
+

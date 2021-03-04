@@ -1,0 +1,306 @@
+# 原生JS实现Ajax
+
+参考文章：
+
+- 作者：郭先生_515
+  链接：https://www.jianshu.com/p/ea064da40e25
+  来源：简书
+  著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+Ajax的原理：
+
+- 简单来说就是 通过XmlHttpRequest对象向服务器发异步请求，从服务器获得数据，然后用 javascript 来操作DOM更新页面的技术。
+- 要清楚这个过程和原理，我们必须对 XMLHttpRequest 有所了解。XMLHttpRequest 是 ajax 的核心机制，它是在 IE5 中首先引入的，是一种支持异步请求的技术。简单的说，也就是 javascript 可以及时向服务器提出请求和处理响应，而不阻塞用户，达到无刷新的效果。
+
+自定义的Ajax方法：
+
+```javascript
+var Ajax = {
+    get: function(url,callback){
+        var xhr = new XMLHttpRequest();//XMLHttpRequest对象用于在后台与服务器交换数据
+        xhr.open('GET',url,false);//设置发起参数
+        //当状态改变时触发函数
+        xhr.onreadystatechange = function(){
+            //readyState===4 时说明请求已完成
+            if(xhr.readyState === 4){
+                if(xhr.status === 200 || xhr.status === 304){
+                    //xhr.responseText用于获得字符串形式的响应数据
+                    console.log(xhr.responseText);
+                    callback(xhr.responseText);
+                }
+            }
+        }
+        xhr.send();//发起请求
+    },
+    //data应为'a=a1&b=b1'这种字符串格式，在jq里如果data为对象会自动将对象转成这种字符串格式
+    post: function(url,data,callback){
+        var xhr = new XMLHttpRequest();//XMLHttpRequest对象用于在后台与服务器交换数据
+        xhr.open('POST',url,false);//设置发起参数
+        xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');//添加http头，发送信息至服务器时内容编码类型。
+        //当状态改变时触发函数
+        xhr.onreadystatechange=function(){
+            //readyState===4 时说明请求已完成
+            if (xhr.readyState===4){
+                if (xhr.status===200 || xhr.status===304){
+                    //xhr.responseText用于获得字符串形式的响应数据
+                    callback(xhr.responseText);
+                }
+            }
+        }
+        xhr.send(data);//发起请求
+    }
+}
+```
+
+代码解释：
+
+- open(method, url, async)
+  - mothod：发送请求所使用的方法（GET或POST）；与POST相比，GET更简单也更快，并且在大部分情况下都能用；然而，在以下情况中，请使用POST请求：
+    1. 无法使用缓存文件（更新服务器伤的文件或数据库）。
+    2. 向服务器发送大量数据（POST没有数据量限制）。
+    3. 发送包含未知字符的用户输入时，POST比GET更稳定可靠。
+  - url：规定服务器端脚本的URL（该文件可以是任何类型的文件，比如.txt和.xml，或者服务器脚本文件，比如.asp和.php（在传回响应之前，能够在服务器上执行任务））。
+  - async：规定应当对请求进行异步（true）或同步（false）处理；true是在等待服务器响应时执行其他脚本，当响应就绪后对响应进行处理；false是等待服务器响应再执行。
+- send()
+  - 将请求发送到服务器。
+- onreadystatechange：存有处理服务器响应的函数，每当 readyState 改变时，onreadystatechange 函数就会被执行。
+- readyState：对应服务器响应的状态信息，下面是数值对应的具体含义。
+  - 0：请求未初始化。（代理被创建，但尚未调用open()方法）
+  - 1：服务器连接已建立。（open方法已经被调用）
+  - 2：请求已接收。（send方法已经被调用，并且头部和状态已经可获得）
+  - 3：请求处理中。（下载中，responseText属性已经包含部分数据）
+  - 4：请求已完成，切响应已就绪。（下载操作已完成）
+- responseText：获得字符串形式的响应数据。
+- setRequestHeader()：POST传数据时，用来添加 HTTP 头，然后send(data)，注意data格式；GET发送信息时直接加参数到url上就可以，比如url?a=a1&b=b1。
+
+## 读取JSON文件
+
+参考文章：https://www.jianshu.com/p/df9adc286f56 。
+
+使用原生Ajax：
+
+```javascript
+window.onload = function () {
+    var request = new XMLHttpRequest();
+    request.open("get", "demo.json");//设置请求方法与JSON文件的所在路径
+    request.send();
+    request.onload = function () {/*XHR对象获取到返回信息后执行*/
+        if (request.status == 200) {/*返回状态为200，即为数据获取成功*/
+            var json = JSON.parse(request.responseText);
+            console.log(json);
+        }
+    }
+}
+```
+
+使用jQuery：
+
+```javascript
+$.getJSON('ajax/test.json', function(data) {
+  var items = [];
+  
+  $.each(data, function(key, val) {
+    items.push('<li id="' + key + '">' + val + '</li>');
+  });
+ 
+  $('<ul/>', {'class': 'my-new-list',html: items.join('')}).appendTo('body');
+});
+```
+
+工程化开发时（webpack/parcel）等，可以用import导入：
+
+```javascript
+import xx from 'xxx.json'
+//文件后缀可省略，如
+import xx from 'xxx'
+```
+
+# 属性
+
+## url
+
+路径：
+
+1. 相对路径。从当前URL路径开始定位。例如当前路径为http://localhost:8080/page/login/register.html ，而url属性的值如下：
+
+   ```javascript
+   url: "user/checkIfTheUserExists",//要发送到的路径
+   ```
+
+   则请求的ajax路径为http://localhost:8080/page/login/user/checkIfTheUserExists 。
+
+2. 绝对路径。从项目名开始（项目名可以为空）定位。例如当前路径为http://localhost:8080/page/login/register.html （无项目名），而url属性的值如下：
+
+   ```javascript
+   url: "/user/checkIfTheUserExists",//要发送到的路径
+   ```
+
+   则请求的ajax路径为http://localhost:8080/user/checkIfTheUserExists 。
+
+## data
+
+来自：https://www.cnblogs.com/yangguoe/p/8986108.html 
+
+ajax有三种传递数据的方式：
+
+1. JSON格式。
+
+   ```javascript
+   //形如{“username”:”chen”,”nickname”:”alien”}
+   $.ajax({
+       type:"post",
+       url:"/test/saveUser",
+       data:{"username":"chen","nickname":"alien"},
+       dataType:"json",
+       success: function(data){
+           console.log(data);
+       }
+   });
+   ```
+
+2. JSON字符串格式。
+
+   ```javascript
+   //形如“{“username”:”chen”,”nickname”:”alien”}” 或者JSON.stringify({“username”:”chen”,”nickname”:”alien”})
+   $.ajax({
+       type:"post",
+       url:"/test/saveUser",
+       data:JSON.stringify({"username":"chen","nickname":"alien"}),
+       contentType:"json/application"
+       dataType:"json",
+       success: function(data){
+           console.log(data);
+       }
+   });
+   ```
+
+3. 标准参数模式。
+
+   ```javascript
+   //形如“username=chen&nickname=alien”
+   $.ajax({
+       type:"post",
+       url:"/test/saveUser",
+       data:"username=chen&nickname=alien",
+       dataType:"json",
+       success: function(data){
+           console.log(data);
+       }
+   });
+   ```
+
+从表单中取值的方法：
+
+1. JQuery的$('#id').serialize()方法，是将对应表单中的input的name和value进行拼装，最后拼成“标准参数模式”的字符串。例子如下：
+
+   ```javascript
+   data: $('#form-register').serialize()//序列化数据（序列化为标准格式）
+   ```
+
+2. 利用JQuery的val()方法。例子如下：
+
+   ```javascript
+   data:{
+   	username: $("input[name='username']").val()   
+   }
+   ```
+
+关于POST和GET：
+
+- POST请求能用所有传参模式。
+- GET请求不能用JSON字符串格式。
+
+## dataType
+
+来自：https://www.cnblogs.com/jiduoduo/p/12247636.html 
+
+预期服务器返回的数据类型。如果不指定，jQuery 将自动根据 HTTP 包 MIME 信息来智能判断，比如 XML MIME  类型就被识别为 XML。在 1.4 中，JSON 就会生成一个 JavaScript 对象，而 script  则会执行这个脚本。随后服务器端返回的数据会根据这个值解析后，传递给回调函数。可用值:
+
+- "xml": 返回 XML 文档，可用 jQuery 处理。
+- "html": 返回纯文本 HTML 信息；包含的 script 标签会在插入 dom 时执行。
+- "script": 返回纯文本 JavaScript 代码。不会自动缓存结果。除非设置了 "cache" 参数。注意：在远程请求时(不在同一个域下)，所有 POST 请求都将转为 GET 请求。（因为将使用 DOM 的 script标签来加载）
+- "json": 返回 JSON 数据 。
+- "jsonp": JSONP 格式。使用 JSONP 形式调用函数时，如 "myurl?callback=?" jQuery 将自动替换 ? 为正确的函数名，以执行回调函数。
+- "text": 返回纯文本字符串
+
+# 注意事项
+
+参考文章：
+
+在jQuery中，若想要获取ajax的返回值，必须注意两方面：
+
+1. ajax的同步异步问题。
+2. 于ajax方法体还是外retrun。
+
+不要将retrun放到ajax函数里，这样会导致得不到返回值。因为ajax内部是若干个定义的函数，于ajax中return，是返回到ajax定义函数，而不是返回到ajax外层的函数。
+
+正确示例：
+
+- ```javascript
+  checkIfTheUserExists: function (username) {
+      $.post(
+          '/user/checkIfTheUserExists',
+          {'username':username},
+          function (data) {}
+      )
+      return true;
+  }
+  ```
+
+错误示例：
+
+- ```javascript
+  checkIfTheUserExists: function (username) {
+      $.post(
+          '/user/checkIfTheUserExists',
+          {'username':username},
+          function (data) {return true;}
+      )
+  }
+  ```
+
+若需要得到ajax的值进行返回，则还需要注意异步问题，由于ajax默认是异步执行的，所以需要改为同步执行，确保代码按顺序执行。
+
+- 正确示例，同步调用：
+
+  ```javascript
+  checkIfTheUserExists: function (username) {
+      let repeat = false;
+      $.ajax({
+          url: '/user/checkIfTheUserExists',
+          type: 'post',
+          data: {'username':username},
+          async: false,//不采用异步方式，即用同步方式。（默认为true）
+          success: function (data) {
+              repeat = data;//得到是否重复
+          }
+      })
+      return repeat;
+  }
+  ```
+
+- 错误示例，默认时为异步调用：
+
+  ```javascript
+  checkIfTheUserExists: function (username) {
+      let repeat = false;
+      $.ajax({
+          url: '/user/checkIfTheUserExists',
+          type: 'post',
+          data: {'username':username},
+          success: function (data) {
+              repeat = data;//得到是否重复
+          }
+      })
+      return repeat;
+  }
+  ```
+
+# 前后端交互
+
+参考文章：https://blog.csdn.net/weixin_40821240/article/details/106158393 。
+
+前端请求中，不同contentType、data格式及相对应的后端接收方式(直接对象接收，@RequestParam注解，@RequestBody注解)总结。
+
+
+

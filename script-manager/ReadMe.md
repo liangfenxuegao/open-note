@@ -1,0 +1,2 @@
+本脚本管理器的JS引擎使用的是Nashorn，而该引擎最高只支持JS的ECMAScript5.1语法标准，所以请不要使用高于此标准的语法结构。
+Nashorn JavaScript Engine在Java15已经不可用了。计划的代替品是GraalVM.js，或者使用Node.js来管理JS脚本。

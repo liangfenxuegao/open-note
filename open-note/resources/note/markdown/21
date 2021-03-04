@@ -1,0 +1,1016 @@
+# 开源笔记-许可
+
+**版本：1.1**
+
+**发布于2020年4月**
+
+**使用、复制和分发的子条款：**
+
+*注释：你可以为作品添加子条款。详见父条款第四条。*
+
+**使用、复制和分发的父条款：**
+
+1. 根据本许可的条款和条件，每位贡献者在此授予您永久、全世界、非排他性、免费、免版税、不可撤销的版权许可，用以复制、衍生、公开展示、公开表演、转授许可证，并以源形式或目标形式分发作品和此类衍生作品。
+2. 使用、复制和分发开源笔记许可发行的作品时，必须携带开源笔记许可。允许为链接方式携带。
+3. 一旦您在商业性质作品中使用了开源笔记许可发行的作品，您必须表示感谢，尤其是对该作品主要贡献者的感谢。当开源笔记许可发行的作品为你产生良好效益时，鼓励您为用到的作品贡献者们、开源笔记组织捐赠，但这绝非强制性的。
+4. 您可以为作品添加子许可条款，且子条款必须写在父条款前。注意您不可修改父条款，否则本许可自动作废，您将不能使用任何由开源笔记许可发行的作品。子条款不可与父条款冲突。
+5. 您可在非约束条文中添加作品贡献者、备注、使用说明书、引用资料等文本，但不可出现以开源笔记许可为名义的约束性条款，它们不属于开源笔记许可，开源笔记许可不对这些内容负责，对于属于开源笔记的约束条款应当写在子条款区。
+6. 当您使用了其它许发行的作品，请确保其对其它许可，尤其是对本许可友好，不与本许可条款冲突。加入的许可不应当是污染性的，例如GPL。不满足上述条件时您不应当加入其它许可，或不对使用到这类许可的作品附上开源笔记许可。
+
+**非约束条文：**
+
+*注释：你可以为作品添加非约束条文。详见父条款第五条。*
+
+1. 本笔记依据小马视频的《【小马技术】Bootstrap 4 从入门到学会》由两份雪糕创建首版，版号1.0.0。该教程在哔哩哔哩的视频链接：https://www.bilibili.com/video/BV1kp411R7TW
+2. 本笔记参考了Bootsrtap官方文档：https://v4.bootcss.com/docs/getting-started/introduction/ ，以及Bootstrap中文网的文档：https://getbootstrap.com/docs/4.0/getting-started/introduction/ 。
+3. 建议学习前有HTML、CSS、JavaScript基础，若会Sass、JQuery就更好了。
+4. 本笔记的开发环境：Visual Studio Code工具，Windows10系统。
+5. 部分引用于其它位置的资料若没有在正文给出连接，则是在本文最后的“参考文献”中贴出。
+
+# Bootstrap笔记
+
+## 一、Bootstrap4来了
+
+Bootstrap 是全球最受欢迎的前端组件库，用于开发响应式布局、移动设备优先的 WEB 项目。        
+
+Bootstrap 是用于 HTML、CSS 和 JS 开发的开源工具包。利用 Bootstrap 提供的 Sass  变量和混合（mixins）、响应式栅格系统、可扩展的预制组件以及强大的 jQuery 插件，能够让你快速地开发出产品原型或构建整个 app。        
+
+类似Bootstrap的CSS UI框架有JQuery UI、BootMetro（Windows10风格）、W3css、Flat UI等。
+
+教程作者提供了配套的课程文件，放在gitee上，这是网址：https://gitee.com/komavideo/LearnBootstrap4
+
+## 二、Bootstrap4之初次使用
+
+### 2.1 快速入门：
+
+**Bootstrap4支持技术：**
+
+- JQuery
+- Popper.js（弹窗库）
+
+**从模板开始：**
+
+- 进入Bootstrap官网，从文档页中提取出页面的初始模板。
+  - 官方文档：https://getbootstrap.com/docs/4.0/getting-started/introduction/
+  - 中文文档：https://v4.bootcss.com/docs/getting-started/introduction/
+
+**使用CDN的例子：**
+
+```html
+<!-- 使用CDN引入使用Bootstrap所需的库 -->
+<!DOCTYPE html><!-- HTML5 doctype -->
+<html>
+	<head>
+		<meta charset="utf-8">
+		<!-- 使用 HTML5 doctype 并包含 viewport meta 标签以实现正确的响应式行为，它能开启多平台显示自动响应 -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<title>入门</title>
+		<!-- 引入Bootstrap CSS -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	</head>
+	<body>
+		<h1>你好世界！</h1>
+
+		<!-- 引入Bootstrap所需的JS库，包括JQuery、popper、Bootstrap，JQuery必须放在首位 -->
+		<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+	</body>
+</html>
+```
+
+**使用本地库的例子：**
+
+```html
+<!-- 下载使用Bootstrap所需的库后，于本地引入 -->
+<!DOCTYPE html><!-- HTML5 doctype -->
+<html lang="zh-cmn-Hans"><!-- zh-cmn-Hans的意思是“简体中文” -->
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Hello, world!</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../library/bootstrap-4.4.1-dist/css/bootstrap.min.css">
+  </head>
+  <body>
+    <h1>Hello, world!</h1>
+
+    <!-- Optional JavaScript -->
+    <!-- 
+        引入Bootstrap所需的JS库，包括JQuery、popper、Bootstrap，JQuery必须放在首位。
+        Bootstrap 所提供的 bootstrap.bundle.js 和 bootstrap.bundle.min.js 文件中包含了 Popper，但不包含 jQuery。
+     -->
+    <script src="../library/JavaScript/jquery-3.4.0.js"></script>
+    <script src="../library/JavaScript/popper-1.14.3.js"></script>
+    <script src="../library/bootstrap-4.4.1-dist/js/bootstrap.min.js"></script>
+  </body>
+</html>
+```
+
+### 2.2 重要的全局样式
+
+Bootstrap 使用了一些重要的全局样式和设置，你在使用它们的时候要留意，这些全局样式和设置几乎都是专门针对跨浏览器样式的 *标准化（normalization）* 为目标的。下面就让我们一起来了解吧。
+
+**HTML5 doctype：**
+
+Bootstrap 要求使用 HTML5 doctype。如果不使用，你会看到一些奇怪的不完整的样式，但使用之后就不会导致任何错误了。
+
+```html
+<!DOCTYPE html>
+```
+
+**响应式meta标签：**
+
+Bootstrap 天生就是 *移动设备优先* 的，依照这一策略，我们首先为移动设备优化代码，然后根据需要，基于 CSS 媒体查询来对组件进行缩小或放大。为了确保所有设备能够正确渲染和触摸缩放，**请将响应式 viewport meta 标签**添加到`<head>`标签中。
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+```
+
+## 三、为要素配置颜色
+
+知识点提要：Bootstrap4内置颜色、前景色、背景色。
+
+官网文档位置：https://getbootstrap.com/docs/4.0/utilities/colors/
+
+**实际测试：**
+
+```html
+<div class="">默认效果</div>
+<div class="bg-primary text-white">bg-primary（背景颜色设置为网站主题颜色） text-white（白色文本）</div>
+<div class="bg-secondary text-white">bg-secondary（主题色的辅助色） text-white</div>
+<div class="bg-success text-white">bg-success（成功色） text-white</div>
+<div class="bg-warning text-dark">bg-warning（警告色） text-dark</div>
+<div class="bg-light text-dark">bg-light（明亮背景） text-dark</div>
+```
+
+渲染效果：
+
+![image-20200527181254054](Bootstrap.assets/image-20200527181254054.png)
+
+对于开发人员来说，知道这些关键字就行了，这些关键字到底要要用什么颜色，这应该是美工去关心的。更多效果可以参考官网。
+
+## 四、文本样式
+
+知识点提要：`text-*`、`font-*`、`transform`（主要是对拉丁字母的转换）。
+
+官方文档位置：https://getbootstrap.com/docs/4.0/utilities/text/
+
+**实际测试：**
+
+```html
+<!--
+weight-normal直译就是“重量为普通”，也就是正常字体，不加粗或变细。
+display-4是突出显示为4级，和<h1>、<h2>……<h6>标签有所不同。
+-->
+<h2 class="font-weight-normal display-4">普通字体 display-4</h2>
+<div class="bg-light">明亮背景</div>
+<div class="text-center bg-light font-weight-bold">文本居中 明亮背景 加粗字体</div>
+<div class="text-left bg-light">文本居左 明亮背景</div>
+<div class="text-right bg-light">文本居右 明亮背景</div>
+<!--拉丁字母变换，分别是全小写、全大写、首字母大写-->
+<p class="text-lowercase">LOWERCASED TEXT</p>
+<p class="text-uppercase">uppercased text</p>
+<p class="text-capitalize">capitalized text</p>
+```
+
+渲染效果：
+
+![image-20200527205456816](Bootstrap.assets/image-20200527205456816.png)
+
+## 五、元素size变更
+
+知识点提要：`w-*`（宽度）、`h-*`（高度）。
+
+官方文档位置：https://getbootstrap.com/docs/4.0/utilities/sizing/
+
+**理论说明：**
+
+`w-*`用于设置自己在父元素内所占的宽度百分比，`h-*`则是设置所占的高度百分比。
+
+**实际测试：**
+
+```html
+<style>
+    .my-container {
+        width: 200px;
+        height: 200px;
+        background: #ddd;
+        margin-bottom: 5px;
+    }
+</style>
+
+<div class="my-container">
+    <div class="bg-primary w-25 h-50">w-25 h-50</div>
+</div>
+<div class="my-container">
+    <div class="bg-success w-75 h-100">w-75 h-100</div>
+</div>
+```
+
+渲染：
+
+![image-20200528202813793](Bootstrap.assets/image-20200528202813793.png)
+
+## 六、padding和margin的使用
+
+知识点提要：`[p|m][location]-[size]`（p表示padding（边距），m表示margin（外边距））
+
+官方文档位置：https://getbootstrap.com/docs/4.0/utilities/spacing/
+
+**理论说明：**
+
+location的位置可以设置这些参数：
+
+- t,b,l,r
+  - t：top
+  - b：bottom
+  - l：left
+  - r：right
+- x,y
+  - x：lr（左右同时设置）
+  - y：tb（上下同时设置）
+
+size可以设置这些参数：
+
+- 0
+- 1：0.25rem
+- 2：0.5rem
+- 3：1.0rem
+- 4：1.5rem
+- 5：3.0rem
+- auto
+
+rem的含义：以根要素为基准，按照比例设定子元素的大小。
+
+关于rem的释义还可以参考该链接：https://developer.mozilla.org/zh-CN/docs/Web/CSS/length
+
+使用rem的是为了实现响应式设计，对之对应的px就不行。
+
+**实际测试：**
+
+```html
+<style>
+    .my-container {
+        width: 200px;
+        height: 200px;
+        background: #ddd;
+        margin-bottom: 5px;
+    }
+</style>
+
+<h3>padding：</h3>
+<!-- pt-3表示“上边距3”，pl-3表示“左边距3” -->
+<div class="my-container pt-3 pl-3">
+    <!-- 使用主题色 占父元素50%宽度、50%高度 上边距1、左边距2  -->
+    <div class="bg-primary w-50 h-50 pt-1 pl-2">通过pt和pl设置边距</div>
+</div>
+<!-- px-3指“左右留白3”，py-3指“上下留白3” -->
+<div class="my-container px-3 py-3">
+    <div class="bg-success w-100 h-100">通过px和py设置边距</div>
+</div>
+
+<h3>margin：</h3>
+<hr>
+<!-- pt-3表示“上边距3”，pl-3表示“左边距3” -->
+<div class="my-container mt-3 ml-3">
+    <!-- 使用主题色 占父元素50%宽度、50%高度 上边距1、左边距2  -->
+    <div class="bg-primary w-50 h-50 ml-2">通过mt和ml设置外边距</div>
+</div>
+<hr>
+<!-- px-3指“左右留白3”，py-3指“上下留白3” -->
+<div class="my-container mx-3 my-3">
+    <div class="bg-success w-100 h-100 mx-3">通过mx和my设置外边距</div>
+</div>
+```
+
+渲染效果：
+
+![image-20200528231536125](Bootstrap.assets/image-20200528231536125.png)
+
+## 七、学会使用Bootstrap官网
+
+知识点提要：官方文档的使用。
+
+官网：https://getbootstrap.com/
+
+**讲解：**
+
+打开Bootstrap的官网，能看到导航栏有Home、Documentation、Examples、Icons、Themes、Expo、Blog这些选项卡。
+
+首先看Home，其包含了Installation（安装）、BootstrapCDN（通过CDN引用Bootstrap）、Bootstrap Icons（官方推出的图标库）、Official Themes（官方主题）。
+
+再看Documentation，一级目录里面有Contents，其介绍了Bootstrap中包含的内容。
+
+Browsers & devices则介绍了Bootstrap支持的浏览器和设备。
+
+Theming Bootstrap介绍了如何自定义主题样式，这里Bootstrap用到了Sass来编译为CSS。
+
+这里着重说明一下Utilities，其包含了Bootstrap的主要内容。
+
+## 八、按钮的技巧
+
+知识点提要：按钮的各种设定、btn-*。
+
+官方文档位置：https://getbootstrap.com/docs/4.5/components/buttons/
+
+**实际测试：**
+
+```html
+<button>Yes</button><!-- 普通 -->
+<button class="btn">Yes</button><!-- 加入Bootstrap的btn类 -->
+<button class="btn btn-primary">Yes</button><!-- 加入btn类并使用主题色 -->
+<button class="btn btn-danger btn-sm">Yes</button><!-- 使用危险色并设为小号按钮 -->
+<button class="btn btn-success btn-lg">Yes</button><!-- 使用成功色并设为大号按钮 -->
+```
+
+渲染：
+
+![image-20200530223451995](Bootstrap.assets/image-20200530223451995.png)
+
+更多内容可参考官网。
+
+## 九、独特的网格系统
+
+知识点提要：`row`、`col-*`、12列布局。
+
+官网文档链接：https://getbootstrap.com/docs/4.5/layout/grid/
+
+**理论说明：**
+
+Bootstrap的网格系统使用一系列容器、行、列来布局和对齐内容。它内置了弹性框，并且完全响应。
+
+**实际测试：**
+
+```html
+<!-- Bootstrap推荐将网格系统放入到container类中(div标签内) -->
+<div class="container">
+    <!-- 该行的三列以平均宽度显示（每行均有12列） -->
+    <div class="row mb-3">
+        <div class="col-4 bg-danger">
+            COL1
+        </div>
+        <div class="col-4 bg-success">
+            COL2
+        </div>
+        <div class="col-4 bg-warning">
+            COL3
+        </div>
+    </div>
+    <!-- 该行的三列以1比4比1的宽度显示 -->
+    <div class="row">
+        <div class="col-2 bg-danger">
+            COL1
+        </div>
+        <div class="col-8 bg-success">
+            COL2
+        </div>
+        <div class="col-2 bg-warning">
+            COL3
+        </div>
+    </div>
+    <!-- 3比2比4。另外要注意的是这里的列数超过了12为18，所以一行是显示不下的，会换行显示 -->
+    <div class="row mt-3">
+        <div class="col-6 bg-danger">
+            COL1
+        </div>
+        <div class="col-4 bg-success">
+            COL2
+        </div>
+        <div class="col-8 bg-warning">
+            COL3
+        </div>
+    </div>
+</div>
+```
+
+渲染（可以看到一行显示不下时，COL3另起一行了）：
+
+![image-20200531101735002](Bootstrap.assets/image-20200531101735002.png)
+
+## 十、理解响应式布局
+
+知识点提要：屏幕大小的划分。
+
+官网位置：https://getbootstrap.com/docs/4.5/layout/grid/
+
+**讲解：**
+
+以前的网页都只是在电脑上看的，但进入移动时代后，小屏的浏览需求上来了，由于屏幕和形态的区别，所以显示效果需求也不同，一种方法是做多套页面使用于不同终端，另一种方法就是现在要讲的使用响应式布局。
+Bootstrap4根据客户端显示屏幕的大小，分为以下几个分类：
+
+![image-20200605195840491](Bootstrap.assets/image-20200605195840491.png)
+
+**实际测试：**
+
+先看个基本的布局方式，其不具备响应式功能：
+
+```html
+<!-- 课题：基本的布局方式，但还不具有响应式功能，请先看一下目前的效果吧 -->
+<div class="container">
+    <div class="row">
+        <div class="col bg-danger">
+            1 of 2
+        </div>
+        <div class="col bg-success">
+            2 of 2
+        </div>
+    </div>
+    <div class="row">
+        <div class="col bg-info">
+            1 of 3
+        </div>
+        <div class="col bg-primary">
+            2 of 3
+        </div>
+        <div class="col bg-warning">
+            3 of 3
+        </div>
+    </div>
+</div>
+```
+
+渲染效果（改变浏览器宽度并不会有响应行为）：
+
+![image-20200605205842776](Bootstrap.assets/image-20200605205842776.png)
+
+![image-20200605210008472](Bootstrap.assets/image-20200605210008472.png)
+
+## 十一、制作响应式网页
+
+知识点提要：`col-*`（超小屏）、`col-sm-*`（小屏，手机）、`col-md-*`（中屏，平板）、`col-lg-*`（大屏，电脑）、`col-xl-*`（高清屏）。
+
+官网位置：https://getbootstrap.com/docs/4.5/layout/grid/
+
+**实际测试：**
+
+```html
+<div class="row mb-3">
+    <div class="col-6 bg-success">始终为所在容器的一半宽</div>
+</div>
+<div class="row mb-3">
+    <!-- 该类的含义为，高清屏（col-xl）时占12列，中屏（col-md）时占8列，小屏（col-sm）时占4列，超小屏（col）时占6列 -->
+    <div class="col-xl-12 col-lg-10 col-md-8 col-sm-4 col-6 bg-warning">Helo2</div>
+</div>
+<div class="row">
+    <div class="col-12 col-md-6 bg-danger">Helo3a</div>
+    <div class="col-12 col-md-6 bg-primary">Helo3b</div>
+</div>
+<div class="row mt-3">
+    <div class="col-12 col-md-6 bg-danger">Helo4a</div>
+    <!-- d-none表示不显示，但当屏幕的宽度大于平板电脑（d-md-block）时，显示为容器的一半宽（6列） -->
+    <div class="d-none d-md-block col-md-6 bg-primary">Helo4b</div>
+</div>
+```
+
+渲染效果：
+
+![响应式网页](Bootstrap.assets/响应式网页.gif)
+
+## 十二、制作自己的网页
+
+知识点提要：总结之前的知识。
+
+参考文档：https://getbootstrap.com/docs/4.5/content/typography/
+
+**实际测试：**
+
+```html
+<!DOCTYPE html><!-- Bootstrap 要求使用 HTML5 doctype -->
+<html>
+
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title>制作自己的网页</title>
+    <link rel="stylesheet" href="../library/bootstrap-4.4.1-dist/css/bootstrap.min.css">
+    <style>
+        /* 对myheader类的设置 */
+        .myheader {
+            background: url(滑稽.gif);/* 背景为图片 */
+            background-size: myheader/* 表示背景大小同myheader类 */
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <!-- 父盒子设置了text-center，所以子元素均居中显示 -->
+        <div class="myheader text-white text-center py-5">
+            <br><br>
+            <h1 class="display-3 mb-3">两份雪糕</h1>
+            <a href="https://space.bilibili.com/75021521" target="_blank" class="btn btn-primary btn-lg">哔哩哔哩</a>
+            <a href="https://weibo.com/6326266451/profile?topnav=1&wvr=6" target="_blank" class="btn btn-danger btn-lg">新浪微博</a>
+            <br><br>
+        </div>
+    </header>
+    <main>
+    </main>
+    <footer>
+    </footer>
+
+	<!-- 
+        引入Bootstrap所需的JS库，包括JQuery、popper、Bootstrap，JQuery必须放在首位。
+        Bootstrap 所提供的 bootstrap.bundle.js 和 bootstrap.bundle.min.js 文件中包含了 Popper，但不包含 jQuery。
+     -->
+	<script src="../library/JavaScript/jquery-3.4.0.js"></script>
+	<script src="../library/bootstrap-4.4.1-dist/js/bootstrap.bundle.js"></script>
+</body>
+
+</html>
+```
+
+## 十三、特殊Section的使用
+
+知识点提要：section标记。
+
+**讲解：**
+
+section标签用于对页面上的内容进行分块，其通常由标题及其内容组成。
+
+另外代码中还用到了header、main、footer标签，都可以看作为语义化标签，不仅令网页结构更加清晰，还有利于SEO优化。
+
+**实际测试：**
+
+```html
+<!DOCTYPE html><!-- Bootstrap 要求使用 HTML5 doctype -->
+<html>
+
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title>制作自己的网页</title>
+    <link rel="stylesheet" href="../library/bootstrap-4.4.1-dist/css/bootstrap.min.css">
+    <style>
+        /* 对myheader类的设置 */
+        .myheader {
+            background: url(少女房间-电脑-手机-相机.jpg);/* 背景为图片 */
+            background-size: myheader/* 表示背景大小同myheader类 */
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <!-- 父盒子设置了text-center，所以子元素均居中显示 -->
+        <div class="myheader text-dark text-center py-5">
+            <br><br>
+            <h1 class="display-3 mb-3">两份雪糕</h1><!-- 为了SEO，h1标签一般只用一次 -->
+            <a href="https://space.bilibili.com/75021521" target="_blank" class="btn btn-primary btn-lg">哔哩哔哩</a>
+            <a href="https://weibo.com/6326266451/profile?topnav=1&wvr=6" target="_blank" class="btn btn-danger btn-lg">新浪微博</a>
+            <br><br>
+        </div>
+    </header>
+    <main>
+        <!-- py-5指上下边距皆为5 -->
+        <section class="py-5"><!-- section标签用于对页面上的内容进行分块，其内部通常由标题和正文组成 -->
+            <h2 class="text-center mb-5">欢迎访问两份雪糕的博客</h2><!-- h2和h3标签相继合理使用，有利于SEO -->
+            <!-- 正文被装入了container中 -->
+            <div class="container">
+                <div class="mb-5">
+                    <h3>勇者斗恶龙建造者</h3>
+                    <p>日本知名游戏厂商SE社正式宣布将面向平台推出《勇者斗恶龙：建造者》游戏，风格为方块建筑RPG。初代《勇者斗恶龙 创造者》于NS上推出，本作2018年春发售。《勇者斗恶龙:建造者》和《勇者斗恶龙:建造者2》的NS版，在西方市场由任天堂发行。</p>
+                    <img src="resource/勇者斗恶龙建造者.jpg" class="w-100">
+                </div>
+                <div class="mb-5">
+                    <h3>塞尔达传说之黄昏公主</h3>
+                    <p>《塞尔达传说 黄昏公主》（ゼルダの伝说 トワイライトプリンセス，The Legend of Zelda: Twilight Princess）是由任天堂情报开发本部制作、任天堂发行的动作冒险游戏。2006年11月9日首发登陆Wii和NGC，Wii首发作品。双平台合计销量达到885万套以上，是系列目前为止销量最高作。《塞尔达传说：黄昏公主HD》2016年3月10日登陆WiiU平台。</p>
+                    <img src="resource/塞尔达传说之黄昏公主.jpg" class="w-100">
+                </div>
+                <div class="mb-5">
+                    <h3>讨鬼传2</h3>
+                    <p>《讨鬼传2》是由KOEI TECMO公司开发的一款动作游戏，于2016年7月28日发行。在吸收了《讨鬼传》优势内容的基础上，增加了诸多提升游戏爽快度的要素。游戏风格也转变成为开放世界形式，且能无缝进入战斗。</p>
+                    <img src="resource/讨鬼传2.jpg" class="w-100">
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+    </footer>
+
+	<!-- 
+        引入Bootstrap所需的JS库，包括JQuery、popper、Bootstrap，JQuery必须放在首位。
+        Bootstrap 所提供的 bootstrap.bundle.js 和 bootstrap.bundle.min.js 文件中包含了 Popper，但不包含 jQuery。
+     -->
+	<script src="../library/JavaScript/jquery-3.4.0.js"></script>
+	<script src="../library/bootstrap-4.4.1-dist/js/bootstrap.bundle.js"></script>
+</body>
+
+</html>
+```
+
+## 十四、完成特殊Section
+
+知识点提要：实现响应式布局、`col-md-*`、`order-md-*`（行中列的表示顺序）。
+
+**实际测试：**
+
+```html
+<!DOCTYPE html><!-- Bootstrap 要求使用 HTML5 doctype -->
+<html>
+
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title>完成特殊Section</title>
+    <link rel="stylesheet" href="../library/bootstrap-4.4.1-dist/css/bootstrap.min.css">
+    <style>
+        /* 对myheader类的设置 */
+        .myheader {
+            background: url(resource/少女房间-电脑-手机-相机.jpg);/* 背景为图片 */
+            background-size: myheader/* 表示背景大小同myheader类 */
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <!-- 父盒子设置了text-center，所以子元素均居中显示 -->
+        <div class="myheader text-dark text-center py-5">
+            <br><br>
+            <h1 class="display-3 mb-3">两份雪糕</h1><!-- 为了SEO，h1标签一般只用一次 -->
+            <a href="https://space.bilibili.com/75021521" target="_blank" class="btn btn-primary btn-lg">哔哩哔哩</a>
+            <a href="https://weibo.com/6326266451/profile?topnav=1&wvr=6" target="_blank" class="btn btn-danger btn-lg">新浪微博</a>
+            <br><br>
+        </div>
+    </header>
+    <main>
+        <!-- py-5指上下边距皆为5 -->
+        <section class="py-5"><!-- section标签用于对页面上的内容进行分块，其内部通常由标题和正文组成 -->
+            <h2 class="text-center mb-5">欢迎访问两份雪糕的博客</h2><!-- h2和h3标签相继合理使用，有利于SEO -->
+            <!-- 正文被装入了container中 -->
+            <div class="container">
+                <!-- 加入网格系统（row col），实现响应式布局 -->
+                <div class="mb-5 row">
+                    <div class="col-md-9"><!-- 例如这里表示中屏及以上占9列宽 -->
+                        <h3>勇者斗恶龙建造者</h3>
+                        <p>日本知名游戏厂商SE社正式宣布将面向平台推出《勇者斗恶龙：建造者》游戏，风格为方块建筑RPG。初代《勇者斗恶龙 创造者》于NS上推出，本作2018年春发售。《勇者斗恶龙:建造者》和《勇者斗恶龙:建造者2》的NS版，在西方市场由任天堂发行。</p>
+                    </div>
+                    <div class="col-md-3">
+                        <img src="resource/勇者斗恶龙建造者.jpg" class="w-100">
+                    </div>
+                </div>
+                <div class="mb-5 row">
+                    <!-- 通过order可以指定显示顺序 -->
+                    <div class="col-md-9 order-md-2">
+                        <h3>塞尔达传说之黄昏公主</h3>
+                        <p>《塞尔达传说 黄昏公主》（ゼルダの伝说 トワイライトプリンセス，The Legend of Zelda: Twilight Princess）是由任天堂情报开发本部制作、任天堂发行的动作冒险游戏。2006年11月9日首发登陆Wii和NGC，Wii首发作品。双平台合计销量达到885万套以上，是系列目前为止销量最高作。《塞尔达传说：黄昏公主HD》2016年3月10日登陆WiiU平台。</p>
+                    </div>
+                    <div class="col-md-3 order-md-1">
+                        <img src="resource/塞尔达传说之黄昏公主.jpg" class="w-100">
+                    </div>
+                </div>
+                <div class="mb-5 row">
+                    <div class="col-md-9">
+                        <h3>讨鬼传2</h3>
+                        <p>《讨鬼传2》是由KOEI TECMO公司开发的一款动作游戏，于2016年7月28日发行。在吸收了《讨鬼传》优势内容的基础上，增加了诸多提升游戏爽快度的要素。游戏风格也转变成为开放世界形式，且能无缝进入战斗。</p>
+                    </div>
+                    <div class="col-md-3">
+                        <img src="resource/讨鬼传2.jpg" class="w-100">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+    </footer>
+
+	<!-- 
+        引入Bootstrap所需的JS库，包括JQuery、popper、Bootstrap，JQuery必须放在首位。
+        Bootstrap 所提供的 bootstrap.bundle.js 和 bootstrap.bundle.min.js 文件中包含了 Popper，但不包含 jQuery。
+     -->
+	<script src="../library/JavaScript/jquery-3.4.0.js"></script>
+	<script src="../library/bootstrap-4.4.1-dist/js/bootstrap.bundle.js"></script>
+</body>
+
+</html>
+```
+
+大屏渲染效果：
+
+![image-20200607103401762](Bootstrap.assets/image-20200607103401762.png)
+
+小屏渲染效果：
+
+![image-20200607103425569](Bootstrap.assets/image-20200607103425569.png)
+
+## 十五、表格也疯狂
+
+知识点提要：`<table>`、`table-*`
+
+**实际测试：**
+
+```html
+<!-- 又见到了section标签，需要记住的是，其内容首先是个标题，然后是类为container的标签，这样结构更加清晰 -->
+<section class="bg-light text-center py-5">
+    <h2>今后计划</h2>
+    <div class="container">
+        <!-- 构造table时，最好往其内部添加thead、tbody标签，目的还是为了方便爬虫爬取 -->
+        <table class="table table-hover"><!-- table-hover能在鼠标悬停时，突出显示所在行 -->
+            <thead>
+                <tr>
+                    <th class="text-center">技术视频</th>
+                    <th class="text-center">游戏视频</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bootstrap4入门</td>
+                    <td>勇者斗恶龙建造者2</td>
+                </tr>
+                <tr>
+                    <td>Git入门</td>
+                    <td>信长之野望创造</td>
+                </tr>
+                <tr>
+                    <td>MongoDB入门</td>
+                    <td>怪物猎人世界</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+```
+
+**渲染效果（注意鼠标悬停的位置会有突出显示效果）：**
+
+![表格也疯狂](Bootstrap.assets/表格也疯狂.gif)
+
+## 十六、制作Tab菜单
+
+知识点提要：制作Tab内容布局。
+
+**实际测试：**
+
+```html
+<!-- Tab菜单 -->
+<section class="py-5">
+    <h2 class="text-center">我爱看轻小说</h2>
+    <div class="container">
+        <ul>
+            <li><a href="#one">《厌血症的我变成吸血鬼后》</a></li>
+            <li><a href="#two">《天才剑仙的徒弟为何是我这个废柴》</a></li>
+        </ul>
+        <div id="one">
+            <p>吸血后会死的吸血姬？不吸血就是个战五渣的废萌萝莉。</p>
+            <p>史上混的最惨的吸血鬼女王索菲娅，与变成吸血鬼后的乐哀的百合日常。</p>
+            <p>为什么两只吸血鬼一摸一样？你懂个锤子，快乐自然要双倍的。</p>
+        </div>
+        <div id="two">
+            <p>师傅是剑仙，侍女是天才，师姐是大姐头，青梅更是奇人，远不及她们出色的我又该何去何从？</p>
+            <p>哦，忘了说，她们都长得很好看，这个倒是俺也一样……等等，她们不会馋我身子吧？溜了溜了……</p>
+        </div>
+    </div>
+</section>
+```
+
+**渲染效果：**
+
+![image-20200607171232934](Bootstrap.assets/image-20200607171232934.png)
+
+## 十七、完善Tab菜单
+
+知识点提要：`nav`、`nav-tabs`、`nav-item`、`nav-link`、`tab-content`、`tab-pane`、`data-toggle="tab"`。
+
+参考文档：https://getbootstrap.com/docs/4.5/components/navs/
+
+**理论说明：**
+
+data-toggle用于指定用什么事件触发，例如data-toggle="tab"指用tab事件触发。
+
+**实际测试：**
+
+```html
+<!-- Tab菜单 -->
+<section class="py-5">
+    <h2 class="text-center">我爱看轻小说</h2>
+    <div class="container">
+        <ul class="nav nav-tabs"><!-- 声明这是导航及tab菜单 -->
+            <!-- 使用nav-itme声明这是选项之一 -->
+            <li class="nav-itme">
+                <!-- heaf的值要和下面tab-pane类所在标签的id值对应。data-toggle声明这是用于切换tab的标签 -->
+                <a href="#book1" class="nav-link active" data-toggle="tab">《厌血症的我变成吸血鬼后》</a>
+            </li>
+            <li class="nav-itme">
+                <a href="#book2" class="nav-link" data-toggle="tab">《天才剑仙的徒弟为何是我这个废柴》</a>
+            </li>
+        </ul>
+        <div class="tab-content py-3"><!-- tab-content表示这是tab的具体内容 -->
+            <!-- id的值要和上面a标签heaf属性值对应 -->
+            <div id="book1" class="tab-pane active"><!-- tab-pane是样式 -->
+                <p>吸血后会死的吸血姬？不吸血就是个战五渣的废萌萝莉。</p>
+                <p>史上混的最惨的吸血鬼女王索菲娅，与变成吸血鬼后的乐哀的百合日常。</p>
+                <p>为什么两只吸血鬼一摸一样？你懂个锤子，快乐自然要双倍的。</p>
+            </div>
+            <div id="book2" class="tab-pane">
+                <p>师傅是剑仙，侍女是天才，师姐是大姐头，青梅更是奇人，远不及她们出色的我又该何去何从？</p>
+                <p>哦，忘了说，她们都长得很好看，这个倒是俺也一样……等等，她们不会馋我身子吧？溜了溜了……</p>
+            </div>
+        </div>
+    </div>
+</section>
+```
+
+渲染效果：
+
+![实现标签页切换](Bootstrap.assets/实现标签页切换.gif)
+
+## 十八、制作页脚
+
+知识点提要：footer。
+
+**讲解：**
+
+语义化标签footer，讲属于页脚的内容通通放到footer标签内，目的还是为了网页结构清晰、方便爬虫爬取。
+
+**实际测试：**
+
+```html
+<footer class="text-center text-muted py-4">
+    Copyright © 2020 两份雪糕
+</footer>
+```
+
+渲染效果：
+
+![image-20200607223452633](Bootstrap.assets/image-20200607223452633.png)
+
+## 十九、制作提示框
+
+知识点提要：data-toggle="tooltip"、data-placement。
+
+文档位置：https://getbootstrap.com/docs/4.5/components/tooltips/
+
+**理论说明：**
+
+Tooltip依赖popper.js，所以你必须添加对popper.js的依赖。
+
+初始化页面上所有tooltip的方法是使用data-toggle属性：
+
+```javascript
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+```
+
+**实际测试：**
+
+```html
+<div class="py-3">
+    <div id="east" class="active">
+        <!-- data-placement用于指示放置位置，包括top、right、bottom、left -->
+        <p>
+            2018年东部冠军是
+            <span class="font-weight-bold text-success" title="绿凯东部第一" data-toggle="tooltip" data-placement="top">
+                凯尔特人
+            </span>
+            还是
+            <span class="font-weight-bold text-danger" title="老詹没输" data-toggle="tooltip" data-placement="bottom">
+                骑士
+            </span>
+            ？不会是猛龙吧？
+        </p>
+    </div>
+</div>
+```
+
+```html
+<!-- 使用tooltip还需要用到脚本。下面的代码用到了JQuery -->
+<script>
+    $(function(){
+        'use strict';//strict：严格的。以严格方式执行该JavaScript脚本
+        $('[data-toggle="tooltip"]').tooltip();//初始化页面上所有tooltip的方法是使用data-toggle属性
+    });
+</script>
+```
+
+渲染效果：
+
+![提示框](Bootstrap.assets/提示框.gif)
+
+## 二十、制作导航条
+
+知识点提要：nav、navbar。
+
+文档位置：https://getbootstrap.com/docs/4.5/components/navbar/
+
+**理论说明：**
+
+- nav：语义化标签，方便爬虫爬取。
+- navbar：这是导航栏。
+- navbar-expand：响应式折叠。
+- navbar-light：配色方案之一。
+- navbar-nav：导航列表，装载nav-item。
+- nav-item：用于标注每个导航选项。
+
+**实际测试：**
+
+```html
+<div class="container">
+    <!-- 其实这里将nav替换为div并不会改变什么，但使用nav的好处是语义化标签，方便爬虫爬取 -->
+    <nav class="navbar navbar-expand navbar-light"><!-- navbar-expand用于响应式折叠。navbar-light是配色方案之一 -->
+        <a href="#" class="navbar-brand">开源笔记</a><!-- navbar-beand用于品牌 -->
+        <!-- 导航列表 -->
+        <ul class="navbar-nav">
+            <!-- nav-item用于标注每个导航选项 -->
+            <li class="nav-item"><a href="#" class="nav-link">链接</a></li>
+            <li class="nav-item"><a href="#" class="nav-link">仓库</a></li>
+            <li class="nav-item"><a href="#" class="nav-link">关于</a></li>
+        </ul>
+    </nav>
+</div>
+```
+
+渲染效果：
+
+![image-20200608211221725](Bootstrap.assets/image-20200608211221725.png)
+
+## 二十一、制作汉堡菜单
+
+知识点提要：navbar-toggler。
+
+文档位置：https://getbootstrap.com/docs/4.5/components/navbar/#toggler
+
+**理论说明：**
+
+- navbar-expand-md：小屏时响应折叠。
+- navbar-toggler：声明这是个开关。
+
+**实际测试：**
+
+```html
+<div class="container">
+    <!-- 其实这里将nav替换为div并不会改变什么，但使用nav的好处是语义化标签，方便爬虫爬取 -->
+    <nav class="navbar navbar-expand-md navbar-light"><!-- navbar-expand用于响应式折叠。navbar-light是配色方案之一 -->
+        <a href="#" class="navbar-brand">开源笔记</a><!-- navbar-beand用于品牌 -->
+        <!-- 
+汉堡菜单按钮。
+navbar-toggler：声明这是个开关。
+data-toggle="collapse"：触发collapse行为。
+data-target="#menu"：触发目标为id="menu"的标签。
+-->
+        <button class="navbar-toggler" data-toggle="collapse" data-target="#menu">
+            <span class="navbar-toggler-icon"></span><!-- 汉堡图标。用到了Bootstrap Icon库。 -->
+        </button>
+        <!-- 汉堡菜单的具体内容 -->
+        <div id="menu" class="collapse navbar-collapse"><!-- 为该div的class属性添加collapse、navbar-collapse两个类后就能实现收纳效果 -->
+            <!-- 导航列表 -->
+            <ul class="navbar-nav">
+                <!-- nav-item用于标注每个导航选项 -->
+                <li class="nav-item"><a href="#" class="nav-link">首页</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">链接</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">仓库</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">关于</a></li>
+            </ul>
+        </div>
+    </nav>
+</div>
+```
+
+渲染效果：
+
+![image-20200608231112462](Bootstrap.assets/image-20200608231112462.png)
+
+点击叠层图标：
+
+![image-20200608231124989](Bootstrap.assets/image-20200608231124989.png)
+
+## 二十二、报警提示
+
+知识点提要：`alert`、`alert-*`、`close`、`data-dismiss="alert"`。
+
+文档位置：https://getbootstrap.com/docs/4.5/components/alerts/
+
+**实际测试：**
+
+```html
+<!-- 
+    alert：指这是警告类。
+    alert-info：配置为info色。
+    rounded：调整圆角效果，为0时无圆角效果。
+    alert-dismissible：该alert可消失。
+    fade：淡入淡出。
+    show：显示本alert。
+-->
+<div class="alert alert-info text-center mb-0 rounded-0 alert-dismissible fade show">
+    新版Bootstrap4教学视频出版啦！
+    <!-- 关闭按钮。data-dismiss="alert"用于关闭alert。&times是符号X。 -->
+    <button class="close" data-dismiss="alert">&times;</button>
+</div>
+```
+
+渲染效果：
+
+![image-20200609193656049](Bootstrap.assets/image-20200609193656049.png)
+
+# 参考文献：
+

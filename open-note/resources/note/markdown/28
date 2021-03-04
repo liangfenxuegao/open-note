@@ -1,0 +1,117 @@
+## 1.  Spring Security使用ajax实现异步登录
+
+参考博文：https://blog.csdn.net/qq_34869990/article/details/103360678 
+
+**自定义登录处理逻辑：**
+
+编写自定义登录成功和登录失败处理逻辑(返回json数据，而不是页面跳转)，系统默认登录成功会跳回上一个页面，我们需要进行错误提示，所以需要自定义ajax处理。
+
+1. 登录成功处理器：
+
+   ```java
+   @Component
+   public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+   
+       @Override
+       public void onAuthenticationSuccess(
+               HttpServletRequest httpServletRequest,
+               HttpServletResponse httpServletResponse,
+               Authentication authentication) throws IOException, ServletException {
+   
+           //装载消息
+           HashMap<String, Object> map = new HashMap<>();
+           map.put("code",200);//HTTP状态码。200表示OK，即正常状态。
+           map.put("message","登录成功");
+           String stringJson = new JSONObject(map).toString();//将map转为JSON格式
+   
+           httpServletRequest.getSession().setAttribute("username",authentication.getName());//设置当前Session中，username键对应的值是当前登录用户的用户名。
+           httpServletResponse.setContentType("application/json;charset=UTF-8");//设置内容类型
+           PrintWriter out = httpServletResponse.getWriter();
+           out.write(stringJson);
+           out.flush();
+           out.close();
+       }
+   }
+   ```
+
+2. 登录失败处理器：
+
+   ```java
+   @Component
+   public class MyAuthenticationFailHandler implements AuthenticationFailureHandler {
+   
+       @Override
+       public void onAuthenticationFailure(
+               HttpServletRequest request,
+               HttpServletResponse response,
+               AuthenticationException exception) throws IOException, ServletException {
+   
+           //装载消息
+           HashMap<String, Object> map = new HashMap<>();
+           map.put("code",300);//HTTP状态码。300表示Multiple Choices。
+           map.put("message",exception.getMessage()+"请检查是否有账号或密码错误");
+           String stringJson = new JSONObject(map).toString();//将map转为JSON格式
+   
+           response.setContentType("application/json;charset=UTF-8");//设置内容类型
+           PrintWriter out = response.getWriter();
+           out.write(stringJson);
+           out.flush();
+           out.close();
+       }
+   }
+   ```
+
+## 2. 获取当前登录用户信息
+
+参考文章：https://www.hangge.com/blog/cache/detail_2717.html 。
+
+方法一：通过注入Principal接口获取用户信息。
+
+- 在运行过程中，Spring 会将 Username、Password、Authentication、Token 注入到 Principal 接口中，我们可以直接获取使用。
+
+- ```java
+  @GetMapping("getCurrentLoginUsername")
+  public String hello(Principal principal) {
+  	return principal.getName();//如果未登录，principal将为null。
+  }
+  ```
+
+## 3. 获取更多与User相关的信息
+
+参考文章：https://blog.csdn.net/a1015088819/article/details/49893073 。
+
+想要获取更多的信息得扩展UserDetails的默认实现类User和UserDetailsService接口。Spring Security是将整个User信息放入session中的。
+
+## 4.修改session用户信息
+
+参考文章：https://www.cnblogs.com/ealenxie/p/9445052.html 。
+
+场景 :  
+
+- 前端通过session获取当前用户信息，当前用户信息在前端页面发生了改变时(比如用户update了自己的email属性)；可能数据库里面已经update了，而程序没有重启或者用户没有重新登陆，则session中的值是不会发生改变的，即验证的用户信息也是不变的，前端显示也并不会更新。
+
+基本思路：
+
+1. 使用SecurityContextHolder获取authentication对象。
+2. 初始化UsernamePasswordAuthenticationToken实例，这里填入要更新的用户信息，即userDto。
+3. 重新设置Context的Authentication。
+
+实例代码：
+
+- ```java
+  public void updateUserInSession(UserDto userDto){
+      //使用SecurityContextHolder获取authentication对象
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      //初始化UsernamePasswordAuthenticationToken实例，这里填入要更新的用户信息，即userDto。
+      UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDto, authentication);
+      authenticationToken.setDetails(authentication.getDetails());
+      //重新设置Context的Authentication
+      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+  }
+  ```
+
+理论说明：
+
+- getAuthentication() / setAuthentication() ，这两个方法是为了获取/设置 Authentication 对象 ，Authentication 是一个接口。
+- 用户认证最核心的部分是接口 Authentication接口，它有两个最重要的方法 getPrincipal() / setPrincipal()，可获取被验证的用户的身份 / 可用于设置被验证的用户的身份。
+- Authentication有一个基本的实现类，UsernamePasswordAuthenticationToken，我们只要将它初始化出来，并将我们更新的用户信息赋上去，即可完成修改session的用户信息。

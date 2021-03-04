@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="xuegao.practice.openNote.dao.CityMapper"><!-- 当使用接口获取映射方法时，命名空间不能随便取，要指定为接口的全类名 -->
+    <!--得到按country_id升序排列的省市名数组-->
+    <select id="getCityListByCountryIdAsc" resultType="xuegao.practice.openNote.entity.City">
+        SELECT country_id, state_cn, state_en, name_cn, name_en
+        FROM open_note.city
+        WHERE country_id is not null
+        ORDER BY country_id ASC
+    </select>
+
+    <!--根据countryId、省名、市名确定对应的city表id值-->
+    <select id="getIdByCountryStateCity" resultType="integer">
+        SELECT id FROM city
+        WHERE (country_id = #{countryId}
+                   AND (state_cn = #{stateCn} OR state_en = #{stateEn})
+                   AND (name_cn = #{cityCn} OR name_en = #{cityEn}))
+    </select>
+
+    <!--根据countryId和cityName确定对应的city表id值，适用于省名为空的情况。-->
+    <select id="getIdByCountryCity" resultType="integer">
+        SELECT id FROM city
+        WHERE (country_id = #{countryId} AND (name_cn = #{cityCn} OR name_en = #{cityEn}))
+    </select>
+
+    <!--通过cityId得到City-->
+    <select id="getCityByCityId" resultType="xuegao.practice.openNote.entity.City">
+        SELECT * FROM open_note.city WHERE id = #{cityId}
+    </select>
+
+    <!--负责映射中文版的城市信息-->
+    <resultMap id="cityDtoCnMap" type="xuegao.practice.openNote.dto.CityDto">
+        <id column="id" property="id"/><!--用id标签指定主键，MyBaits底层会有优化。-->
+        <result column="country_id" property="countryId"/>
+        <result column="state_cn" property="stateCn"/>
+        <result column="name_cn" property="nameCn"/>
+        <!--
+            使用分步查询得到city。column：将指定列的值传入该方法。select：指定该属性使用的查询方法。
+            fetchType可以灵活的设置查询是否需要使用延迟加载，而不受全局配置影响。
+        -->
+        <association column="country_id" property="countryDto" select="xuegao.practice.openNote.dao.CountryMapper.getNameCnByCountryId" fetchType="eager"/>
+    </resultMap>
+    <select id="getCityCnByCityId" resultMap="cityDtoCnMap">
+        SELECT id, country_id, state_cn, name_cn FROM open_note.city WHERE id = #{cityId}
+    </select>
+
+    <!--通过countryId得到匹配的省份集合-->
+    <select id="getStateCnSetByCountryId" resultType="string">
+        SELECT state_cn FROM city WHERE country_id = #{countryId}
+    </select>
+
+    <!--通过省名得到有哪些市-->
+    <select id="getCityCnSetByStateCn" resultType="string">
+        SELECT name_cn FROM city WHERE state_cn = #{stateCn}
+    </select>
+
+    <!--根据countryId得到匹配的省市信息-->
+    <select id="getCityListByCountryId" resultType="xuegao.practice.openNote.entity.City">
+        SELECT state_cn, name_cn FROM city WHERE country_id = #{countryId}
+    </select>
+</mapper>

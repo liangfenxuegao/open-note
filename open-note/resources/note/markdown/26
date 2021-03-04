@@ -1,0 +1,794 @@
+# 符号
+
+## 声明
+
+**import**
+
+参考文章：https://www.cnblogs.com/chenkeyu/p/7716857.html 。
+
+*关于import static：*
+
+import static静态导入是JDK1.5中的新特性。一般我们导入一个类都用`import 包名.类名;`，而静态导入是这样`import static 包名.类名.*;`。
+
+这里的多了个static，还有就是类名后面多了个 .*  。意思是导入这个类里的静态成员（静态方法、静态变量）。当然，也可以只导入某个静态方法，只要把 .*  换成静态方法名就行了。然后在这个类中，就可以直接用方法名调用静态方法，而不必用“类名.方法名（）” 的方式来调用。
+
+注意事项：
+
+1. 静态导入可能会让代码更加难以阅读。
+2. 如果同时导入的两个类中又有重命名的静态成员，会出现编译器错误。例如Integer类和Long类的MAX_VALUE。
+3. 可以导入的静态成员包括静态对象引用、静态常量和静态方法。
+
+## 修饰符
+
+**static**
+
+static静态代码块优先于其他静态方法调用：
+
+```java
+static{}
+```
+
+**final**
+
+当类中有final修饰的对象，它将不能被继承。
+
+## 类型
+
+**<?>**
+
+不确定类型，来传进类就是什么类。
+
+# 对象
+
+## 概念
+
+**PO**
+
+(persistant object) 持久对象。
+
+在 o/r 映射的时候出现的概念，如果没有 o/r 映射，没有这个概念存在了。通常对应数据模型 ( 数据库 ),  本身还有部分业务逻辑的处理。可以看成是与数据库中的表相映射的 java 对象。最简单的 PO 就是对应数据库中某个表中的一条记录，多个记录可以用 PO 的集合。 PO 中应该不包含任何对数据库的操作。
+
+**DO**
+
+（Domain Object）领域对象。
+
+就是从现实世界中抽象出来的有形或无形的业务实体。
+
+**TO**
+
+(Transfer Object) 数据传输对象。
+
+不同的应用程序之间传输的对象。
+
+**DTO**
+
+（Data Transfer Object）数据传输对象。
+
+这个概念来源于J2EE的设计模式，原来的目的是为了EJB的分布式应用提供粗粒度的数据实体，以减少分布式调用的次数，从而提高分布式调用的性能和降低网络负载，但在这里，我泛指用于展示层与服务层之间的数据传输对象。
+
+**VO**
+
+(value object) 值对象。
+
+VO 在领域模型中一般指 ValueObject 值对象，即保存k-v 值的对象。在 web 层中也有人把 VO用作 ViewObject 作为给视图层传输供数据的对象（ViewObject 一般也都是 ValueObject）。
+
+**BO**
+
+(business object) 业务对象。
+
+从业务模型的角度看 , 见 UML 元件领域模型中的领域对象。封装业务逻辑的 java 对象 , 通过调用 DAO 方法 , 结合 PO,VO  进行业务操作。 business object: 业务对象 主要作用是把业务逻辑封装为一个对象。这个对象可以包括一个或多个其它的对象。  比如一个简历，有教育经历、工作经历、社会关系等等。 我们可以把教育经历对应一个 PO ，工作经历对应一个 PO ，社会关系对应一个 PO 。  建立一个对应简历的 BO 对象处理简历，每个 BO 包含这些 PO 。 这样处理业务逻辑时，我们就可以针对 BO 去处理。
+
+**POJO**
+
+(plain ordinary java object) 简单无规则 java 对象。
+
+传统意义的 java 对象。就是说在一些 Object/Relation Mapping 工具中，能够做到维护数据库表记录的  persisent object 完全是一个符合 Java Bean 规范的纯 Java 对象，没有增加别的属性和方法。我的理解就是最基本的  Java Bean ，只有属性字段及 setter 和 getter 方法。POJO是DO/DTO/BO/VO的统称。
+
+**DAO**
+
+(data access object) 数据访问对象。
+
+是一个 sun 的一个标准 j2ee 设计模式， 这个模式中有个接口就是 DAO  ，它负责持久层的操作。为业务层提供接口。此对象用于访问数据库。通常和 PO 结合使用， DAO 中包含了各种数据库的操作方法。通过它的方法 ,  结合 PO 对数据库进行相关的操作。夹在业务逻辑与数据库资源中间。配合 VO， 提供数据库的 CRUD 操作。
+
+## 继承与多态
+
+**继承：**
+
+所有的父类的成员，包括变量和方法，都成为了子类的成员，除了构造方法。构造方法是父类所独有的，因为它们的名字就是类的名字，所以父类的构造方法在子类中不存在。除此之外，子类继承得到了父类所有的成员。
+
+但是得到不等于可以随便使用。每个成员有不同的访问属性，子类继承得到了父类所有的成员，但是不同的访问属性使得子类在使用这些成员时有所不同：有些父类的成员直接成为子类的对外的界面，有些则被深深地隐藏起来，即使子类自己也不能直接访问。下表列出了不同访问属性的父类成员在子类中的访问属性：
+
+| 父类成员访问属性 | 在父类中的含义                     | 在子类中的含义                                               |
+| :--------------- | :--------------------------------- | :----------------------------------------------------------- |
+| public           | 对所有人开放                       | 对所有人开放                                                 |
+| protected        | 只有包内其它类、自己和子类可以访问 | 只有包内其它类、自己和子类可以访问                           |
+| 默认             | 只有包内其它类可以访问             | 如果子类与父类在同一个包内：只有包内其它类可以访问。否则：相当于private，不能访问。 |
+| private          | 只有自己可以访问                   | 不能访问                                                     |
+
+在构造一个子类的对象时，父类的构造方法也是会被调用的，而且父类的构造方法在子类的构造方法之前被调用。在程序运行过程中，子类对象的一部分空间存放的是父类对象。因为子类从父类得到继承，在子类对象初始化过程中可能会使用到父类的成员。所以父类的空间正是要先被初始化的，然后子类的空间才得到初始化。在这个过程中，如果父类的构造方法需要参数，如何传递参数就很重要了。
+
+super()：
+
+- 用于寻找没有参数的构造器，如果括号内有参数，则寻找有参数的构造函数。
+
+**多态和向上造型：**
+
+参考文章：
+
+- https://blog.csdn.net/Q2556338777/article/details/102037451
+
+对象变量可以保存其声明的类型的对象,或该类型的任何子类型的对象。
+
+Java中保存对象类型的变量是多态变量。“多态”这个术语(字面意思是许多形态)是指一个变量可以保存不同类型(即其声明的类型或任何子类型)的对象。
+
+多态变量：
+
+- Java的对象变量是多态的，它们能保存不知一种类型的对象。
+- 它们可以保存的是声明类型的对象，或声明类型的子类的对象。
+- 当把子类的对象赋给弗雷的变量的时候，就发生了向上造型。
+
+造型：
+
+- 子类的对象可以赋值给父类的变量。父类的对象不可以赋值给子类的变量。但可以用“造型”，造型不是“类型转换”。例子如下：
+
+  - ```java
+    Vechicle v;//Car的父类
+    Car c;
+    c = (Car)v;//通过造型将父类对象造型为子类对象
+    ```
+
+- 运行时有机制来检查这样的转化是否合理，即`ClassCastException`。
+
+- 向上造型：
+
+  - 把子类的对象当作父类的对象来用。
+
+  - 向上造型是默认的，不需要运算符。
+
+  - 向上造型总是安全的。
+
+  - 向上造型并不会丢失子类的属性和方法，但是会无法使用。但可以用造型重新变为子类。
+
+  - 例子：
+
+    - ```java
+      parent p = new child();//parent是父类，child是子类。
+      //通过造型将父类对象造型为子类对象
+      (child)p;
+      ```
+
+# 流程控制
+
+## 异常处理
+
+**try catch语句**
+
+Exception e用于捕捉指定类型的错误。finally是可选的。
+
+```java
+try{
+	//尝试执行try内的代码
+}catch(Exception e){
+    e.printStackTrace();//打印错误日志
+	//若出现异常则执行catch的代码
+}finally{
+    //无论如何都会执行
+}
+```
+
+# 线程进程
+
+## Thread
+
+**sleep()**
+
+令线程沉睡，单位为毫秒。
+
+# 方法
+
+## 判断方法
+
+**IsEmpty()**
+
+IsEmpty()是Java中用于判断某种容器是否有元素的系统库函数。如用来判断ArrayList，HashSet，HashMap是否有元素等。
+
+## 构造函数相关
+
+**Super()**
+
+用于寻找没有参数的构造器，如果括号内有参数，则寻找有参数的构造函数。
+
+**注意事项**
+
+创建带参构造前一定要先创建空参构造，因为很多框架的反射之源就是空参构造器。
+
+## 日期
+
+参考文章：
+
+- https://www.cnblogs.com/convict/p/8759014.html
+- https://blog.csdn.net/weixin_38405253/article/details/100765007
+
+**不推荐的旧方法：**
+
+Calendar：
+
+- ```java
+  Calendar now = Calendar.getInstance();
+  System.out.println("年：" + now.get(Calendar.YEAR));
+  System.out.println("月：" + (now.get(Calendar.MONTH) + 1));
+  System.out.println("日：" + now.get(Calendar.DAY_OF_MONTH));
+  System.out.println("时：" + now.get(Calendar.HOUR_OF_DAY));
+  System.out.println("分：" + now.get(Calendar.MINUTE));
+  System.out.println("秒：" + now.get(Calendar.SECOND));
+  ```
+
+Date：
+
+- ```java
+  Date d = new Date();
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  System.out.println("当前时间：" + sdf.format(d));
+  ```
+
+不推荐的原因：
+
+- 需要使用SimpleDateFormat对时间进行格式化，但SimpleDateFormat是线程不安全的。
+- calendar是共享变量，并且这个共享变量没有做线程安全控制。当多个线程同时使用相同的SimpleDateFormat对象【如用static修饰的SimpleDateFormat】调用format方法时，多个线程会同时调用calendar.setTime方法，可能一个线程刚设置好time值另外的一个线程马上把设置的time值给修改了导致返回的格式化时间可能是错误的。
+- 在多并发情况下使用SimpleDateFormat需格外注意SimpleDateFormat除了format是线程不安全以外，parse方法也是线程不安全的。parse方法实际调用 alb.establish(calendar).getTime()方法来解析，alb.establish(calendar)方法里主要完成了。
+  - 重置日期对象cal的属性值。
+  - 使用calb中中属性设置cal。
+  - 返回设置好的cal对象。
+- 但是这三步不是原子操作。
+
+**JDK1.8新增：**
+
+LocalDateTime：
+
+- ```java
+  LocalDateTime nowDateTime = LocalDateTime.now();
+  System.out.println(nowDateTime);
+  DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+  System.out.println(dateTimeFormatter.format(nowDateTime));
+  // 反着使用也可以
+  System.out.println(nowDateTime.format(dateTimeFormatter));
+  ```
+
+LocalDate：
+
+- ```java
+  LocalDate nowDate = LocalDate.now();
+  System.out.println(nowDate);
+  DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  System.out.println(dateFormatter.format(nowDate));
+  // 反着使用也可以
+  System.out.println(nowDate.format(dateFormatter));
+  ```
+
+LocalTime：
+
+- ```java
+  LocalTime nowTime = LocalTime.now();
+  System.out.println(nowTime);
+  DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+  System.out.println(timeFormatter.format(nowTime));
+  // 反着使用也可以
+  System.out.println(nowTime.format(timeFormatter));
+  ```
+
+
+
+# 数据结构
+
+## 字面量
+
+**Integer**
+
+Integer是java为int提供的封装类。int的默认值为0， 而Integer的默认值为null，即Integer可以区分出未赋值和值为0的区别，int则无法表达出未赋值的情况，例如，要想表达出没有参加考试和考试成绩为0的区别，则只能使用Integer。
+
+ 在JSP开发中，Integer的默认为null，所以用el表达式在文本框中显示时，值为空白字符串，而int默认的默认值为0，所以用el表达式在文本框中显示时，结果为0，所以，int不适合作为web层的表单数据的类型。 
+
+在Hibernate中，如果将OID定义为Integer类型，那么Hibernate就可以根据其值是否为null而判断一个对象是否是临时的 ，如果将OID定义为了int类型，还需要在hbm映射文件中设置其unsaved-value属性为0。 
+
+另外，Integer提供了多个与整数相关的操作方法，例如，将一个字符串转换成整数，Integer中还定义了表示整数的最大值和最小值的常量。
+
+## 容器
+
+**String**
+
+不可修改的字符串对象。
+
+得到String的长度（设从string字符串里取值）：
+
+- string.length()
+
+访问String里的字符（设从string字符串里取值）：
+
+- string.charAt(index)
+  - 返回index上的字符。
+  - index的范围是0到string.length()-1。
+- 不能用for-each来遍历字符串。
+
+**String[]**
+
+```java
+String[] supportedFileTypes = {"markdown","docx"};
+```
+
+**StringBuffer**
+
+可以不断修改的String对象，且线程安全，但速度比StringBuilder慢。适用多线程下在字符缓冲区进行大量操作的情况。
+
+```java
+StringBuffer stringBuffer = new StringBuffer();
+```
+
+**StringBuilder**
+
+可以不断修改的String对象，但线程不安全，速度比StringBuffer快。适用于单线程下在字符缓冲区进行大量操作的情况。
+
+```java
+StringBuilder stringBuilder = new StringBuilder();//实例化StringBuilder对象
+stringBuilder.append("123");//使用append向该对象添加字符
+```
+
+注意StringBuilder的构造函数是可以填写参数的，能直接写入实例化对象的初始化数据，以及最大长度。
+
+```java
+StringBuilder stringBuilder = new StringBuilder(6);//设置最大长度为6
+StringBuilder stringBuilder = new StringBuilder("Hello");//设置初始内容为Hello
+StringBuilder stringBuilder = new StringBuilder("Hello",10);//设置初始内容为Hello并设置最大长度为10
+```
+
+StringBuilder与String类型互转：
+
+- StringBuilder转为String。StringBuilder有toString()方法，是要对StringBuilder对象使用toString()方法即可转为String类型。
+- String转为StringBuilder。StringBuilder有入参类型为String的构造函数，只要new StringBuilder(String类型对象)即可。
+
+**Set**
+
+HashSet的实例化方法（type表示类型）：
+
+- ```java
+  Set<type> set = new HashSet<>();
+  ```
+
+
+**Vector**
+
+Vector 类实现了一个动态数组。和 ArrayList 很相似，但是两者是不同的：
+
+- Vector 是同步访问的。
+- Vector 包含了许多传统的方法，这些方法不属于集合框架。
+
+Vector 主要用在事先不知道数组的大小，或者只是需要一个可以改变大小的数组的情况。
+
+**ArrayList**
+
+ArrayList 类是一个可以动态修改的数组，与普通数组的区别就是它是没有固定大小的限制，我们可以添加或删除元素。
+
+ArrayList 继承了 AbstractList ，并实现了 List 接口。
+
+**Map**
+
+HashMap的创建方法（type表示类型）：
+
+- ```java
+  Map<type,type> map = new HashMap<>();
+  ```
+
+方法：
+
+- map.put(key, value)。填入key和value，当key存在的时候，会覆盖掉原来的value并返回旧value。
+- map.containsKey(key)。填入key值，判断map中是否有相同的键值。
+- map.keySet()。Map接口提供keySet()方法，可以获取所有key到一个set集合，因为map中的key本身就是set集合，所以和set集合中的特性是一样的。
+
+# I/O
+
+## 终端
+
+**Scanner**
+
+当程序需要从终端得到输入时调用该语句。
+
+```java
+Scanner in = new Scanner(System.in)
+```
+
+## 路径
+
+**路径**
+
+- 相对路径：不以`/`开头的路径将从Java项目开始查找。使用项目内的路径，打成jar包后会找不到的。
+- 绝对路径：以`/`开头的路径将从所在磁盘开始查找。
+
+将程序打为JAR包后，需要注意的是，==由于.jar文件是个单独的文件，所以不能直接访问到内部的文件，需要用ClassLoader来读取jar包中的文件。==						
+
+**类路径**
+
+classpath和classpath\*区别： 
+
+- classpath：只会到你的class路径中查找找文件。 
+- classpath\*：不仅包含class路径，还包括jar文件中（class路径）进行查找。
+
+## JAR文件
+
+**读取jar包内的文件：**
+
+参考文件：https://blog.csdn.net/u013467442/article/details/88807557 。
+
+之所以不能读取Jar包中的文件，这主要是因为jar包是一个单独的文件而非文件夹，绝对不可能通过`file:/e:/.../ResourceJar.jar/resource /res.txt`这种形式的文件URL来定位`res.txt`。所以即使是相对路径，也无法定位到jar文件内的txt文件。
+ 我们可以用类装载器(ClassLoader)来读取jar包中的文件。
+ 我们需要利用`this.getClass().getResourceAsStream`方法，以流的形式拿到Jar包中的文件,正确写法如下所示：
+
+```java
+BufferedReader in = new BufferedReader(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(path)));
+StringBuffer buffer = new StringBuffer();
+String line = "";
+while ((line = in.readLine()) != null){
+    buffer.append(line);
+}
+String input = buffer.toString();
+```
+
+**往jar包添加文件：**
+
+jar 本身的压缩算法就是zip，所以只能新建压缩文件来解决：
+
+1. 新建一个tmp文件。
+2. 打开原来的jar，当然是解压缩的。
+3. 以zip压缩写入新文件。
+4. 继续把新的文件写入新文件。
+5. 关闭老文件，删除老文件。
+6. 关闭新文件，更名为老文件
+
+因为算法需要统计计算，数据前后之间不是独立的，有内部的算法关系，所以无法直接在后面追加。 	
+
+## 写入文件
+
+参考文章：
+
+- https://www.cnblogs.com/x_wukong/p/4679116.html
+
+**FileWrtter：**
+
+FileWritter，字符流写入字符到文件。默认情况下，它会使用新的内容取代所有现有的内容，然而，当指定一个true （布尔）值作为FileWritter构造函数的第二个参数，它会保留现有的内容，并追加新内容在文件的末尾。
+
+1. 替换所有现有的内容与新的内容。
+
+   - ```java
+     new FileWriter(file);
+     ```
+
+2. 保留现有的内容和附加在该文件的末尾的新内容。
+
+   - ```java
+     new FileWriter(file,true);
+     ```
+
+追加文件示例 ：
+
+- 一个名为“javaio-appendfile.txt”的文件，已经含有：“ABC Hello”内容。
+
+- ```java
+  package com.yiibai.file;
+  
+  import java.io.File;
+  import java.io.FileWriter;
+  import java.io.BufferedWriter;
+  import java.io.IOException;
+  
+  public class AppendToFileExample {
+      public static void main( String[] args ){ 
+          try{
+              String data = " This content will append to the end of the file";
+  
+              File file =new File("javaio-appendfile.txt");
+  
+              //if file doesnt exists, then create it
+              if(!file.exists()){
+                  file.createNewFile();
+              }
+  
+              //true = append file
+              FileWriter fileWritter = new FileWriter(file.getName(),true);
+              fileWritter.write(data);
+              fileWritter.close();
+  
+              System.out.println("Done");
+  
+          }catch(IOException e){
+              e.printStackTrace();
+          }
+      }
+  }
+  ```
+
+- 运行后，文本文件“javaio-appendfile.txt”内容更新如下：“ABC Hello This content will append to the end of the file”。
+
+**BufferedWriter**
+
+缓冲字符（BufferedWriter ）是一个字符流类来处理字符数据。不同于字节流（数据转换成字节），你可以直接写字符串，数组或字符数据保存到文件。
+
+```java
+package com.yiibai.iofile;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class WriteToFileExample {
+    public static void main(String[] args) {
+        try {
+
+            String content = "This is the content to write into file";
+
+            File file = new File("/users/mkyong/filename.txt");
+
+            // if file doesnt exists, then create it
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(content);
+            bw.close();
+
+            System.out.println("Done");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+**FileOutputStream**
+
+文件输出流是一种用于处理原始二进制数据的字节流类。为了将数据写入到文件中，必须将数据转换为字节，并保存到文件。请参阅下面的完整的例子。
+
+```java
+public static void main(String[] args) {
+	File file = new File("d:\\read.txt");
+	FileOutputStream outputStream;
+	try {
+		outputStream = new FileOutputStream(file);
+		outputStream.write("Hello World！".getBytes());
+		outputStream.close();
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+}
+```
+
+## 读取文件
+
+参考文章：
+
+- https://www.cnblogs.com/stupid-vincent/p/8461974.html
+- https://www.cnblogs.com/lovebread/archive/2009/11/23/1609122.html
+
+按字节读取，常用于二进制文件，例如图片、音频、视频等：
+
+```java
+try{
+    InputStream is = new FileInputStream(strFile);
+    int iAvail = is.available();
+    byte[] bytes = new byte[iAvail];
+    is.read(bytes);
+    logger.info("文件内容:\n" + new String(bytes));
+    is.close();
+}catch(Exception e){
+    e.printStackTrace();
+}
+```
+
+按行读取：
+
+```java
+try {
+    BufferedReader in = new BufferedReader(new FileReader("test.log"));
+    String str;
+    while ((str = in.readLine()) != null) {
+        System.out.println(str);
+    }
+    System.out.println(str);
+} catch (IOException e) {
+}
+```
+
+# 脚本管理
+
+参考文章：https://blog.csdn.net/jianggujin/article/details/51046122 。
+
+在JDK1.6中为我们提供了一个ScriptEngineManager类，ScriptEngineManager为ScriptEngine类实现一个发现和实例化机制，还维护一个键值对集合来存储所有Manager创建的引擎共享的状态。此类使用服务提供者机制枚举所有的ScriptEngineFactory实现。
+
+ScriptEngineManager提供了一个方法，可以返回一个所有工厂实现和基于语言名称、文件拓展命和mime类型查找工厂的实用方法所组成的数组。
+
+键/值对的Bindings（即由管理器维护的“Global Scope”）对于ScriptEngineManager创建的所有ScriptEngine实例都是可用的。Bindings中的值通常公开于所有脚本中。
+
+通过上面的描述，我们就应当知道了，需要时用到的类为ScriptEngineManager和ScriptEngine。
+
+**我们先来看一下ScriptEngineManager：**
+
+构造方法如下：
+
+| 方法名                                  | 说明                                                         |
+| --------------------------------------- | ------------------------------------------------------------ |
+| ScriptEngineManager()                   | 如果调用者可访问线程上下文 ClassLoader，则调用此构造方法的效果与调用 ScriptEngineManager(Thread.currentThread().getContextClassLoader()) 相同 |
+| ScriptEngineManager(ClassLoader loader) | 此构造方法使用服务调用者机制加载对于给定 ClassLoader 可见的 ScriptEngineFactory 实现 |
+
+方法摘要如下：
+
+| 返回值                      | 方法名                                                       | 说明                                                         |
+| --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Object                      | get(String key)                                              | 获取 Global Scope 中指定键的值                               |
+| Bindings                    | getBindings()                                                | getBindings                                                  |
+| ScriptEngine                | getEngineByExtension(String extension)                       | 查找并创建一个给定扩展的 ScriptEngine                        |
+| ScriptEngine                | getEngineByMimeType(String mimeType)                         | 查找并创建一个给定 mime 类型的 ScriptEngine                  |
+| ScriptEngine                | getEngineByName(String shortName)                            | 查找并创建一个给定名称的 ScriptEngine                        |
+| `List<ScriptEngineFactory>` | getEngineFactories()                                         | 返回一个数组，该数组的元素是发现机制找到的所有 ScriptEngineFactory 类的实例 |
+| void                        | put(String key, Object value)                                | 设置 Global Scope 中指定的键/值对                            |
+| void                        | registerEngineExtension(String extension, ScriptEngineFactory factory) | 注册一个 ScriptEngineFactory 来处理扩展                      |
+| void                        | registerEngineMimeType(String type, ScriptEngineFactory factory) | 注册一个 ScriptEngineFactory 来处理 mime 类型。              |
+| void                        | registerEngineName(String name, ScriptEngineFactory factory) | 注册一个ScriptEngineFactory 来处理语言名称                   |
+| void                        | setBindings(Bindings bindings)                               | setBindings 存储 globalScope 字段中的指定 Bindings           |
+
+**再来看下，JDK为我们提供了哪些可用的脚本引擎工厂：**
+
+可用如下代码测试：
+
+```java
+//查看JDK为我们提供了哪些可用的脚本引擎工厂
+@Test
+public void getScriptEngineFactory() {
+    ScriptEngineManager manager = new ScriptEngineManager();
+    List<ScriptEngineFactory> factories = manager.getEngineFactories();
+    for (ScriptEngineFactory factory : factories) {
+        System.out.println(factory.getNames());
+    }
+}
+```
+
+运行结果：`[nashorn, Nashorn, js, JS, JavaScript, javascript, ECMAScript, ecmascript]`。
+
+通过控制台输出的结果，我们知道JDK已经为我们实现了js相关的脚本引擎，我们直接使用就可以了，解决了引擎的问题，下面我们再来看看脚本引擎如何使用，这就需要`ScriptEngine`了。
+
+**ScriptEngine：**
+
+ScriptEngine是基础接口，该接口的方法在此规范的每个实现中都必须具有完整的功能。 
+这些方法提供基本的脚本功能。为这个简单接口编写的应用程序应该对每个实现稍做修改就能够运行。这包括执行脚本的方法，以及设置和获取值的方法。 
+这些值是两种类型的键/值对。组成第一种类型的键/值对中的键是此规范或个别实现中保留和定义的键。包含保留键的键/值对中的值具有指定的含义。 
+另一种类型由那些创建 Java 语言 Bindings 的键/值对组成，值通常通过相应键或其装饰的形式用脚本表示。
+
+ScriptEngine 的方法摘要：
+
+| 返回值              | 方法名                                     | 说明                                                         |
+| ------------------- | ------------------------------------------ | ------------------------------------------------------------ |
+| Bindings            | createBindings()                           | 返回一个未初始化的 Bindings                                  |
+| Object              | eval(Reader reader)                        | 除了脚本的源是以 Reader 形式提供的外，与 eval(String) 相同   |
+| Object              | eval(Reader reader, Bindings n)            | 除了脚本的源是以 Reader 形式提供的外，与 eval(String, Bindings) 相同 |
+| Object              | eval(Reader reader, ScriptContext context) | 与 eval(String, ScriptContext) 相同，其中脚本的源是从 Reader 读取的 |
+| Object              | eval(String script)                        | 执行指定的脚本                                               |
+| Object              | eval(String script, Bindings n)            | 执行脚本，脚本执行期间使用 Bindings 参数作为 ScriptEngine 的 ENGINE_SCOPE Bindings |
+| Object              | eval(String script, ScriptContext context) | 立即执行脚本，该脚本的源是作为第一个参数传递的 String        |
+| Object              | get(String key)                            | 获取在此引擎的状态中设置的值                                 |
+| Bindings            | getBindings(int scope)                     | 返回指定值的范围                                             |
+| ScriptContext       | getContext()                               | 返回 ScriptEngine 的默认 ScriptContext，在没有指定 ScriptContext 时，该 ScriptEngine 的 Bindings、Reader 和 Writer 被用于脚本执行 |
+| ScriptEngineFactory | getFactory()                               | 返回此 ScriptEngine 所属的类的 ScriptEngineFactory           |
+| void                | put(String key, Object value)              | 设置 ScriptEngine 的状态中的键/值对，它创建一个将在脚本执行中使用或者以其他方式使用的 Java Language Binding，具体取决于该键是否被保留 |
+| void                | setBindings(Bindings bindings, int scope)  | 设置将由脚本使用的指定值的范围。                             |
+| void                | setContext(ScriptContext context)          | 设置 ScriptEngine 的默认 ScriptContext，在没有指定 ScriptContext 时，该 ScriptEngine 的 Bindings、Reader 和 Writer 被用于脚本执行 |
+
+**具体使用：**
+
+执行一段简单的js表达式：
+
+- ```java
+  @Test
+  public void invokeExpression() throws ScriptException {
+      ScriptEngineManager manager = new ScriptEngineManager();
+      ScriptEngine engine = manager.getEngineByName("js");
+      String js = "1 + 2";
+      Integer result = (Integer) engine.eval(js);
+      System.out.println(result);
+  }
+  ```
+
+- 运行此段代码，注意会收到一段警告：`Warning: Nashorn engine is planned to be removed from a future JDK release`。==事实上Nashorn JavaScript Engine 在 Java 15 已经不可用了。==计划中的代替品是GraalVM.js。
+
+执行JS函数：
+
+- ```java
+  @Test
+  public void invokeFunction() throws ScriptException, NoSuchMethodException {
+      ScriptEngineManager manager = new ScriptEngineManager();
+      ScriptEngine engine = manager.getEngineByName("js");
+      String js = "function welcome(){return 'welcome';}";
+      engine.eval(js);
+      Invocable invocable = (Invocable) engine;
+      String result = (String) invocable.invokeFunction("welcome");
+      System.out.println(result);
+  }
+  ```
+
+- 运行结果：`welcome`。
+
+这里我们用到了`Invocable`接口，`Invocable`由 ScriptEngines 实现的可选接口，该 ScriptEngines 的方法允许在以前执行过的脚本中调用程序。当然啦，我们不仅能执行函数，还可以传递参数：
+
+- ```java
+  @Test
+  public void invokeFunctionWithParam() throws ScriptException, NoSuchMethodException {
+      ScriptEngineManager manager = new ScriptEngineManager();
+      ScriptEngine engine = manager.getEngineByName("js");
+      String js = "function welcome(name){return 'welcome ' + name;}";
+      engine.eval(js);
+      Invocable invocable = (Invocable) engine;
+      //执行welcome方法，放入“雪糕”参数。
+      String result = (String) invocable.invokeFunction("welcome", "雪糕");
+      System.out.println(result);
+  }
+  ```
+
+- 运行结果：`welcome 雪糕`。
+
+将Java对象注入到JS代码中运行：
+
+- ```java
+  @Test
+  public void inject() throws ScriptException, NoSuchMethodException {
+      ScriptEngineManager manager = new ScriptEngineManager();
+      ScriptEngine engine = manager.getEngineByName("js");
+      Date date = new Date();
+      System.out.println(date.getTime());
+      engine.put("date", date);
+      String js = "function getTime(){return date.getTime();}";
+      engine.eval(js);
+      Invocable invocable = (Invocable) engine;
+      Double result = (Double) invocable.invokeFunction("getTime");
+      System.out.println(result);
+  }
+  ```
+
+- 运行结果：
+
+  - ```
+    1612445107275
+    1.612445107275E12
+    ```
+
+Java通过线程启动JS函数：
+
+- ```java
+  //注意不要再用@Test，而是直接在其它地方调用本方法。
+  public void runThread() throws ScriptException, NoSuchMethodException {
+      ScriptEngineManager manager = new ScriptEngineManager();
+      ScriptEngine engine = manager.getEngineByName("js");
+      engine.put("out", System.out);
+      String js = "var obj = new Object(); obj.run = function(){out.println('thread...')}";
+      engine.eval(js);
+      Object obj = engine.get("obj");
+      Invocable inv = (Invocable) engine;
+      Runnable r = inv.getInterface(obj, Runnable.class);
+      Thread t = new Thread(r);
+      t.start();
+  }
+  ```
+
+# 其它
+
+## 转义字符
+
+| 转义字符 | 含义                                                         |
+| -------- | ------------------------------------------------------------ |
+| \t       | 到下一个表格位                                               |
+| \b       | 回退一格                                                     |
+| \n       | 换行                                                         |
+| \r       | 回车                                                         |
+| \\\\     | 表本身的意思，反斜杠后紧接的字符，都是表本身的含义，例如还可以\\"、\\'等。 |
+
+## POI
+
+处理Mcriosoft office系列软件。
